@@ -11,7 +11,15 @@ export const useAuth = () => {
       setLoading(false);
     });
 
-    return () => unsubscribe();
+    // Add a delay to ensure the loading spinner is visible for a minimum amount of time
+    const delay = setTimeout(() => {
+      setLoading(false);
+    }, 2000); // 2 seconds delay
+
+    return () => {
+      unsubscribe();
+      clearTimeout(delay);
+    };
   }, []);
 
   return { user, loading };
