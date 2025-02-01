@@ -13,10 +13,10 @@ function DashBoard() {
     if (hour < 18) {
       return 'Good Afternoon';
     }
-    return 'Good Evening';
+    return 'Good Night';
   };
 
-  const username = user.displayName;
+  const username = user?.displayName || 'User';
 
   return (
     <div>
