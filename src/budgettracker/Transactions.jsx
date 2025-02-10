@@ -1,8 +1,8 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { UserContext } from '../context/UserContext';
-import { collection, query, where, getDocs, addDoc } from 'firebase/firestore';
+import { collection, query, where, getDocs, addDoc, doc, updateDoc, getDoc } from 'firebase/firestore';
 import { db } from '../config/firebase';
-import AddTransactionModal from './AddTransactionModal';
+import AddTransactionModal from './modals/AddTransactionModal';
 import AddTransactionButton from './AddTransactionButton';
 import { Table, Tag } from 'antd';
 import {
@@ -15,6 +15,8 @@ const Transactions = () => {
   const { user } = useContext(UserContext);
   const [transactions, setTransactions] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [cardDetails, setCardDetails] = useState({ balance: 0 });
+  const [walletDetails, setWalletDetails] = useState({ balance: 0 });
 
   // Income Categories
   const incomeCategories = [
@@ -60,6 +62,22 @@ const Transactions = () => {
 
   useEffect(() => {
     if (user) {
+      const fetchDetails = async () => {
+        const cardDoc = await getDoc(doc(db, 'cardDetails', user.uid));
+        const walletDoc = await getDoc(doc(db, 'walletDetails', user.uid));
+        if (cardDoc.exists()) {
+          setCardDetails(cardDoc.data());
+        }
+        if (walletDoc.exists()) {
+          setWalletDetails(walletDoc.data());
+        }
+      };
+      fetchDetails();
+    }
+  }, [user]);
+
+  useEffect(() => {
+    if (user) {
       const fetchTransactions = async () => {
         const q = query(collection(db, 'transactions'), where('userId', '==', user.uid));
         const querySnapshot = await getDocs(q);
@@ -78,6 +96,42 @@ const Transactions = () => {
         date: new Date(transaction.date).toISOString(),
         amount: parseFloat(transaction.amount),
       };
+
+      // Update balance based on transaction type
+      if (transaction.type === 'Income') {
+        if (transaction.paymentMethod === 'Card') {
+          const newBalance = (parseFloat(cardDetails.balance) + newTransaction.amount).toFixed(2);
+          setCardDetails((prevDetails) => ({
+            ...prevDetails,
+            balance: newBalance,
+          }));
+          await updateDoc(doc(db, 'cardDetails', user.uid), { balance: newBalance });
+        } else if (transaction.paymentMethod === 'Wallet') {
+          const newBalance = (parseFloat(walletDetails.balance) + newTransaction.amount).toFixed(2);
+          setWalletDetails((prevDetails) => ({
+            ...prevDetails,
+            balance: newBalance,
+          }));
+          await updateDoc(doc(db, 'walletDetails', user.uid), { balance: newBalance });
+        }
+      } else if (transaction.type === 'Expense') {
+        if (transaction.paymentMethod === 'Card') {
+          const newBalance = (parseFloat(cardDetails.balance) - newTransaction.amount).toFixed(2);
+          setCardDetails((prevDetails) => ({
+            ...prevDetails,
+            balance: newBalance,
+          }));
+          await updateDoc(doc(db, 'cardDetails', user.uid), { balance: newBalance });
+        } else if (transaction.paymentMethod === 'Wallet') {
+          const newBalance = (parseFloat(walletDetails.balance) - newTransaction.amount).toFixed(2);
+          setWalletDetails((prevDetails) => ({
+            ...prevDetails,
+            balance: newBalance,
+          }));
+          await updateDoc(doc(db, 'walletDetails', user.uid), { balance: newBalance });
+        }
+      }
+
       const docRef = await addDoc(collection(db, 'transactions'), newTransaction);
       setTransactions([...transactions, { id: docRef.id, ...newTransaction }]);
     }
@@ -220,13 +274,16 @@ const Transactions = () => {
           boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
         }}
       />
-      <div className="mt-4">
+      <div className="mt-4 flex justify-end">
         <AddTransactionButton onClick={() => setIsModalOpen(true)} />
       </div>
       {isModalOpen && (
         <AddTransactionModal
+          open={isModalOpen}
           onClose={() => setIsModalOpen(false)}
           onAddTransaction={handleAddTransaction}
+          cardBalance={cardDetails.balance}
+          walletBalance={walletDetails.balance}
         />
       )}
     </div>
