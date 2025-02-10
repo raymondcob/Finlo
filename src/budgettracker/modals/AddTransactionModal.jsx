@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { FaGamepad, FaWallet, FaCreditCard, FaShoppingCart, FaUtensils, FaMoneyBill, FaPiggyBank, FaHome, FaCar, FaBriefcase, FaPlane, FaGift, FaHeart, FaDumbbell, FaFilm, FaHamburger, FaWifi, FaPhone, FaChild, FaPaw, FaStethoscope, FaUniversity, FaCoins, FaChartLine, FaHandHoldingUsd } from 'react-icons/fa';
+import { FaWallet, FaCreditCard, FaShoppingCart,FaMoneyBill, FaPiggyBank, FaHome, FaCar, FaBriefcase, FaPlane, FaGift, FaHeart, FaDumbbell, FaFilm, FaHamburger, FaWifi, FaPhone, FaChild, FaPaw, FaStethoscope, FaUniversity, FaCoins, FaChartLine, FaHandHoldingUsd } from 'react-icons/fa';
 import { DatePicker, Select, Input } from 'antd';
 import moment from 'moment';
 
 const { Option } = Select;
 
-const AddTransactionModal = ({ onClose, onAddTransaction }) => {
+const AddTransactionModal = ({ onClose, onAddTransaction, cardBalance, walletBalance }) => {
   const [category, setCategory] = useState('Salary');
   const [type, setType] = useState('Income');
   const [provider, setProvider] = useState('');
@@ -165,13 +165,13 @@ const AddTransactionModal = ({ onClose, onAddTransaction }) => {
                 <Option value="Wallet" className="text-lg">
                   <div className="flex items-center gap-2">
                     <FaWallet />
-                    Wallet
+                    Wallet (Balance: ${walletBalance})
                   </div>
                 </Option>
                 <Option value="Card" className="text-lg">
                   <div className="flex items-center gap-2">
                     <FaCreditCard />
-                    Card
+                    Card (Balance: ${cardBalance})
                   </div>
                 </Option>
               </Select>
