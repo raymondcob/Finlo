@@ -5,22 +5,19 @@ import { auth } from "../../config/firebase";
 import { UserContext } from '../../context/UserContext';
 import { FaGoogle } from "react-icons/fa";
 
-
 const LoginForm = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
-  const { user, setUser } = useContext(UserContext); 
-  
-
+  const { user, setUser } = useContext(UserContext);
 
   const handleLogin = (e) => {
     e.preventDefault();
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         console.log("User signed in:", userCredential.user);
-        setUser(userCredential.user); 
+        setUser(userCredential.user);
         navigate('/dashboard');
       })
       .catch((error) => {
@@ -30,6 +27,10 @@ const LoginForm = () => {
 
   const handleGoogleLogin = () => {
     const provider = new GoogleAuthProvider();
+    provider.setCustomParameters({
+      prompt: "select_account", // Force account selection
+    });
+
     signInWithPopup(auth, provider)
       .then((result) => {
         const user = result.user;
@@ -82,7 +83,6 @@ const LoginForm = () => {
           required
           onChange={(e) => setPassword(e.target.value)}
         />
-        
       </div>
 
       {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
@@ -116,6 +116,6 @@ const LoginForm = () => {
       </p>
     </form>
   );
-}
+};
 
 export default LoginForm;
