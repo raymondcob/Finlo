@@ -46,5 +46,6 @@ Contributions are welcome! To contribute:
 This project is licensed under the [MIT License](LICENSE).
 
 ## Contact
-For any inquiries or feedback, feel free to reach out via email at **your-email@example.com**.
+For any inquiries or feedback, feel free to reach out via email at **raymondcob10@gmail.com
+**.
 
