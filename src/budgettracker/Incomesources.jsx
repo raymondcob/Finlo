@@ -33,13 +33,11 @@ const IncomeSources = () => {
   const handleAddCardDetails = async (details) => {
     await setDoc(doc(db, "cardDetails", user.uid), details);
     setCardDetails(details);
-    console.log(details);
   };
 
   const handleAddWalletDetails = async (details) => {
     await setDoc(doc(db, "walletDetails", user.uid), details);
     setWalletDetails(details);
-    console.log(details);
   };
 
   return (

@@ -1,8 +1,9 @@
+import React from "react";
 
 const WalletDetails = ({ name, balance, onSetDetails, isDetailsSet }) => {
   return (
     <div className="w-full max-w-[460px] min-w-[300px] h-[283px] flex justify-center items-center relative p-[10px] box-border">
-      <div className="w-full h-[240px] bg-gradient-to-b from-[#9a2f12] to-[#fdaa60] rounded-xl p-6 flex flex-col justify-between box-border -z-10">
+      <div className="w-full h-[240px] bg-gradient-to-b from-[#9a2f12] to-[#fdaa60] rounded-xl p-6 flex flex-col justify-between box-border ">
         <div>
           <div className="font-title text-3xl font-inter font-semibold text-[#fcfcfc]/85 mb-2">
             {name}'s Wallet
