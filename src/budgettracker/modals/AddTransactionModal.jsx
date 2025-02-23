@@ -98,7 +98,7 @@ const AddTransactionModal = ({ onClose, onAddTransaction, cardBalance, walletBal
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-10">
+    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-50">
       <div className="bg-white rounded-xl p-8 w-[900px] max-w-full mx-4">
         {/* Header */}
         <div className="flex items-center gap-3 mb-8">
