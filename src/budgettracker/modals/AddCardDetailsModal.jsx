@@ -1,27 +1,30 @@
-import React, { useState } from 'react';
-import { Modal, Input, Button } from 'antd';
+"use client"
+
+import { useState } from "react"
+import { Modal, Input, Button, Form } from "antd"
 
 const AddCardDetailsModal = ({ open, onClose, onSave }) => {
-  const [cardHolder, setCardHolder] = useState('');
-  const [validThru, setValidThru] = useState('');
-  const [cardNumber, setCardNumber] = useState('');
-  const [balance, setBalance] = useState('');
-  const [error, setError] = useState('');
+  const [form] = Form.useForm()
+  const [error, setError] = useState("")
 
   const handleSave = () => {
-    if (!cardHolder || !validThru || !cardNumber || !balance) {
-      setError('All fields are required');
-      return;
-    }
-    const details = {
-      cardHolder,
-      validThru,
-      cardNumber,
-      balance: parseFloat(balance).toFixed(2),
-    };
-    onSave(details);
-    onClose();
-  };
+    form
+      .validateFields()
+      .then((values) => {
+        const details = {
+          cardHolder: values.cardHolder,
+          validThru: values.validThru,
+          cardNumber: values.cardNumber,
+          balance: Number.parseFloat(values.balance).toFixed(2),
+        }
+        onSave(details)
+        form.resetFields()
+        onClose()
+      })
+      .catch((info) => {
+        setError("Please fill all required fields correctly")
+      })
+  }
 
   return (
     <Modal
@@ -36,45 +39,66 @@ const AddCardDetailsModal = ({ open, onClose, onSave }) => {
           Save
         </Button>,
       ]}
+      className="dark:bg-gray-800 dark:text-white"
+      styles={{
+        header: {
+          background: "var(--finance-blue-50)",
+        },
+        body: {
+          padding: "20px",
+        },
+        mask: {
+          backdropFilter: "blur(4px)",
+        },
+      }}
     >
-      <div className="mb-4">
-        <label className="block mb-2">Card Holder</label>
-        <Input
-          value={cardHolder}
-          onChange={(e) => setCardHolder(e.target.value)}
-          required
-        />
-      </div>
-      <div className="mb-4">
-        <label className="block mb-2">Valid Thru</label>
-        <Input
-          value={validThru}
-          onChange={(e) => setValidThru(e.target.value)}
-          required
-        />
-      </div>
-      <div className="mb-4">
-        <label className="block mb-2">Card Number</label>
-        <Input
-          value={cardNumber}
-          onChange={(e) => setCardNumber(e.target.value)}
-          required
-        />
-      </div>
-      <div className="mb-4">
-        <label className="block mb-2">Initial Balance</label>
-        <Input
-          value={balance}
-          onChange={(e) => setBalance(e.target.value)}
-          required
-        />
-      </div>
-      {error && <p className="text-red-500 text-sm">{error}</p>}
-      <p className="text-red-500 text-sm">
+      <Form form={form} layout="vertical" className="mt-4">
+        <Form.Item
+          name="cardHolder"
+          label="Card Holder"
+          rules={[{ required: true, message: "Please enter card holder name" }]}
+        >
+          <Input
+            placeholder="Enter card holder name"
+            className="dark:bg-gray-700 dark:text-white dark:border-gray-600"
+          />
+        </Form.Item>
+
+        <Form.Item
+          name="validThru"
+          label="Valid Thru"
+          rules={[{ required: true, message: "Please enter expiration date" }]}
+        >
+          <Input placeholder="MM/YY" className="dark:bg-gray-700 dark:text-white dark:border-gray-600" />
+        </Form.Item>
+
+        <Form.Item
+          name="cardNumber"
+          label="Card Number"
+          rules={[{ required: true, message: "Please enter card number" }]}
+        >
+          <Input placeholder="**** **** **** ****" className="dark:bg-gray-700 dark:text-white dark:border-gray-600" />
+        </Form.Item>
+
+        <Form.Item
+          name="balance"
+          label="Initial Balance"
+          rules={[
+            { required: true, message: "Please enter initial balance" },
+            { pattern: /^[0-9]+(\.[0-9]{1,2})?$/, message: "Please enter a valid amount" },
+          ]}
+        >
+          <Input placeholder="0.00" className="dark:bg-gray-700 dark:text-white dark:border-gray-600" />
+        </Form.Item>
+      </Form>
+
+      {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
+      <p className="text-red-500 text-sm mt-4">
         Note: You can only set the initial balance once. It will be updated through transactions.
       </p>
     </Modal>
-  );
-};
+  )
+}
 
-export default AddCardDetailsModal;
+export default AddCardDetailsModal
+

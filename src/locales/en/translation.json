@@ -1,0 +1,38 @@
+{
+  "navigation": {
+    "dashboard": "Dashboard",
+    "transactions": "Transactions",
+    "reports": "Reports",
+    "income": "Income Sources",
+    "savingsGoals": "Savings Goals",
+    "settings": "Settings"
+  },
+  "dashboard": {
+    "welcome": "{{greeting}}, {{username}}!",
+    "quickActions": "Quick Actions",
+    "addTransaction": "Add Transaction",
+    "viewReports": "View Reports",
+    "manageIncome": "Manage Income Sources",
+    "recentActivity": "Recent Activity",
+    "financialTips": "Financial Tips"
+  },
+  "transactions": {
+    "title": "Transactions",
+    "subtitle": "View and manage your financial transactions",
+    "category": "Category",
+    "type": "Type",
+    "provider": "Provider",
+    "paymentMethod": "Payment Method",
+    "date": "Date",
+    "amount": "Amount"
+  },
+  "savingsGoals": {
+    "title": "Savings Goals",
+    "addGoal": "Add Savings Goal",
+    "activeGoals": "Active Goals",
+    "completedGoals": "Completed Goals",
+    "noActiveGoals": "No active savings goals. Click \"Add Savings Goal\" to get started!",
+    "noCompletedGoals": "No completed savings goals yet. Keep saving!",
+    "deadline": "Deadline"
+  }
+}
