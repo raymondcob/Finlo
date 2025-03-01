@@ -1,15 +1,16 @@
-import { Routes, Route, Navigate } from 'react-router-dom';
-import LoginForm from '../components/Auth/LoginForm';
-import SignUpForm from '../components/Auth/SignUpForm';
-import DashBoard from '../budgettracker/dashboard';
-import Transactions from '../budgettracker/Transactions';
-import Reports from '../budgettracker/Reports';
-import Income from '../budgettracker/Incomesources';
-import Settings from '../budgettracker/settings';
-import PrivateRoute from './PrivateRoute';
-import MainLayout from '../components/Layout/MainLayout';
-import AuthLayout from '../components/Layout/AuthLayout';
-import { useAuth } from '../hooks/useAuth';
+import { Routes, Route, Navigate } from "react-router-dom";
+import LoginForm from "../components/Auth/LoginForm";
+import SignUpForm from "../components/Auth/SignUpForm";
+import DashBoard from "../budgettracker/dashboard";
+import Transactions from "../budgettracker/Transactions";
+import Reports from "../budgettracker/Reports";
+import Income from "../budgettracker/Incomesources";
+import Settings from "../budgettracker/settings";
+import SavingsGoals from "../budgettracker/SavingsGoals";
+import PrivateRoute from "./PrivateRoute";
+import MainLayout from "../components/Layout/MainLayout";
+import AuthLayout from "../components/Layout/AuthLayout";
+import { useAuth } from "../hooks/useAuth";
 
 const AppRoutes = () => {
   const { user } = useAuth();
@@ -34,8 +35,12 @@ const AppRoutes = () => {
         <Route path="reports" element={<Reports />} />
         <Route path="income" element={<Income />} />
         <Route path="settings" element={<Settings />} />
+        <Route path="savings-goals" element={<SavingsGoals />} />
       </Route>
-      <Route path="*" element={<Navigate to={user ? "/dashboard" : "/auth"} />} />
+      <Route
+        path="*"
+        element={<Navigate to={user ? "/dashboard" : "/auth"} />}
+      />
     </Routes>
   );
 };

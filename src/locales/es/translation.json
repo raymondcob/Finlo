@@ -1,0 +1,38 @@
+{
+  "navigation": {
+    "dashboard": "Tablero",
+    "transactions": "Transacciones",
+    "reports": "Informes",
+    "income": "Fuentes de Ingresos",
+    "savingsGoals": "Metas de Ahorro",
+    "settings": "Configuración"
+  },
+  "dashboard": {
+    "welcome": "{{greeting}}, {{username}}!",
+    "quickActions": "Acciones Rápidas",
+    "addTransaction": "Añadir Transacción",
+    "viewReports": "Ver Informes",
+    "manageIncome": "Gestionar Ingresos",
+    "recentActivity": "Actividad Reciente",
+    "financialTips": "Consejos Financieros"
+  },
+  "transactions": {
+    "title": "Transacciones",
+    "subtitle": "Ver y gestionar sus transacciones financieras",
+    "category": "Categoría",
+    "type": "Tipo",
+    "provider": "Proveedor",
+    "paymentMethod": "Método de Pago",
+    "date": "Fecha",
+    "amount": "Monto"
+  },
+  "savingsGoals": {
+    "title": "Metas de Ahorro",
+    "addGoal": "Añadir Meta de Ahorro",
+    "activeGoals": "Metas Activas",
+    "completedGoals": "Metas Completadas",
+    "noActiveGoals": "No hay metas de ahorro activas. ¡Haga clic en \"Añadir Meta de Ahorro\" para comenzar!",
+    "noCompletedGoals": "Aún no hay metas de ahorro completadas. ¡Sigue ahorrando!",
+    "deadline": "Fecha Límite"
+  }
+}
