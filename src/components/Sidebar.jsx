@@ -8,11 +8,11 @@ import { IoMdSettings } from "react-icons/io"
 import { PageTitleContext } from "../context/PageTitleContext"
 import { motion, AnimatePresence } from "framer-motion"
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi"
-import { PiTipJarLight } from "react-icons/pi";
-import {useTranslation} from 'react-i18next';
+import { PiTipJarLight } from "react-icons/pi"
+import { useTranslation } from "react-i18next"
 
 const Sidebar = ({ isOpen, onMenuClick }) => {
-  const { t } = useTranslation();
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const location = useLocation()
   const { setPageTitle } = useContext(PageTitleContext)
@@ -43,12 +43,12 @@ const Sidebar = ({ isOpen, onMenuClick }) => {
   }, [location.pathname, setPageTitle])
 
   const menuItems = [
-    { id: "dashboard", label: t('navigation.dashboard'), icon: AiFillHome, path: "/dashboard" },
-    { id: "transactions", label: t('navigation.transactions'), icon: FaMoneyBillTransfer, path: "/transactions" },
-    { id: "reports", label: t('navigation.reports'), icon: FaFileInvoiceDollar, path: "/reports" },
-    { id: "income", label: t('navigation.income'), icon: GiWallet, path: "/income" },
-    { id: "savings-goals", label: t('navigation.savingsGoals'), icon: PiTipJarLight, path: "/savings-goals" },
-    { id: "settings", label: t('navigation.settings'), icon: IoMdSettings, path: "/settings" },
+    { id: "dashboard", label: t("navigation.dashboard"), icon: AiFillHome, path: "/dashboard" },
+    { id: "transactions", label: t("navigation.transactions"), icon: FaMoneyBillTransfer, path: "/transactions" },
+    { id: "reports", label: t("navigation.reports"), icon: FaFileInvoiceDollar, path: "/reports" },
+    { id: "income", label: t("navigation.income"), icon: GiWallet, path: "/income" },
+    { id: "savings-goals", label: t("navigation.savingsGoals"), icon: PiTipJarLight, path: "/savings-goals" },
+    { id: "settings", label: t("navigation.settings"), icon: IoMdSettings, path: "/settings" },
   ]
 
   const handleMenuClick = (path, id, label) => {
@@ -67,11 +67,11 @@ const Sidebar = ({ isOpen, onMenuClick }) => {
   const sidebarVariants = {
     open: {
       width: isCollapsed ? "5rem" : "16rem",
-      transition: { type: "spring", stiffness: 300, damping: 30, duration: 0.2 },
+      transition: { duration: 0.2, ease: "easeOut" },
     },
     closed: {
       width: "0rem",
-      transition: { type: "spring", stiffness: 300, damping: 30, duration: 0.2 },
+      transition: { duration: 0.2, ease: "easeOut" },
     },
   }
 
@@ -79,22 +79,28 @@ const Sidebar = ({ isOpen, onMenuClick }) => {
     open: {
       opacity: 1,
       x: 0,
-      transition: { type: "spring", stiffness: 300, damping: 30, duration: 0.2 },
+      transition: { duration: 0.2, ease: "easeOut" },
     },
     closed: {
       opacity: 0,
       x: -20,
-      transition: { type: "spring", stiffness: 300, damping: 30, duration: 0.2 },
+      transition: { duration: 0.2, ease: "easeOut" },
     },
   }
 
   return (
     <>
-      {isMobile && isOpen && <div className="fixed inset-0 bg-black bg-opacity-50 z-20" onClick={onMenuClick} />}
+      {isMobile && isOpen && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 z-20"
+          onClick={onMenuClick}
+          style={{ backdropFilter: "blur(2px)" }}
+        />
+      )}
 
       <AnimatePresence>
         <motion.div
-          className={`fixed inset-y-0 left-0 z-30 md:relative md:z-0 min-h-[90vh] bg-white shadow-lg flex flex-col dark:bg-gray-800 dark:text-white transition-all duration-200 ease-in-out overflow-hidden`}
+          className="fixed inset-y-0 left-0 z-30 md:relative md:z-0 min-h-[90vh] bg-white shadow-lg flex flex-col dark:bg-gray-800 dark:text-white transition-all duration-200 ease-in-out overflow-hidden"
           initial={isMobile ? "closed" : "open"}
           animate={isOpen || !isMobile ? "open" : "closed"}
           variants={sidebarVariants}
@@ -128,13 +134,13 @@ const Sidebar = ({ isOpen, onMenuClick }) => {
                   animate="open"
                   className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all duration-200 ${
                     activeItem === item.id
-                      ? "bg-finance-blue-50 text-finance-blue-700 dark:bg-finance-blue-900/30 dark:text-finance-blue-300"
+                      ? "bg-finance-blue-50 text-finance-blue-700 dark:bg-finance-blue-900/30 dark:text-finance-blue-300 shadow-sm"
                       : "text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
                   }`}
                   onClick={() => handleMenuClick(item.path, item.id, item.label)}
                 >
                   <div
-                    className={`flex items-center justify-center w-8 h-8 rounded-lg ${
+                    className={`flex items-center justify-center w-8 h-8 rounded-full ${
                       activeItem === item.id
                         ? "bg-finance-blue-100 text-finance-blue-700 dark:bg-finance-blue-800 dark:text-finance-blue-300"
                         : "text-gray-500 dark:text-gray-400"
@@ -170,5 +176,5 @@ const Sidebar = ({ isOpen, onMenuClick }) => {
   )
 }
 
-export default Sidebar
+export default Sidebar;
 

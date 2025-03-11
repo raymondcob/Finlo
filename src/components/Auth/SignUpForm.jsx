@@ -1,125 +1,175 @@
-import { Link, useNavigate } from "react-router-dom";
-import { useState, useContext } from "react";
-import { auth } from "../../config/firebase";
-import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
-import { UserContext } from "../../context/UserContext";
+import { Link, useNavigate } from "react-router-dom"
+import { useState, useContext } from "react"
+import { auth } from "../../config/firebase"
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth"
+import { UserContext } from "../../context/UserContext"
+import { useTranslation } from "react-i18next"
+import { motion } from "framer-motion"
+import { FaUser, FaEnvelope, FaLock, FaEye, FaEyeSlash } from "react-icons/fa"
 
 function SignUpForm() {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const { t } = useTranslation()
+  const [name, setName] = useState("")
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [error, setError] = useState("")
+  const [showPassword, setShowPassword] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
 
-  const navigate = useNavigate();
-  const { setUser } = useContext(UserContext);
+  const navigate = useNavigate()
+  const { setUser } = useContext(UserContext)
 
-  const handleSignUp = (e) => {
-    e.preventDefault();
+  const handleSignUp = async (e) => {
+    e.preventDefault()
+    setIsLoading(true)
+    setError("")
 
-    createUserWithEmailAndPassword(auth, email, password)
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password)
+      const user = userCredential.user
 
-      .then((userCredential) => {
-        const user = userCredential.user;
-        updateProfile(user, {
-          displayName: name
-        })
-          .then(() => {
-            setUser(user);
-            navigate("/dashboard");
-          })
-          .catch((error) => {
-            setError(error.message);
-          });
+      await updateProfile(user, {
+        displayName: name,
       })
-      .catch((error) => {
-        setError(error.message);
-      });
-  };
+
+      setUser(user)
+      navigate("/dashboard")
+    } catch (error) {
+      setError(error.message)
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   return (
-    <form
-      onSubmit={handleSignUp}
-      className="p-5 w-full sm:max-w-md md:max-w-md  bg-white rounded-lg shadow-lg"
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, delay: 0.2 }}
+      className="w-full max-w-md px-2 sm:px-0"
     >
-      <h1 className="text-3xl font-semibold mb-4 text-center">
-        Create an Account
-      </h1>
-      <p className="text-sm text-gray-500 mb-6 text-center">
-        Join us by filling in your details below.
-      </p>
-
-      {/* Name Input */}
-      <div className="mb-4">
-        <label
-          htmlFor="name"
-          className="block text-lg font-bold mb-2 text-gray-700"
-        >
-          Name
-        </label>
-        <input
-          id="name"
-          type="text"
-          className="w-full border rounded-md p-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-          placeholder="Enter your name"
-          onChange={(e) => setName(e.target.value)}
-        />
+      <div className="text-center mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-white mb-2">{t("auth.signup.title")}</h1>
+        <p className="text-gray-600 dark:text-gray-300">{t("auth.signup.subtitle")}</p>
       </div>
 
-      {/* Email Input */}
-      <div className="mb-4">
-        <label
-          htmlFor="email"
-          className="block text-lg font-bold mb-2 text-gray-700"
+      <form onSubmit={handleSignUp} className="space-y-5">
+        <div className="space-y-4">
+          <div>
+            <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              {t("auth.signup.name")}
+            </label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <FaUser className="h-5 w-5 text-gray-400" />
+              </div>
+              <input
+                id="name"
+                type="text"
+                placeholder={t("auth.signup.namePlaceholder")}
+                className="pl-10 w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-finance-blue-500 transition-all duration-200"
+                required
+                onChange={(e) => setName(e.target.value)}
+              />
+            </div>
+          </div>
+
+          <div>
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              {t("auth.signup.email")}
+            </label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <FaEnvelope className="h-5 w-5 text-gray-400" />
+              </div>
+              <input
+                id="email"
+                type="email"
+                placeholder={t("auth.signup.emailPlaceholder")}
+                className="pl-10 w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-finance-blue-500 transition-all duration-200"
+                required
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </div>
+          </div>
+
+          <div>
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              {t("auth.signup.password")}
+            </label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <FaLock className="h-5 w-5 text-gray-400" />
+              </div>
+              <input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                placeholder={t("auth.signup.passwordPlaceholder")}
+                className="pl-10 w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-finance-blue-500 transition-all duration-200"
+                required
+                onChange={(e) => setPassword(e.target.value)}
+              />
+              <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="text-gray-400 hover:text-gray-500 focus:outline-none"
+                >
+                  {showPassword ? <FaEyeSlash className="h-5 w-5" /> : <FaEye className="h-5 w-5" />}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {error && (
+          <div className="bg-red-50 dark:bg-red-900/30 text-red-800 dark:text-red-300 p-3 rounded-lg text-sm">
+            {error}
+          </div>
+        )}
+
+        <button
+          type="submit"
+          disabled={isLoading}
+          className={`w-full flex justify-center items-center gap-2 bg-finance-blue-600 hover:bg-finance-blue-700 text-white font-medium py-3 px-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-finance-blue-500 transition-colors duration-200 ${
+            isLoading ? "opacity-70 cursor-not-allowed" : ""
+          }`}
         >
-          Email
-        </label>
-        <input
-          id="email"
-          type="email"
-          className="w-full border rounded-md p-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-          placeholder="Enter your email"
-          onChange={(e) => setEmail(e.target.value)}
-        />
-      </div>
+          {isLoading ? (
+            <>
+              <svg
+                className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                ></path>
+              </svg>
+              {t("common.loading")}
+            </>
+          ) : (
+            t("auth.signup.signUpButton")
+          )}
+        </button>
 
-      {/* Password Input */}
-      <div className="mb-4">
-        <label
-          htmlFor="password"
-          className="block text-lg font-bold mb-2 text-gray-700"
-        >
-          Password
-        </label>
-        <input
-          id="password"
-          type="password"
-          className="w-full border rounded-md p-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-          placeholder="Create a password"
-          onChange={(e) => setPassword(e.target.value)}
-        />
-      </div>
-
-      {error && (
-        <p className="text-red-500 text-sm mt-2 mb-2">{error}</p>
-      )}
-
-      {/* Sign Up Button */}
-      <button
-        type="submit"
-        className="w-full bg-blue-500 text-white rounded-md py-2 hover:bg-blue-600"
-      >
-        Sign Up
-      </button>
-
-      {/* Login Link */}
-      <p className="mt-4 text-center text-sm text-gray-600">
-        Already have an account?{" "}
-        <Link to="/auth" className="text-blue-500 hover:underline">
-          Login
-        </Link>
-      </p>
-    </form>
-  );
+        <p className="text-center text-gray-600 dark:text-gray-300 mt-6">
+          {t("auth.signup.haveAccount")}{" "}
+          <Link
+            to="/auth"
+            className="text-finance-blue-600 hover:text-finance-blue-500 dark:text-finance-blue-400 font-medium"
+          >
+            {t("auth.signup.login")}
+          </Link>
+        </p>
+      </form>
+    </motion.div>
+  )
 }
 
 export default SignUpForm;
+

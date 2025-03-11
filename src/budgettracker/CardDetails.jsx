@@ -1,10 +1,13 @@
+"use client"
+
 import { useState, useEffect } from "react"
 import { FaPiggyBank } from "react-icons/fa"
-import { FcSimCardChip } from "react-icons/fc";
+import { FcSimCardChip } from "react-icons/fc"
 import AllocateToGoalModal from "./modals/AllocateToGoalModal"
 import { db } from "../config/firebase"
 import { doc, getDoc, setDoc } from "firebase/firestore"
 import { message } from "antd"
+import { useTranslation } from "react-i18next"
 
 const CardDetails = ({
   balance,
@@ -18,8 +21,10 @@ const CardDetails = ({
   setGoals,
   setBalance,
   setCardDetails,
+  isBalanceSet, // Add this prop
 }) => {
   const [isAllocateModalOpen, setIsAllocateModalOpen] = useState(false)
+  const { t } = useTranslation()
 
   useEffect(() => {
     const fetchCardDetails = async () => {
@@ -41,7 +46,7 @@ const CardDetails = ({
 
   const handleAllocateToGoal = async (amount, goalName) => {
     if (amount > balance) {
-      message.error("The amount entered is higher than the available balance.")
+      message.error(t("savingsGoals.notifications.allocationError.message"))
       return
     }
 
@@ -75,9 +80,11 @@ const CardDetails = ({
 
     if (amountToAllocate < amount) {
       message.info(
-        `Only $${amountToAllocate} was needed to complete this goal. The remaining $${
-          amount - amountToAllocate
-        } stays in your card.`,
+        t("savingsGoals.notifications.allocationSuccess.message", {
+          amount: amountToAllocate,
+          remaining: amount - amountToAllocate,
+          source: t("transactions.payment.card").toLowerCase(),
+        }),
       )
     }
   }
@@ -87,16 +94,15 @@ const CardDetails = ({
       {/* Balance Section */}
       <div className="flex items-center justify-between">
         <div className="flex flex-col">
-          <span className="text-white text-2xl font-lato font-normal mb-2">Balance</span>
+          <span className="text-white text-2xl font-lato font-normal mb-2">{t("incomesources.cardbalance")}</span>
           <span className="text-white text-[22px] font-inter font-semibold">$ {balance}</span>
         </div>
-        {/* Set Card Details Button in the Same Row as Balance */}
+        {/* Set Card Details Button */}
         <button
-          className=" mr-2 px-2 py-1.5 bg-white/10 backdrop-blur-sm border border-white/30 text-white rounded-full transition-colors duration-200 hover:bg-white/20 text-sm"
-          onClick={onSetDetails}
-          disabled={isDetailsSet}
+          className="mr-2 px-2 py-1.5 bg-white/10 backdrop-blur-sm border border-white/30 text-white rounded-full transition-colors duration-200 hover:bg-white/20 text-sm"
+          onClick={onSetDetails} // Always allow opening the modal
         >
-          {isDetailsSet ? "Card Details Set" : "Set Card Details"}
+          {isDetailsSet ? t("incomesources.updatecarddetails") : t("incomesources.setcarddetails")}
         </button>
       </div>
 
@@ -109,11 +115,15 @@ const CardDetails = ({
       <div className="flex flex-col gap-2">
         <div className="flex justify-between">
           <div>
-            <div className="text-white/70 text-[16px] font-inter font-semibold mb-1">CARD HOLDER</div>
+            <div className="text-white/70 text-[16px] font-inter font-semibold mb-1">
+              {t("incomesources.cardholder")}
+            </div>
             <div className="text-white text-lg font-inter font-medium">{cardHolder}</div>
           </div>
           <div>
-            <div className="text-white/70 text-[16px] font-inter font-semibold mb-1">VALID THRU</div>
+            <div className="text-white/70 text-[16px] font-inter font-semibold mb-1">
+              {t("incomesources.validthru")}
+            </div>
             <div className="text-white text-lg font-inter font-medium">{validThru}</div>
           </div>
         </div>
@@ -134,7 +144,7 @@ const CardDetails = ({
         <button
           className="absolute top-1 right-2 w-10 h-10 rounded-full bg-white/20 flex items-center justify-center hover:bg-white/30 transition-colors duration-200"
           onClick={() => setIsAllocateModalOpen(true)}
-          title="Allocate to Savings Goal"
+          title={t("incomesources.allocatetogoals")}
         >
           <FaPiggyBank className="text-white text-lg" />
         </button>
@@ -153,5 +163,5 @@ const CardDetails = ({
   )
 }
 
-export default CardDetails
+export default CardDetails;
 

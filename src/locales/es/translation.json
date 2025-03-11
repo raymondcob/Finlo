@@ -1,38 +1,465 @@
 {
   "navigation": {
-    "dashboard": "Tablero",
+    "dashboard": "Panel de Control",
     "transactions": "Transacciones",
     "reports": "Informes",
-    "income": "Fuentes de Ingresos",
-    "savingsGoals": "Metas de Ahorro",
+    "income": "Fuentes",
+    "savingsGoals": "Objetivos de Ahorro",
     "settings": "Configuración"
   },
   "dashboard": {
     "welcome": "{{greeting}}, {{username}}!",
+    "subtitle": "Bienvenido a tu panel de control financiero",
+    "description": "Realiza un seguimiento de tus finanzas, gestiona transacciones y visualiza informes en un solo lugar.",
     "quickActions": "Acciones Rápidas",
-    "addTransaction": "Añadir Transacción",
+    "addTransaction": "Agregar Transacción",
     "viewReports": "Ver Informes",
-    "manageIncome": "Gestionar Ingresos",
+    "manageIncome": "Gestionar Fuentes de Ingresos",
     "recentActivity": "Actividad Reciente",
-    "financialTips": "Consejos Financieros"
+    "financialTips": "Consejos Financieros",
+    "totalbalance": "Saldo Total",
+    "totalExpenses": "Gastos Totales",
+    "totalIncome": "Ingresos Totales",
+    "totalSavings": "Ahorros Totales",
+    "incomevsexpenses": "Ingresos vs Gastos",
+    "quickactions": {
+      "quickadd": "Agregar Rápido",
+      "quickview": "Ver Todo",
+      "reports": "Informes",
+      "sources": "Fuentes"
+    },
+    "insights": {
+      "title": "Información Rápida",
+      "financialHealth": "Salud Financiera",
+      "expensesWarning": "⚠️ Tus gastos superan el 80% de tus ingresos",
+      "savingsProgress": "🎯 ¡Estás progresando en tus ahorros!",
+      "goodFinances": "👍 ¡Tus finanzas se ven bien!",
+      "noRecentTransactions": "No hay transacciones recientes",
+      "noActiveGoals": "No hay objetivos de ahorro activos",
+      "recentTransactions": "Transacciones Recientes"
+    }
   },
   "transactions": {
     "title": "Transacciones",
-    "subtitle": "Ver y gestionar sus transacciones financieras",
+    "subtitle": "Visualiza y gestiona tus transacciones financieras",
     "category": "Categoría",
-    "type": "Tipo",
+    "tabletype": "Tipo",
     "provider": "Proveedor",
     "paymentMethod": "Método de Pago",
     "date": "Fecha",
-    "amount": "Monto"
+    "amount": "Cantidad",
+    "addtransaction": "Agregar Transacción",
+    "insufficientBalance": "El monto de la transacción supera el saldo disponible.",
+    "lowBalancealert": "Alerta de saldo bajo: ${{balance}} restante en tu {{method}}",
+    "transactionadded": "{{type}}: ${{amount}} {{action}} {{method}}",
+    "error": "La transacción falló",
+    "categories": {
+      "income": {
+        "title": "Ingresos",
+        "salary": "Salario",
+        "freelanceincome": "Ingresos por Freelance",
+        "bonus": "Bono",
+        "investmentincome": "Ingresos por Inversiones",
+        "rentalincome": "Ingresos por Alquiler",
+        "dividends": "Dividendos",
+        "interestincome": "Ingresos por Intereses",
+        "gifts": "Regalos",
+        "refunds": "Reembolsos",
+        "otherincome": "Otros Ingresos"
+      },
+      "essential": {
+        "title": "Gastos Esenciales",
+        "rent/mortgage": "Alquiler/Hipoteca",
+        "utilities": "Servicios Públicos",
+        "groceries": "Comestibles",
+        "transportation": "Transporte",
+        "insurance": "Seguro",
+        "medicalexpenses": "Gastos Médicos",
+        "internet": "Internet",
+        "phonebill": "Factura Telefónica",
+        "childcare": "Cuidado de Niños",
+        "loanpayments": "Pagos de Préstamos"
+      },
+      "lifestyle": {
+        "title": "Gastos de Estilo de Vida",
+        "diningout": "Comer Fuera",
+        "entertainment": "Entretenimiento",
+        "shopping": "Compras",
+        "travel": "Viajes",
+        "gym/fitness": "Gimnasio/Fitness",
+        "subscriptions": "Suscripciones",
+        "gifts/donations": "Regalos/Donaciones",
+        "personalcare": "Cuidado Personal",
+        "petexpenses": "Gastos de Mascotas",
+        "otherexpenses": "Otros Gastos"
+      }
+    },
+    "type": {
+      "income": "Ingreso",
+      "expense": "Gasto"
+    },
+    "payment": {
+      "card": "Tarjeta",
+      "wallet": "Billetera"
+    },
+    "dateFilters": {
+      "last7days": "Últimos 7 días",
+      "last30days": "Últimos 30 días",
+      "last90days": "Últimos 90 días"
+    }
+  },
+  "reports": {
+    "title": "Informes Financieros",
+    "subtitle": "Analiza tus datos financieros con gráficos interactivos",
+    "tabs": {
+      "overview": "Resumen",
+      "calendar": "Calendario de Transacciones"
+    },
+    "charts": {
+      "yearlyComparison": "Seguimiento de Ahorros Anuales",
+      "incomeCategories": "Categorías de Ingresos",
+      "expenseCategories": "Categorías de Gastos",
+      "monthlyCalendar": "Calendario de Transacciones Mensuales",
+      "noData": {
+        "savings": "No hay datos de ahorros disponibles",
+        "savingsSubtitle": "Comienza a ahorrar para ver tu progreso",
+        "transactions": "No se encontraron transacciones",
+        "transactionsSubtitle": "Agrega transacciones para ver tu resumen financiero",
+        "income": "No se encontraron transacciones de ingresos",
+        "incomeSubtitle": "Agrega algunas transacciones de ingresos para ver tus estadísticas",
+        "expense": "No se encontraron transacciones de gastos",
+        "expenseSubtitle": "Agrega algunas transacciones de gastos para ver tus estadísticas"
+      },
+      "labels": {
+        "savings": "Tus Ahorros",
+        "targets": "Objetivos",
+        "amount": "Cantidad ($)",
+        "month": "Mes"
+      },
+      "categories": {
+        "income": {
+          "Salary": "Salario",
+          "Freelance Income": "Ingresos por Freelance",
+          "Bonus": "Bono",
+          "Investment Income": "Ingresos por Inversiones",
+          "Rental Income": "Ingresos por Alquiler",
+          "Dividends": "Dividendos",
+          "Interest Income": "Ingresos por Intereses",
+          "Gifts": "Regalos",
+          "Refunds": "Reembolsos",
+          "Other Income": "Otros Ingresos"
+        },
+        "expense": {
+          "Rent/Mortgage": "Alquiler/Hipoteca",
+          "Utilities": "Servicios Públicos",
+          "Groceries": "Comestibles",
+          "Transportation": "Transporte",
+          "Insurance": "Seguro",
+          "Medical Expenses": "Gastos Médicos",
+          "Internet": "Internet",
+          "Phone Bill": "Factura Telefónica",
+          "Childcare": "Cuidado de Niños",
+          "Loan Payments": "Pagos de Préstamos",
+          "Dining Out": "Comer Fuera",
+          "Entertainment": "Entretenimiento",
+          "Shopping": "Compras",
+          "Travel": "Viajes",
+          "Gym/Fitness": "Gimnasio/Fitness",
+          "Subscriptions": "Suscripciones",
+          "Gifts/Donations": "Regalos/Donaciones",
+          "Personal Care": "Cuidado Personal",
+          "Pet Expenses": "Gastos de Mascotas",
+          "Other Expenses": "Otros Gastos"
+        }
+      }
+    }
   },
   "savingsGoals": {
-    "title": "Metas de Ahorro",
-    "addGoal": "Añadir Meta de Ahorro",
-    "activeGoals": "Metas Activas",
-    "completedGoals": "Metas Completadas",
-    "noActiveGoals": "No hay metas de ahorro activas. ¡Haga clic en \"Añadir Meta de Ahorro\" para comenzar!",
-    "noCompletedGoals": "Aún no hay metas de ahorro completadas. ¡Sigue ahorrando!",
-    "deadline": "Fecha Límite"
+    "title": "Objetivos de Ahorro",
+    "subtitle": "Realiza un seguimiento de tu progreso hacia objetivos financieros",
+    "addGoal": "Agregar Objetivo de Ahorro",
+    "activeGoals": "Objetivos Activos",
+    "completedGoals": "Objetivos Completados",
+    "noActiveGoals": "No hay objetivos de ahorro activos. ¡Haz clic en \"Agregar Objetivo de Ahorro\" para comenzar!",
+    "noCompletedGoals": "Aún no hay objetivos de ahorro completados. ¡Sigue ahorrando!",
+    "deadline": "Fecha Límite",
+    "noDeadline": "Sin fecha límite",
+    "goalName": "Nombre del Objetivo",
+    "targetAmount": "Cantidad Objetivo",
+    "currentAmount": "Cantidad Actual",
+    "progress": "Progreso",
+    "allocate": "Asignar",
+    "modals": {
+      "addGoal": {
+        "title": "Agregar Objetivo de Ahorro",
+        "goalName": "Nombre del Objetivo",
+        "goalNamePlaceholder": "ej. Coche Nuevo, Vacaciones, Fondo de Emergencia",
+        "targetAmount": "Cantidad Objetivo",
+        "deadline": "Fecha Límite (Opcional)",
+        "deadlinePlaceholder": "Seleccionar fecha objetivo",
+        "save": "Guardar",
+        "cancel": "Cancelar"
+      },
+      "allocate": {
+        "title": "Asignar a Objetivo de Ahorro",
+        "selectGoal": "Seleccionar Objetivo",
+        "amount": "Cantidad",
+        "save": "Guardar",
+        "cancel": "Cancelar",
+        "noGoals": "No hay objetivos disponibles"
+      }
+    },
+    "notifications": {
+      "goalCompleted": {
+        "title": "¡Felicidades!",
+        "message": "¡Has alcanzado tu objetivo de ahorro para {{goalName}}!"
+      },
+      "goalSurpassed": {
+        "title": "¡Increíble!",
+        "message": "¡Has superado tu objetivo de ahorro para {{goalName}}!"
+      },
+      "goalMissed": {
+        "title": "Objetivo No Alcanzado",
+        "message": "No cumpliste tu objetivo de ahorro para {{goalName}}, ¡pero estás progresando!"
+      },
+      "allocationSuccess": {
+        "message": "Solo se necesitaban ${{amount}} para completar este objetivo. Los ${{remaining}} restantes permanecen en tu {{source}}."
+      },
+      "allocationError": {
+        "message": "La cantidad ingresada es mayor que el saldo disponible."
+      }
+    }
+  },
+  "greetings": {
+    "morning": "Buenos Días",
+    "afternoon": "Buenas Tardes",
+    "evening": "Buenas Noches"
+  },
+  "calendar": {
+    "toolbar": {
+      "today": "Hoy",
+      "previous": "Atrás",
+      "next": "Siguiente"
+    },
+    "labels": {
+      "month": {
+        "january": "Enero",
+        "february": "Febrero",
+        "march": "Marzo",
+        "april": "Abril",
+        "may": "Mayo",
+        "june": "Junio",
+        "july": "Julio",
+        "august": "Agosto",
+        "september": "Septiembre",
+        "october": "Octubre",
+        "november": "Noviembre",
+        "december": "Diciembre"
+      },
+      "weekdays": {
+        "sunday": "Domingo",
+        "monday": "Lunes",
+        "tuesday": "Martes",
+        "wednesday": "Miércoles",
+        "thursday": "Jueves",
+        "friday": "Viernes",
+        "saturday": "Sábado"
+      }
+    },
+    "modal": {
+      "title": "Transacciones para {{date}}",
+      "income": "Ingresos",
+      "expense": "Gastos",
+      "noTransactions": "No hay transacciones para esta fecha",
+      "total": "Total"
+    }
+  },
+  "incomesources": {
+    "title": "Fuentes de Ingreso",
+    "subtitle": "Administra tus tarjetas y detalles de la cartera",
+    "mycard": "Mi Tarjeta",
+    "mywallet": "Mi Cartera",
+    "cardholder": "Titular de la Tarjeta",
+    "validthru": "Válida Hasta",
+    "cashbalance": "Saldo en Efectivo",
+    "cardbalance": "Balance",
+    "walletholder": "Cartera de {{username}}",
+    "allocatetogoals": "Asignar a Metas de Ahorro",
+    "updatecarddetails": "Actualizar Detalles de la Tarjeta",
+    "setcarddetails": "Establecer Detalles de la Tarjeta",
+    "cashbalancedset": "Saldo establecido",
+    "cashbalanceinitial": "Establecer Saldo Inicial",
+    "cardbalancealert": "Alerta de saldo bajo en la tarjeta: ${{balance}}",
+    "walletbalancealert": "Alerta de saldo bajo en la cartera: ${{balance}}",
+    "modals": {
+      "addCard": {
+        "title": "Agregar Detalles de Tarjeta",
+        "cardHolder": "Titular de la Tarjeta",
+        "cardHolderPlaceholder": "Ingrese el nombre del titular",
+        "validThru": "Válida Hasta",
+        "validThruPlaceholder": "MM/AA",
+        "cardNumber": "Número de Tarjeta",
+        "cardNumberPlaceholder": "**** **** **** ****",
+        "initialBalance": "Saldo Inicial",
+        "initialBalancePlaceholder": "0.00",
+        "balanceSetWarning": "Nota: El saldo inicial solo se puede establecer una vez. Se actualizará a través de transacciones.",
+        "save": "Guardar",
+        "cancel": "Cancelar"
+      },
+      "addWallet": {
+        "title": "Agregar Detalles de Cartera",
+        "balance": "Saldo",
+        "balancePlaceholder": "0.00",
+        "balanceSetWarning": "Nota: Solo puede establecer el saldo inicial una vez. Se actualizará a través de transacciones.",
+        "save": "Guardar",
+        "cancel": "Cancelar"
+      }
+    }
+  },
+  "settings": {
+    "title": "Configuración",
+    "subtitle": "Administra tus preferencias y configuración de cuenta",
+    "tabs": {
+      "profile": "Perfil",
+      "security": "Seguridad",
+      "help": "Ayuda y Soporte"
+    },
+    "profile": {
+      "title": "Configuración de Perfil",
+      "googleAccountNotice": "Alguna información de perfil solo se puede actualizar a través de tu cuenta de Google. Visita",
+      "googleAccountLink": "Configuración de Cuenta de Google",
+      "toModify": "para modificar tu correo electrónico y contraseña.",
+      "fullName": "Nombre Completo",
+      "emailAddress": "Dirección de Correo Electrónico",
+      "saveChanges": "Guardar Cambios",
+      "profilePicture": "La foto de perfil solo se puede actualizar a través de Google"
+    },
+    "security": {
+      "title": "Configuración de Seguridad",
+      "googleSecurityNotice": "La configuración de seguridad para usuarios autenticados con Google solo se puede administrar a través de tu cuenta de Google. Por favor visita",
+      "googleSecurityLink": "Configuración de Seguridad de Google",
+      "toModify": "para modificar tus preferencias de seguridad.",
+      "updateEmail": "Actualizar Correo Electrónico",
+      "newEmailAddress": "Nueva Dirección de Correo Electrónico",
+      "changePassword": "Cambiar Contraseña",
+      "newPassword": "Nueva Contraseña",
+      "confirmNewPassword": "Confirmar Nueva Contraseña",
+      "updateSecuritySettings": "Actualizar Configuración de Seguridad",
+      "passwordMismatch": "Las contraseñas no coinciden"
+    },
+    "help": {
+      "title": "Ayuda y Soporte",
+      "quickHelp": "Ayuda Rápida",
+      "faqs": {
+        "addTransaction": {
+          "question": "¿Cómo agrego una nueva transacción?",
+          "answer": "Haz clic en el botón '+' en el panel de control y completa los detalles de la transacción."
+        },
+        "setupWalletCard": {
+          "question": "¿Cómo configuro mi cartera o tarjeta?",
+          "answer": "Ve a Fuentes de Ingreso y haz clic en 'Agregar Nuevo' para configurar tus métodos de pago."
+        }
+      },
+      "contactSupport": "Contactar Soporte",
+      "subject": "Asunto",
+      "subjectPlaceholder": "Selecciona un tema",
+      "subjectOptions": {
+        "account": "Problema de Cuenta",
+        "transaction": "Problema de Transacción",
+        "feature": "Solicitud de Función",
+        "other": "Otro"
+      },
+      "message": "Mensaje",
+      "messagePlaceholder": "Describe tu problema o pregunta...",
+      "sendMessage": "Enviar Mensaje",
+      "messageSent": "¡Mensaje enviado! Nos pondremos en contacto contigo pronto.",
+      "messageError": "Error al enviar el mensaje. Por favor, inténtalo de nuevo."
+    },
+    "notifications": {
+      "profileUpdated": "Perfil actualizado correctamente",
+      "profileUpdateFailed": "Error al actualizar el perfil",
+      "emailUpdated": "Correo electrónico actualizado correctamente",
+      "passwordUpdated": "Contraseña actualizada correctamente",
+      "securityUpdateFailed": "Error al actualizar la configuración de seguridad"
+    }
+  },
+  "modals": {
+    "addTransaction": {
+      "title": "Agregar Transacción",
+      "category": "Categoría",
+      "type": "Tipo",
+      "paymentMethod": "Método de Pago",
+      "date": "Fecha",
+      "provider": "Proveedor",
+      "providerPlaceholder": "Ingrese Proveedor",
+      "amount": "Cantidad",
+      "amountPlaceholder": "0.00",
+      "save": "Agregar",
+      "cancel": "Cancelar",
+      "walletBalance": "Cartera (Saldo: ${{balance}})",
+      "cardBalance": "Tarjeta (Saldo: ${{balance}})",
+      "errors": {
+        "noBalance": {
+          "title": "No Hay Saldo Disponible",
+          "content": "Por favor, configura primero el saldo de tu cartera o tarjeta para realizar un seguimiento de las transacciones."
+        },
+        "categoryMismatch": {
+          "title": "Categoría Incorrecta",
+          "incomeContent": "Por favor, selecciona una categoría de ingresos para transacciones de ingresos.",
+          "expenseContent": "Por favor, selecciona una categoría de gastos para transacciones de gastos."
+        }
+      }
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "¡Bienvenido de Nuevo!",
+      "subtitle": "Por favor, ingresa tus datos",
+      "email": "Correo Electrónico",
+      "emailPlaceholder": "Ingresa tu correo electrónico",
+      "password": "Contraseña",
+      "passwordPlaceholder": "Ingresa tu contraseña",
+      "loginButton": "Iniciar Sesión",
+      "orDivider": "o",
+      "googleLogin": "Iniciar Sesión con Google",
+      "noAccount": "¿No tienes una cuenta?",
+      "signUp": "Registrarse",
+      "forgotPassword": "¿Olvidaste tu contraseña?"
+    },
+    "signup": {
+      "title": "Crear una Cuenta",
+      "subtitle": "Únete a nosotros completando tus datos a continuación.",
+      "name": "Nombre",
+      "namePlaceholder": "Ingresa tu nombre",
+      "email": "Correo Electrónico",
+      "emailPlaceholder": "Ingresa tu correo electrónico",
+      "password": "Contraseña",
+      "passwordPlaceholder": "Crea una contraseña",
+      "signUpButton": "Registrarse",
+      "haveAccount": "¿Ya tienes una cuenta?",
+      "login": "Iniciar Sesión"
+    },
+    "welcome": "Bienvenido a StackUp Finance",
+    "tagline": "Tu gestor de finanzas personal para un mejor manejo del dinero",
+    "features": {
+      "tracking": "Controla tus ingresos y gastos",
+      "insights": "Obtén información sobre tus hábitos de gasto",
+      "goals": "Establece y alcanza tus objetivos de ahorro"
+    },
+    "rights": "Todos los derechos reservados."
+  },
+  "common": {
+    "needHelp": "¿Necesitas Ayuda?",
+    "supportText": "Contacta a nuestro equipo de soporte para asistencia",
+    "loading": "Cargando...",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "add": "Agregar",
+    "update": "Actualizar",
+    "delete": "Eliminar",
+    "logout": "Cerrar Sesión",
+    "profile": "Perfil",
+    "settings": "Configuración"
   }
 }
+

@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react"
-import { Line } from "react-chartjs-2"
+import { useEffect, useState } from "react";
+import { Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -10,88 +10,103 @@ import {
   Tooltip,
   Legend,
   Filler,
-} from "chart.js"
-import { doc, getDoc } from "firebase/firestore"
-import { db } from "../../config/firebase"
+} from "chart.js";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../../config/firebase";
+import { FaChartLine } from "react-icons/fa";
+import { useTranslation } from "react-i18next";
 
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler)
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler
+);
 
 const LineChart = ({ userId }) => {
+  const { t } = useTranslation();
   const [data, setData] = useState({
     labels: [],
     datasets: [
       {
-        label: "Total Savings",
+        label: t("reports.charts.labels.savings"),
         data: [],
-        borderColor: "#8B5CF6", // Purple color for savings
+        borderColor: "#8B5CF6",
         backgroundColor: "rgba(139, 92, 246, 0.2)",
         fill: true,
-        tension: 0.4, // Makes the line curved
+        tension: 0.4,
       },
       {
-        label: "Target Goals",
+        label: t("reports.charts.labels.targets"),
         data: [],
-        borderColor: "#10B981", // Green color for targets
+        borderColor: "#10B981",
         backgroundColor: "rgba(16, 185, 129, 0.2)",
         fill: true,
         tension: 0.4,
       },
     ],
-  })
+  });
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        if (!userId) return
+        if (!userId) return;
 
         // Fetch savings goals
-        const savingsDoc = await getDoc(doc(db, "savingsGoals", userId))
-        const savingsGoals = savingsDoc.exists() ? savingsDoc.data().goals : []
+        const savingsDoc = await getDoc(doc(db, "savingsGoals", userId));
+        const savingsGoals = savingsDoc.exists() ? savingsDoc.data().goals : [];
 
         // Process savings data by month
-        const monthlyData = {}
-        const monthlyTargets = {}
+        const monthlyData = {};
+        const monthlyTargets = {};
 
         savingsGoals.forEach((goal) => {
-          const currentAmount = goal.currentAmount || 0
-          const targetAmount = goal.goalAmount || 0
+          const currentAmount = goal.currentAmount || 0;
+          const targetAmount = goal.goalAmount || 0;
 
           // Get the creation date or current date if not available
-          const date = goal.createdAt ? new Date(goal.createdAt) : new Date()
-          const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`
+          const date = goal.createdAt ? new Date(goal.createdAt) : new Date();
+          const monthKey = `${date.getFullYear()}-${String(
+            date.getMonth() + 1
+          ).padStart(2, "0")}`;
 
           // Accumulate savings and targets
-          monthlyData[monthKey] = (monthlyData[monthKey] || 0) + currentAmount
-          monthlyTargets[monthKey] = (monthlyTargets[monthKey] || 0) + targetAmount
-        })
+          monthlyData[monthKey] = (monthlyData[monthKey] || 0) + currentAmount;
+          monthlyTargets[monthKey] =
+            (monthlyTargets[monthKey] || 0) + targetAmount;
+        });
 
         // Get all months
-        const allMonths = Object.keys(monthlyData).sort()
+        const allMonths = Object.keys(monthlyData).sort();
 
         // Calculate cumulative totals
-        let cumulativeSavings = 0
-        let cumulativeTargets = 0
+        let cumulativeSavings = 0;
+        let cumulativeTargets = 0;
 
         const savingsProgress = allMonths.map((month) => {
-          cumulativeSavings += monthlyData[month] || 0
-          return cumulativeSavings
-        })
+          cumulativeSavings += monthlyData[month] || 0;
+          return cumulativeSavings;
+        });
 
         const targetProgress = allMonths.map((month) => {
-          cumulativeTargets += monthlyTargets[month] || 0
-          return cumulativeTargets
-        })
+          cumulativeTargets += monthlyTargets[month] || 0;
+          return cumulativeTargets;
+        });
 
         setData({
           labels: allMonths.map((date) => {
-            const [year, month] = date.split("-")
+            const [year, month] = date.split("-");
             return `${new Date(year, month - 1).toLocaleString("default", {
               month: "short",
-            })} ${year}`
+            })} ${year}`;
           }),
           datasets: [
             {
-              label: "Your Savings",
+              label: t("reports.charts.labels.savings"),
               data: savingsProgress,
               borderColor: "#8B5CF6",
               backgroundColor: "rgba(139, 92, 246, 0.2)",
@@ -99,7 +114,7 @@ const LineChart = ({ userId }) => {
               tension: 0.4,
             },
             {
-              label: "Target Goals",
+              label: t("reports.charts.labels.targets"),
               data: targetProgress,
               borderColor: "#10B981",
               backgroundColor: "rgba(16, 185, 129, 0.2)",
@@ -107,14 +122,14 @@ const LineChart = ({ userId }) => {
               tension: 0.4,
             },
           ],
-        })
+        });
       } catch (error) {
-        console.error("Error fetching savings data:", error)
+        console.error("Error fetching savings data:", error);
       }
-    }
+    };
 
-    fetchData()
-  }, [userId])
+    fetchData();
+  }, [userId, t]);
 
   const options = {
     responsive: true,
@@ -127,15 +142,17 @@ const LineChart = ({ userId }) => {
           font: {
             size: 14,
           },
-          color: document.documentElement.classList.contains("dark") ? "white" : undefined,
+          color: document.documentElement.classList.contains("dark")
+            ? "white"
+            : undefined,
         },
       },
       tooltip: {
         callbacks: {
           label: (context) => {
-            let label = context.dataset.label || ""
+            let label = context.dataset.label || "";
             if (label) {
-              label += ": "
+              label += ": ";
             }
             if (context.parsed.y !== null) {
               label += new Intl.NumberFormat("en-US", {
@@ -143,9 +160,9 @@ const LineChart = ({ userId }) => {
                 currency: "USD",
                 minimumFractionDigits: 0,
                 maximumFractionDigits: 0,
-              }).format(context.parsed.y)
+              }).format(context.parsed.y);
             }
-            return label
+            return label;
           },
         },
         backgroundColor: "rgba(0, 0, 0, 0.7)",
@@ -161,12 +178,14 @@ const LineChart = ({ userId }) => {
         beginAtZero: true,
         title: {
           display: true,
-          text: "Amount ($)",
+          text: t("reports.charts.labels.amount"),
           font: {
             size: 14,
             weight: "bold",
           },
-          color: document.documentElement.classList.contains("dark") ? "white" : undefined,
+          color: document.documentElement.classList.contains("dark")
+            ? "white"
+            : undefined,
         },
         ticks: {
           callback: (value) =>
@@ -176,28 +195,38 @@ const LineChart = ({ userId }) => {
               minimumFractionDigits: 0,
               maximumFractionDigits: 0,
             }).format(value),
-          color: document.documentElement.classList.contains("dark") ? "rgba(255, 255, 255, 0.7)" : undefined,
+          color: document.documentElement.classList.contains("dark")
+            ? "rgba(255, 255, 255, 0.7)"
+            : undefined,
         },
         grid: {
-          color: document.documentElement.classList.contains("dark") ? "rgba(255, 255, 255, 0.1)" : undefined,
+          color: document.documentElement.classList.contains("dark")
+            ? "rgba(255, 255, 255, 0.1)"
+            : undefined,
         },
       },
       x: {
         grid: {
           display: false,
-          color: document.documentElement.classList.contains("dark") ? "rgba(255, 255, 255, 0.1)" : undefined,
+          color: document.documentElement.classList.contains("dark")
+            ? "rgba(255, 255, 255, 0.1)"
+            : undefined,
         },
         title: {
           display: true,
-          text: "Month",
+          text: t("reports.charts.labels.month"),
           font: {
             size: 14,
             weight: "bold",
           },
-          color: document.documentElement.classList.contains("dark") ? "white" : undefined,
+          color: document.documentElement.classList.contains("dark")
+            ? "white"
+            : undefined,
         },
         ticks: {
-          color: document.documentElement.classList.contains("dark") ? "rgba(255, 255, 255, 0.7)" : undefined,
+          color: document.documentElement.classList.contains("dark")
+            ? "rgba(255, 255, 255, 0.7)"
+            : undefined,
         },
       },
     },
@@ -205,14 +234,29 @@ const LineChart = ({ userId }) => {
       intersect: false,
       mode: "index",
     },
-  }
+  };
+
+  const hasData = data.datasets[0].data.length > 0;
+
+  const renderNoData = () => {
+    return (
+      <div className="w-full h-full flex flex-col items-center justify-center text-gray-500 dark:text-gray-400">
+        <FaChartLine className="w-12 h-12 mb-2 opacity-50" />
+        <p className="text-sm md:text-base">
+          {t("reports.charts.noData.savings")}
+        </p>
+        <p className="text-xs md:text-sm mt-1">
+          {t("reports.charts.noData.savingsSubtitle")}
+        </p>
+      </div>
+    );
+  };
 
   return (
     <div className="w-full h-full min-h-[300px] p-4">
-      <Line data={data} options={options} />
+      {hasData ? <Line data={data} options={options} /> : renderNoData()}
     </div>
-  )
-}
+  );
+};
 
-export default LineChart
-
+export default LineChart;
