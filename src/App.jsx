@@ -1,44 +1,40 @@
 import { useState, useEffect } from "react";
 import { BrowserRouter as Router } from "react-router-dom";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "./config/firebase";
 import { UserProvider } from "./context/UserContext";
 import { PageTitleProvider } from "./context/PageTitleContext";
+import { Toaster } from "react-hot-toast";
 import LoadingSpinner from "./components/LoadingSpinner";
 import AppRoutes from "./routes/AppRoutes";
-import './config/i18n';
+import "./config/i18n";
 
 function App() {
-  const [isLoading, setIsLoading] = useState(true);
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Simple resource loading check
-    const handleLoad = () => {
-      if (document.readyState === "complete") {
-        setIsLoading(false);
-      }
-    };
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setUser(user);
+      setLoading(false);
+    });
 
-    // Check if already loaded
-    if (document.readyState === "complete") {
-      setIsLoading(false);
-    } else {
-      window.addEventListener("load", handleLoad);
-    }
-
-    return () => window.removeEventListener("load", handleLoad);
+    return () => unsubscribe();
   }, []);
 
-  if (isLoading) {
+  if (loading) {
     return <LoadingSpinner />;
   }
 
   return (
-    <UserProvider>
-      <PageTitleProvider>
-        <Router>
+    <Router>
+      <UserProvider>
+        <PageTitleProvider>
+          <Toaster position="top-right" />
           <AppRoutes />
-        </Router>
-      </PageTitleProvider>
-    </UserProvider>
+        </PageTitleProvider>
+      </UserProvider>
+    </Router>
   );
 }
 

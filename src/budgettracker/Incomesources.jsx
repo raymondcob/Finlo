@@ -1,14 +1,14 @@
-"use client"
-
 import { useState, useContext, useEffect } from "react"
+import { doc, getDoc, setDoc } from "firebase/firestore"
+import { motion } from "framer-motion"
+import toast from "react-hot-toast"
+import { UserContext } from "../context/UserContext"
+import { db } from "../config/firebase"
 import CardDetails from "./CardDetails"
 import WalletDetails from "./WalletDetails"
 import AddDetailsModal from "./modals/AddDetailsModal"
 import AddCardDetailsModal from "./modals/AddCardDetailsModal"
-import { UserContext } from "../context/UserContext"
-import { db } from "../config/firebase"
-import { doc, getDoc, setDoc } from "firebase/firestore"
-import { motion } from "framer-motion"
+import { useTranslation } from "react-i18next"
 
 const IncomeSources = () => {
   const { user } = useContext(UserContext)
@@ -17,6 +17,8 @@ const IncomeSources = () => {
   const [cardDetails, setCardDetails] = useState(null)
   const [walletDetails, setWalletDetails] = useState(null)
   const [goals, setGoals] = useState([])
+  const [isBalanceSet, setIsBalanceSet] = useState(false)
+  const { t } = useTranslation()
 
   useEffect(() => {
     if (user) {
@@ -26,22 +28,34 @@ const IncomeSources = () => {
         const goalsDoc = await getDoc(doc(db, "savingsGoals", user.uid))
 
         if (cardDoc.exists()) {
-          setCardDetails(cardDoc.data())
+          const cardData = cardDoc.data()
+          setCardDetails(cardData)
+          setIsBalanceSet(!!cardData.balance)
+          if (Number(cardData.balance) < 100) {
+            toast.error(t("incomesources.cardbalancealert", { balance: cardData.balance }))
+          }
         }
+
         if (walletDoc.exists()) {
-          setWalletDetails(walletDoc.data())
+          const walletData = walletDoc.data()
+          setWalletDetails(walletData)
+          if (Number(walletData.balance) < 100) {
+            toast.error(t("incomesources.walletbalancealert", { balance: walletData.balance }))
+          }
         }
+
         if (goalsDoc.exists()) {
           setGoals(goalsDoc.data().goals || [])
         }
       }
       fetchDetails()
     }
-  }, [user])
+  }, [user, t])
 
   const handleAddCardDetails = async (details) => {
     await setDoc(doc(db, "cardDetails", user.uid), details)
     setCardDetails(details)
+    setIsBalanceSet(!!details.balance)
   }
 
   const handleAddWalletDetails = async (details) => {
@@ -49,15 +63,28 @@ const IncomeSources = () => {
     setWalletDetails(details)
   }
 
-  const setCardBalance = (newBalance) => {
+  const setCardBalance = async (newBalance) => {
     setCardDetails((prev) => ({ ...prev, balance: newBalance }))
+    if (Number(newBalance) < 100) {
+      toast.error(t("incomesources.cardbalancealert", { balance: newBalance }))
+    }
+    await setDoc(doc(db, "cardDetails", user.uid), {
+      ...cardDetails,
+      balance: newBalance,
+    })
   }
 
-  const setWalletBalance = (newBalance) => {
+  const setWalletBalance = async (newBalance) => {
     setWalletDetails((prev) => ({ ...prev, balance: newBalance }))
+    if (Number(newBalance) < 100) {
+      toast.error(t("incomesources.walletbalancealert", { balance: newBalance }))
+    }
+    await setDoc(doc(db, "walletDetails", user.uid), {
+      ...walletDetails,
+      balance: newBalance,
+    })
   }
 
-  // Animation variants
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -84,13 +111,15 @@ const IncomeSources = () => {
   return (
     <motion.div variants={containerVariants} initial="hidden" animate="visible" className="space-y-6">
       <motion.div variants={itemVariants} className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm mb-6">
-        <h1 className="text-2xl font-semibold text-gray-800 dark:text-white mb-2">Income Sources</h1>
-        <p className="text-gray-600 dark:text-gray-300">Manage your cards and wallet details</p>
+        <h1 className="text-2xl font-semibold text-gray-800 dark:text-white mb-2">{t("incomesources.title")}</h1>
+        <p className="text-gray-600 dark:text-gray-300">{t("incomesources.subtitle")}</p>
       </motion.div>
 
       <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-4">
-          <h2 className="text-xl font-semibold text-finance-blue-700 dark:text-finance-blue-400 px-2">My Card</h2>
+          <h2 className="text-xl font-semibold text-finance-blue-700 dark:text-finance-blue-400 px-2">
+            {t("incomesources.mycard")}
+          </h2>
           <CardDetails
             balance={cardDetails?.balance || "0.00"}
             cardHolder={cardDetails?.cardHolder || user?.displayName || "Card Holder"}
@@ -106,7 +135,9 @@ const IncomeSources = () => {
           />
         </div>
         <div className="space-y-4">
-          <h2 className="text-xl font-semibold text-finance-green-700 dark:text-finance-green-400 px-2">My Wallet</h2>
+          <h2 className="text-xl font-semibold text-finance-green-700 dark:text-finance-green-400 px=2">
+            {t("incomesources.mywallet")}
+          </h2>
           <WalletDetails
             name={user?.displayName || "User"}
             balance={walletDetails?.balance || "0.00"}
@@ -124,6 +155,8 @@ const IncomeSources = () => {
         open={isCardModalOpen}
         onClose={() => setIsCardModalOpen(false)}
         onSave={handleAddCardDetails}
+        isBalanceSet={isBalanceSet}
+        cardDetails={cardDetails}
       />
       <AddDetailsModal
         open={isWalletModalOpen}
@@ -134,5 +167,5 @@ const IncomeSources = () => {
   )
 }
 
-export default IncomeSources
+export default IncomeSources;
 

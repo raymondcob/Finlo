@@ -25,11 +25,15 @@ import {
 } from "react-icons/fa"
 import { DatePicker, Select, Input, Form, Modal } from "antd"
 import moment from "moment"
+import { useState } from "react"
+import { useTranslation } from "react-i18next"
 
 const { Option } = Select
 
 const AddTransactionModal = ({ open, onClose, onAddTransaction, cardBalance, walletBalance }) => {
+  const { t } = useTranslation()
   const [form] = Form.useForm()
+  const [selectedType, setSelectedType] = useState("Income")
 
   // Income Categories with Icons
   const incomeCategories = [
@@ -75,9 +79,9 @@ const AddTransactionModal = ({ open, onClose, onAddTransaction, cardBalance, wal
 
   // Combine all categories
   const allCategories = [
-    { group: "Income", items: incomeCategories },
-    { group: "Essential Expenses", items: essentialExpenses },
-    { group: "Lifestyle Expenses", items: lifestyleExpenses },
+    { group: t("transactions.categories.income.title"), items: incomeCategories },
+    { group: t("transactions.categories.essential.title"), items: essentialExpenses },
+    { group: t("transactions.categories.lifestyle.title"), items: lifestyleExpenses },
   ]
 
   // Custom option render for dropdown items
@@ -87,20 +91,84 @@ const AddTransactionModal = ({ open, onClose, onAddTransaction, cardBalance, wal
         <div className="h-8 w-8 rounded-full flex items-center justify-center" style={{ backgroundColor: item.color }}>
           {item.icon}
         </div>
-        <span className="text-sm">{item.label}</span>
+        <span className="text-sm">
+          {t(`transactions.categories.${getCategoryType(item.label)}.${item.label.toLowerCase().replace(/\s+/g, "")}`)}
+        </span>
       </div>
     )
   }
 
+  // Helper function to get category type
+  const getCategoryType = (category) => {
+    if (incomeCategories.some((cat) => cat.label === category)) return "income"
+    if (essentialExpenses.some((cat) => cat.label === category)) return "essential"
+    if (lifestyleExpenses.some((cat) => cat.label === category)) return "lifestyle"
+    return ""
+  }
+
+  // Watch for category changes to auto-update type
+  const handleCategoryChange = (value) => {
+    const isIncomeCategory = incomeCategories.some((cat) => cat.label === value)
+    const isExpenseCategory = [...essentialExpenses, ...lifestyleExpenses].some((cat) => cat.label === value)
+
+    if (isIncomeCategory && selectedType !== "Income") {
+      form.setFieldsValue({ type: "Income" })
+      setSelectedType("Income")
+    } else if (isExpenseCategory && selectedType !== "Expense") {
+      form.setFieldsValue({ type: "Expense" })
+      setSelectedType("Expense")
+    }
+  }
+
+  // Validate balances before submission
   const handleSubmit = (values) => {
-    onAddTransaction({
-      category: values.category,
-      type: values.type,
-      provider: values.provider,
-      paymentMethod: values.paymentMethod,
-      date: values.date.toISOString(),
+    if (!cardBalance && !walletBalance) {
+      Modal.error({
+        title: t("modals.addTransaction.errors.noBalance.title"),
+        content: t("modals.addTransaction.errors.noBalance.content"),
+      })
+      return
+    }
+
+    // Validate category and type match
+    const isIncomeCategory = incomeCategories.some((cat) => cat.label === values.category)
+    const isExpenseCategory = [...essentialExpenses, ...lifestyleExpenses].some((cat) => cat.label === values.category)
+
+    if (values.type === "Income" && !isIncomeCategory) {
+      Modal.error({
+        title: t("modals.addTransaction.errors.categoryMismatch.title"),
+        content: t("modals.addTransaction.errors.categoryMismatch.incomeContent"),
+      })
+      return
+    }
+
+    if (values.type === "Expense" && !isExpenseCategory) {
+      Modal.error({
+        title: t("modals.addTransaction.errors.categoryMismatch.title"),
+        content: t("modals.addTransaction.errors.categoryMismatch.expenseContent"),
+      })
+      return
+    }
+
+    // Get local date components
+    const dateValue = values.date.toDate()
+    const localDate = new Date(
+      dateValue.getFullYear(),
+      dateValue.getMonth(),
+      dateValue.getDate(),
+      12, // Set to noon to avoid timezone issues
+      0,
+      0,
+      0,
+    )
+
+    const transactionData = {
+      ...values,
+      date: localDate,
       amount: Number.parseFloat(values.amount),
-    })
+    }
+
+    onAddTransaction(transactionData)
     onClose()
   }
 
@@ -113,7 +181,9 @@ const AddTransactionModal = ({ open, onClose, onAddTransaction, cardBalance, wal
             alt="Receipt Icon"
             className="w-10 h-10"
           />
-          <span className="text-2xl font-semibold text-gray-700 dark:text-gray-200">Add Transaction</span>
+          <span className="text-2xl font-semibold text-gray-700 dark:text-gray-200">
+            {t("modals.addTransaction.title")}
+          </span>
         </div>
       }
       open={open}
@@ -146,10 +216,19 @@ const AddTransactionModal = ({ open, onClose, onAddTransaction, cardBalance, wal
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <Form.Item
             name="category"
-            label={<span className="text-lg font-medium text-gray-700 dark:text-gray-200">Category</span>}
+            label={
+              <span className="text-lg font-medium text-gray-700 dark:text-gray-200">
+                {t("modals.addTransaction.category")}
+              </span>
+            }
             rules={[{ required: true, message: "Category is required" }]}
           >
-            <Select className="w-full h-12" optionLabelProp="label" dropdownStyle={{ maxHeight: 400 }}>
+            <Select
+              className="w-full h-12"
+              optionLabelProp="label"
+              dropdownStyle={{ maxHeight: 400 }}
+              onChange={handleCategoryChange}
+            >
               {allCategories.map((group) => (
                 <Select.OptGroup key={group.group} label={group.group}>
                   {group.items.map((cat) => (
@@ -164,37 +243,49 @@ const AddTransactionModal = ({ open, onClose, onAddTransaction, cardBalance, wal
 
           <Form.Item
             name="type"
-            label={<span className="text-lg font-medium text-gray-700 dark:text-gray-200">Type</span>}
+            label={
+              <span className="text-lg font-medium text-gray-700 dark:text-gray-200">
+                {t("modals.addTransaction.type")}
+              </span>
+            }
             rules={[{ required: true, message: "Type is required" }]}
           >
-            <Select className="w-full h-12 text-lg">
+            <Select className="w-full h-12 text-lg" onChange={(value) => setSelectedType(value)}>
               <Option value="Income" className="text-lg">
-                Income
+                {t("transactions.type.income")}
               </Option>
               <Option value="Expense" className="text-lg">
-                Expense
+                {t("transactions.type.expense")}
               </Option>
             </Select>
           </Form.Item>
 
           <Form.Item
             name="paymentMethod"
-            label={<span className="text-lg font-medium text-gray-700 dark:text-gray-200">Payment Method</span>}
+            label={
+              <span className="text-lg font-medium text-gray-700 dark:text-gray-200">
+                {t("modals.addTransaction.paymentMethod")}
+              </span>
+            }
             rules={[{ required: true, message: "Payment Method is required" }]}
           >
             <Select className="w-full h-12 text-lg">
-              <Option value="Wallet" className="text-lg">
-                <div className="flex items-center gap-2">
-                  <FaWallet />
-                  Wallet (Balance: ${walletBalance})
-                </div>
-              </Option>
-              <Option value="Card" className="text-lg">
-                <div className="flex items-center gap-2">
-                  <FaCreditCard />
-                  Card (Balance: ${cardBalance})
-                </div>
-              </Option>
+              {walletBalance > 0 && (
+                <Option value="Wallet" className="text-lg">
+                  <div className="flex items-center gap-2">
+                    <FaWallet />
+                    {t("modals.addTransaction.walletBalance", { balance: walletBalance })}
+                  </div>
+                </Option>
+              )}
+              {cardBalance > 0 && (
+                <Option value="Card" className="text-lg">
+                  <div className="flex items-center gap-2">
+                    <FaCreditCard />
+                    {t("modals.addTransaction.cardBalance", { balance: cardBalance })}
+                  </div>
+                </Option>
+              )}
             </Select>
           </Form.Item>
         </div>
@@ -202,7 +293,11 @@ const AddTransactionModal = ({ open, onClose, onAddTransaction, cardBalance, wal
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <Form.Item
             name="date"
-            label={<span className="text-lg font-medium text-gray-700 dark:text-gray-200">Date</span>}
+            label={
+              <span className="text-lg font-medium text-gray-700 dark:text-gray-200">
+                {t("modals.addTransaction.date")}
+              </span>
+            }
             rules={[{ required: true, message: "Date is required" }]}
           >
             <DatePicker className="w-full h-12 text-lg" />
@@ -210,21 +305,36 @@ const AddTransactionModal = ({ open, onClose, onAddTransaction, cardBalance, wal
 
           <Form.Item
             name="provider"
-            label={<span className="text-lg font-medium text-gray-700 dark:text-gray-200">Provider</span>}
+            label={
+              <span className="text-lg font-medium text-gray-700 dark:text-gray-200">
+                {t("modals.addTransaction.provider")}
+              </span>
+            }
             rules={[{ required: true, message: "Provider is required" }]}
           >
-            <Input placeholder="Enter Provider" className="w-full h-12 text-lg px-4" />
+            <Input placeholder={t("modals.addTransaction.providerPlaceholder")} className="w-full h-12 text-lg px-4" />
           </Form.Item>
 
           <Form.Item
             name="amount"
-            label={<span className="text-lg font-medium text-gray-700 dark:text-gray-200">Amount</span>}
+            label={
+              <span className="text-lg font-medium text-gray-700 dark:text-gray-200">
+                {t("modals.addTransaction.amount")}
+              </span>
+            }
             rules={[
               { required: true, message: "Amount is required" },
-              { pattern: /^[0-9]+(\.[0-9]{1,2})?$/, message: "Please enter a valid amount" },
+              {
+                pattern: /^[0-9]+(\.[0-9]{1,2})?$/,
+                message: "Please enter a valid amount",
+              },
             ]}
           >
-            <Input prefix="$" placeholder="0.00" className="w-full h-12 text-lg px-4" />
+            <Input
+              prefix="$"
+              placeholder={t("modals.addTransaction.amountPlaceholder")}
+              className="w-full h-12 text-lg px-4"
+            />
           </Form.Item>
         </div>
 
@@ -234,13 +344,13 @@ const AddTransactionModal = ({ open, onClose, onAddTransaction, cardBalance, wal
             onClick={onClose}
             className="px-6 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors duration-200 text-lg dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
           >
-            Cancel
+            {t("modals.addTransaction.cancel")}
           </button>
           <button
             type="submit"
             className="px-6 py-2 rounded-lg bg-finance-blue-600 text-white hover:bg-finance-blue-700 transition-colors duration-200 text-lg"
           >
-            Add
+            {t("modals.addTransaction.save")}
           </button>
         </div>
       </Form>
@@ -248,5 +358,5 @@ const AddTransactionModal = ({ open, onClose, onAddTransaction, cardBalance, wal
   )
 }
 
-export default AddTransactionModal
+export default AddTransactionModal;
 

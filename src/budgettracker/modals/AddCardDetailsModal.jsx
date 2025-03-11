@@ -1,11 +1,24 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Modal, Input, Button, Form } from "antd"
+import { useTranslation } from "react-i18next"
 
-const AddCardDetailsModal = ({ open, onClose, onSave }) => {
+const AddCardDetailsModal = ({ open, onClose, onSave, isBalanceSet, cardDetails }) => {
+  const { t } = useTranslation()
   const [form] = Form.useForm()
   const [error, setError] = useState("")
+
+  useEffect(() => {
+    if (open && cardDetails) {
+      form.setFieldsValue({
+        cardHolder: cardDetails.cardHolder,
+        validThru: cardDetails.validThru,
+        cardNumber: cardDetails.cardNumber,
+        balance: cardDetails.balance,
+      })
+    }
+  }, [open, cardDetails, form])
 
   const handleSave = () => {
     form
@@ -15,7 +28,9 @@ const AddCardDetailsModal = ({ open, onClose, onSave }) => {
           cardHolder: values.cardHolder,
           validThru: values.validThru,
           cardNumber: values.cardNumber,
-          balance: Number.parseFloat(values.balance).toFixed(2),
+          balance: isBalanceSet
+            ? cardDetails.balance // If balance is already set, use the existing balance
+            : Number.parseFloat(values.balance).toFixed(2),
         }
         onSave(details)
         form.resetFields()
@@ -28,15 +43,15 @@ const AddCardDetailsModal = ({ open, onClose, onSave }) => {
 
   return (
     <Modal
-      title="Add Card Details"
+      title={t("incomesources.modals.addCard.title")}
       open={open}
       onCancel={onClose}
       footer={[
         <Button key="cancel" onClick={onClose}>
-          Cancel
+          {t("common.cancel")}
         </Button>,
         <Button key="save" type="primary" onClick={handleSave}>
-          Save
+          {t("common.save")}
         </Button>,
       ]}
       className="dark:bg-gray-800 dark:text-white"
@@ -55,50 +70,60 @@ const AddCardDetailsModal = ({ open, onClose, onSave }) => {
       <Form form={form} layout="vertical" className="mt-4">
         <Form.Item
           name="cardHolder"
-          label="Card Holder"
+          label={t("incomesources.modals.addCard.cardHolder")}
           rules={[{ required: true, message: "Please enter card holder name" }]}
         >
           <Input
-            placeholder="Enter card holder name"
+            placeholder={t("incomesources.modals.addCard.cardHolderPlaceholder")}
             className="dark:bg-gray-700 dark:text-white dark:border-gray-600"
           />
         </Form.Item>
 
         <Form.Item
           name="validThru"
-          label="Valid Thru"
+          label={t("incomesources.modals.addCard.validThru")}
           rules={[{ required: true, message: "Please enter expiration date" }]}
         >
-          <Input placeholder="MM/YY" className="dark:bg-gray-700 dark:text-white dark:border-gray-600" />
+          <Input
+            placeholder={t("incomesources.modals.addCard.validThruPlaceholder")}
+            className="dark:bg-gray-700 dark:text-white dark:border-gray-600"
+          />
         </Form.Item>
 
         <Form.Item
           name="cardNumber"
-          label="Card Number"
+          label={t("incomesources.modals.addCard.cardNumber")}
           rules={[{ required: true, message: "Please enter card number" }]}
         >
-          <Input placeholder="**** **** **** ****" className="dark:bg-gray-700 dark:text-white dark:border-gray-600" />
+          <Input
+            placeholder={t("incomesources.modals.addCard.cardNumberPlaceholder")}
+            className="dark:bg-gray-700 dark:text-white dark:border-gray-600"
+          />
         </Form.Item>
 
         <Form.Item
           name="balance"
-          label="Initial Balance"
+          label={t("incomesources.modals.addCard.initialBalance")}
           rules={[
-            { required: true, message: "Please enter initial balance" },
+            { required: !isBalanceSet, message: "Please enter initial balance" },
             { pattern: /^[0-9]+(\.[0-9]{1,2})?$/, message: "Please enter a valid amount" },
           ]}
         >
-          <Input placeholder="0.00" className="dark:bg-gray-700 dark:text-white dark:border-gray-600" />
+          <Input
+            placeholder={t("incomesources.modals.addCard.initialBalancePlaceholder")}
+            className="dark:bg-gray-700 dark:text-white dark:border-gray-600"
+            disabled={isBalanceSet} // Disable input if balance is already set
+          />
         </Form.Item>
       </Form>
 
       {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
-      <p className="text-red-500 text-sm mt-4">
-        Note: You can only set the initial balance once. It will be updated through transactions.
-      </p>
+      {isBalanceSet && (
+        <p className="text-red-500 text-sm mt-4">{t("incomesources.modals.addCard.balanceSetWarning")}</p>
+      )}
     </Modal>
   )
 }
 
-export default AddCardDetailsModal
+export default AddCardDetailsModal;
 

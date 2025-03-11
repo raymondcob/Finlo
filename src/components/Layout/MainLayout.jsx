@@ -59,7 +59,9 @@ const MainLayout = () => {
       <div className="flex flex-1 overflow-hidden">
         <Sidebar isOpen={isSidebarOpen} onMenuClick={toggleSidebar} />
         <main
-          className={`flex-1 overflow-auto transition-all duration-300 ${isMobile ? "w-full" : isSidebarOpen ? "ml-0" : "ml-0"} dark:bg-gray-900 dark:text-white`}
+          className={`flex-1 overflow-auto transition-all duration-300 ${
+            isMobile ? "w-full" : isSidebarOpen ? "ml-0" : "ml-0"
+          } dark:bg-gray-900 dark:text-white`}
         >
           <div className="p-4 md:p-6 max-w-7xl mx-auto">
             <Outlet />

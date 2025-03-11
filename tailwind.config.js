@@ -10,6 +10,10 @@ module.exports = {
   ],
   theme: {
     extend: {
+
+      animations: {
+        "spin-slow": "spin 3s linear infinite"
+      },
       fontFamily: {
         title: ["Cantarella", "sans-serif"],
         subheading: ["Exo", "serif"],

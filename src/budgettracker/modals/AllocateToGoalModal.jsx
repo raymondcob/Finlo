@@ -1,8 +1,10 @@
 import { Modal, Input, Select, Button, Form, Empty, Progress } from "antd"
+import { useTranslation } from "react-i18next"
 
 const { Option } = Select
 
 const AllocateToGoalModal = ({ open, onClose, onSave, goals }) => {
+  const { t } = useTranslation()
   const [form] = Form.useForm()
 
   const handleSave = () => {
@@ -22,15 +24,15 @@ const AllocateToGoalModal = ({ open, onClose, onSave, goals }) => {
 
   return (
     <Modal
-      title="Allocate to Savings Goal"
+      title={t("savingsGoals.modals.allocate.title")}
       open={open}
       onCancel={onClose}
       footer={[
         <Button key="cancel" onClick={onClose}>
-          Cancel
+          {t("savingsGoals.modals.allocate.cancel")}
         </Button>,
         <Button key="save" type="primary" onClick={handleSave} disabled={incompleteGoals.length === 0}>
-          Save
+          {t("savingsGoals.modals.allocate.save")}
         </Button>,
       ]}
       className="dark:bg-gray-800 dark:text-white"
@@ -48,8 +50,15 @@ const AllocateToGoalModal = ({ open, onClose, onSave, goals }) => {
     >
       {incompleteGoals.length > 0 ? (
         <Form form={form} layout="vertical" className="mt-4">
-          <Form.Item name="goalName" label="Select Goal" rules={[{ required: true, message: "Please select a goal" }]}>
-            <Select placeholder="Select a goal" className="dark:bg-gray-700 dark:text-white dark:border-gray-600">
+          <Form.Item
+            name="goalName"
+            label={t("savingsGoals.modals.allocate.selectGoal")}
+            rules={[{ required: true, message: "Please select a goal" }]}
+          >
+            <Select
+              placeholder={t("savingsGoals.modals.allocate.selectGoal")}
+              className="dark:bg-gray-700 dark:text-white dark:border-gray-600"
+            >
               {incompleteGoals.map((goal, index) => {
                 const percentage = goal.goalAmount ? Math.floor(((goal.currentAmount || 0) / goal.goalAmount) * 100) : 0
 
@@ -72,7 +81,7 @@ const AllocateToGoalModal = ({ open, onClose, onSave, goals }) => {
 
           <Form.Item
             name="amount"
-            label="Amount"
+            label={t("savingsGoals.modals.allocate.amount")}
             rules={[
               { required: true, message: "Please enter amount" },
               { pattern: /^[0-9]+(\.[0-9]{1,2})?$/, message: "Please enter a valid amount" },
@@ -82,11 +91,15 @@ const AllocateToGoalModal = ({ open, onClose, onSave, goals }) => {
           </Form.Item>
         </Form>
       ) : (
-        <Empty description="No available goals" image={Empty.PRESENTED_IMAGE_SIMPLE} className="my-8" />
+        <Empty
+          description={t("savingsGoals.modals.allocate.noGoals")}
+          image={Empty.PRESENTED_IMAGE_SIMPLE}
+          className="my-8"
+        />
       )}
     </Modal>
   )
 }
 
-export default AllocateToGoalModal
+export default AllocateToGoalModal;
 

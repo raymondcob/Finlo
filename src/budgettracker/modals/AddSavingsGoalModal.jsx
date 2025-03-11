@@ -1,6 +1,8 @@
 import { Modal, Input, DatePicker, Button, Form } from "antd"
+import { useTranslation } from "react-i18next"
 
 const AddSavingsGoalModal = ({ open, onClose, onSave }) => {
+  const { t } = useTranslation()
   const [form] = Form.useForm()
 
   const handleSave = () => {
@@ -19,15 +21,15 @@ const AddSavingsGoalModal = ({ open, onClose, onSave }) => {
 
   return (
     <Modal
-      title="Add Savings Goal"
+      title={t("savingsGoals.modals.addGoal.title")}
       open={open}
       onCancel={onClose}
       footer={[
         <Button key="cancel" onClick={onClose}>
-          Cancel
+          {t("savingsGoals.modals.addGoal.cancel")}
         </Button>,
         <Button key="save" type="primary" onClick={handleSave}>
-          Save
+          {t("savingsGoals.modals.addGoal.save")}
         </Button>,
       ]}
       className="dark:bg-gray-800 dark:text-white"
@@ -44,16 +46,20 @@ const AddSavingsGoalModal = ({ open, onClose, onSave }) => {
       }}
     >
       <Form form={form} layout="vertical" className="mt-4">
-        <Form.Item name="goalName" label="Goal Name" rules={[{ required: true, message: "Please enter goal name" }]}>
+        <Form.Item
+          name="goalName"
+          label={t("savingsGoals.modals.addGoal.goalName")}
+          rules={[{ required: true, message: "Please enter goal name" }]}
+        >
           <Input
-            placeholder="e.g. New Car, Vacation, Emergency Fund"
+            placeholder={t("savingsGoals.modals.addGoal.goalNamePlaceholder")}
             className="dark:bg-gray-700 dark:text-white dark:border-gray-600"
           />
         </Form.Item>
 
         <Form.Item
           name="goalAmount"
-          label="Target Amount"
+          label={t("savingsGoals.modals.addGoal.targetAmount")}
           rules={[
             { required: true, message: "Please enter target amount" },
             { pattern: /^[0-9]+(\.[0-9]{1,2})?$/, message: "Please enter a valid amount" },
@@ -62,10 +68,10 @@ const AddSavingsGoalModal = ({ open, onClose, onSave }) => {
           <Input placeholder="0.00" className="dark:bg-gray-700 dark:text-white dark:border-gray-600" />
         </Form.Item>
 
-        <Form.Item name="deadline" label="Deadline (Optional)">
+        <Form.Item name="deadline" label={t("savingsGoals.modals.addGoal.deadline")}>
           <DatePicker
             style={{ width: "100%" }}
-            placeholder="Select target date"
+            placeholder={t("savingsGoals.modals.addGoal.deadlinePlaceholder")}
             className="dark:bg-gray-700 dark:text-white dark:border-gray-600"
           />
         </Form.Item>
@@ -74,5 +80,5 @@ const AddSavingsGoalModal = ({ open, onClose, onSave }) => {
   )
 }
 
-export default AddSavingsGoalModal
+export default AddSavingsGoalModal;
 

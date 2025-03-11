@@ -9,30 +9,457 @@
   },
   "dashboard": {
     "welcome": "{{greeting}}, {{username}}!",
+    "subtitle": "Welcome to your financial dashboard",
+    "description": "Track your finances, manage transactions, and view reports all in one place.",
     "quickActions": "Quick Actions",
     "addTransaction": "Add Transaction",
     "viewReports": "View Reports",
     "manageIncome": "Manage Income Sources",
     "recentActivity": "Recent Activity",
-    "financialTips": "Financial Tips"
+    "financialTips": "Financial Tips",
+    "totalbalance": "Total Balance",
+    "totalExpenses": "Total Expenses",
+    "totalIncome": "Total Income",
+    "totalSavings": "Total Savings",
+    "incomevsexpenses": "Income vs Expenses",
+    "quickactions": {
+      "quickadd": "Quick Add",
+      "quickview": "View All",
+      "reports": "Reports",
+      "sources": "Income Sources"
+    },
+    "insights": {
+      "title": "Quick Insights",
+      "financialHealth": "Financial Health",
+      "expensesWarning": "⚠️ Your expenses are over 80% of your income",
+      "savingsProgress": "🎯 You're making progress on your savings!",
+      "goodFinances": "👍 Your finances are looking good!"
+    },
+    "noRecentTransactions": "No recent transactions",
+    "noActiveGoals": "No active savings goals",
+    "recentTransactions": "Recent Transactions"
   },
   "transactions": {
     "title": "Transactions",
     "subtitle": "View and manage your financial transactions",
     "category": "Category",
-    "type": "Type",
+    "tabletype": "Type",
     "provider": "Provider",
     "paymentMethod": "Payment Method",
     "date": "Date",
-    "amount": "Amount"
+    "amount": "Amount",
+    "addtransaction": "Add Transaction",
+    "insufficientBalance": "Transaction amount exceeds available balance.",
+    "lowBalancealert": "Low balance alert: ${{balance}} remaining in your {{method}}",
+    "transactionadded": "{{type}}: ${{amount}} {{action}} {{method}}",
+    "error": "Transaction failed",
+    "categories": {
+      "income": {
+        "title": "Income",
+        "salary": "Salary",
+        "freelanceincome": "Freelance Income",
+        "bonus": "Bonus",
+        "investmentincome": "Investment Income",
+        "rentalincome": "Rental Income",
+        "dividends": "Dividends",
+        "interestincome": "Interest Income",
+        "gifts": "Gifts",
+        "refunds": "Refunds",
+        "otherincome": "Other Income"
+      },
+      "essential": {
+        "title": "Essential Expenses",
+        "rent/mortgage": "Rent/Mortgage",
+        "utilities": "Utilities",
+        "groceries": "Groceries",
+        "transportation": "Transportation",
+        "insurance": "Insurance",
+        "medicalexpenses": "Medical Expenses",
+        "internet": "Internet",
+        "phonebill": "Phone Bill",
+        "childcare": "Childcare",
+        "loanpayments": "Loan Payments"
+      },
+      "lifestyle": {
+        "title": "Lifestyle Expenses",
+        "diningout": "Dining Out",
+        "entertainment": "Entertainment",
+        "shopping": "Shopping",
+        "travel": "Travel",
+        "gym/fitness": "Gym/Fitness",
+        "subscriptions": "Subscriptions",
+        "gifts/donations": "Gifts/Donations",
+        "personalcare": "Personal Care",
+        "petexpenses": "Pet Expenses",
+        "otherexpenses": "Other Expenses"
+      }
+    },
+    "type": {
+      "income": "Income",
+      "expense": "Expense"
+    },
+    "payment": {
+      "card": "Card",
+      "wallet": "Wallet"
+    },
+    "dateFilters": {
+      "last7days": "Last 7 days",
+      "last30days": "Last 30 days",
+      "last90days": "Last 90 days"
+    }
+  },
+  "reports": {
+    "title": "Financial Reports",
+    "subtitle": "Analyze your financial data with interactive charts",
+    "tabs": {
+      "overview": "Overview",
+      "calendar": "Transaction Calendar"
+    },
+    "charts": {
+      "yearlyComparison": "Yearly Savings Tracker",
+      "incomeCategories": "Income Categories",
+      "expenseCategories": "Expense Categories",
+      "monthlyCalendar": "Monthly Transactions Calendar",
+      "noData": {
+        "savings": "No savings data available",
+        "savingsSubtitle": "Start saving to see your progress",
+        "transactions": "No transactions found",
+        "transactionsSubtitle": "Add transactions to see your financial overview",
+        "income": "No income transactions found",
+        "incomeSubtitle": "Add some income transactions to see your statistics",
+        "expense": "No expense transactions found",
+        "expenseSubtitle": "Add some expense transactions to see your statistics"
+      },
+      "labels": {
+        "savings": "Your Savings",
+        "targets": "Target Goals",
+        "amount": "Amount ($)",
+        "month": "Month"
+      },
+      "categories": {
+        "income": {
+          "Salary": "Salary",
+          "Freelance Income": "Freelance Income",
+          "Bonus": "Bonus",
+          "Investment Income": "Investment Income",
+          "Rental Income": "Rental Income",
+          "Dividends": "Dividends",
+          "Interest Income": "Interest Income",
+          "Gifts": "Gifts",
+          "Refunds": "Refunds",
+          "Other Income": "Other Income"
+        },
+        "expense": {
+          "Rent/Mortgage": "Rent/Mortgage",
+          "Utilities": "Utilities",
+          "Groceries": "Groceries",
+          "Transportation": "Transportation",
+          "Insurance": "Insurance",
+          "Medical Expenses": "Medical Expenses",
+          "Internet": "Internet",
+          "Phone Bill": "Phone Bill",
+          "Childcare": "Childcare",
+          "Loan Payments": "Loan Payments",
+          "Dining Out": "Dining Out",
+          "Entertainment": "Entertainment",
+          "Shopping": "Shopping",
+          "Travel": "Travel",
+          "Gym/Fitness": "Gym/Fitness",
+          "Subscriptions": "Subscriptions",
+          "Gifts/Donations": "Gifts/Donations",
+          "Personal Care": "Personal Care",
+          "Pet Expenses": "Pet Expenses",
+          "Other Expenses": "Other Expenses"
+        }
+      }
+    }
   },
   "savingsGoals": {
     "title": "Savings Goals",
+    "subtitle": "Track your progress towards financial targets",
     "addGoal": "Add Savings Goal",
     "activeGoals": "Active Goals",
     "completedGoals": "Completed Goals",
     "noActiveGoals": "No active savings goals. Click \"Add Savings Goal\" to get started!",
     "noCompletedGoals": "No completed savings goals yet. Keep saving!",
-    "deadline": "Deadline"
+    "deadline": "Deadline",
+    "noDeadline": "No deadline",
+    "goalName": "Goal Name",
+    "targetAmount": "Target Amount",
+    "currentAmount": "Current Amount",
+    "progress": "Progress",
+    "allocate": "Allocate",
+    "modals": {
+      "addGoal": {
+        "title": "Add Savings Goal",
+        "goalName": "Goal Name",
+        "goalNamePlaceholder": "e.g. New Car, Vacation, Emergency Fund",
+        "targetAmount": "Target Amount",
+        "deadline": "Deadline (Optional)",
+        "deadlinePlaceholder": "Select target date",
+        "save": "Save",
+        "cancel": "Cancel"
+      },
+      "allocate": {
+        "title": "Allocate to Savings Goal",
+        "selectGoal": "Select Goal",
+        "amount": "Amount",
+        "save": "Save",
+        "cancel": "Cancel",
+        "noGoals": "No available goals"
+      }
+    },
+    "notifications": {
+      "goalCompleted": {
+        "title": "Congratulations!",
+        "message": "You've reached your savings goal for {{goalName}}!"
+      },
+      "goalSurpassed": {
+        "title": "Amazing!",
+        "message": "You've surpassed your savings goal for {{goalName}}!"
+      },
+      "goalMissed": {
+        "title": "Goal Missed",
+        "message": "You didn't meet your savings goal for {{goalName}}, but you're making progress!"
+      },
+      "allocationSuccess": {
+        "message": "Only ${{amount}} was needed to complete this goal. The remaining ${{remaining}} stays in your {{source}}."
+      },
+      "allocationError": {
+        "message": "The amount entered is higher than the available balance."
+      }
+    }
+  },
+  "greetings": {
+    "morning": "Good Morning",
+    "afternoon": "Good Afternoon",
+    "evening": "Good Evening"
+  },
+  "calendar": {
+    "toolbar": {
+      "today": "Today",
+      "previous": "Back",
+      "next": "Next"
+    },
+    "labels": {
+      "month": {
+        "january": "January",
+        "february": "February",
+        "march": "March",
+        "april": "April",
+        "may": "May",
+        "june": "June",
+        "july": "July",
+        "august": "August",
+        "september": "September",
+        "october": "October",
+        "november": "November",
+        "december": "December"
+      },
+      "weekdays": {
+        "sunday": "Sunday",
+        "monday": "Monday",
+        "tuesday": "Tuesday",
+        "wednesday": "Wednesday",
+        "thursday": "Thursday",
+        "friday": "Friday",
+        "saturday": "Saturday"
+      }
+    },
+    "modal": {
+      "title": "Transactions for {{date}}",
+      "income": "Income",
+      "expense": "Expense",
+      "noTransactions": "No transactions for this date",
+      "total": "Total"
+    }
+  },
+  "incomesources": {
+    "title": "Income Sources",
+    "subtitle": "Manage your cards and wallet details",
+    "mycard": "My Card",
+    "mywallet": "My Wallet",
+    "cardholder": "Card Holder",
+    "validthru": "Valid Thru",
+    "cashbalance": "Cash Balance",
+    "cardbalance": "Balance",
+    "walletholder": "{{username}}'s Wallet",
+    "allocatetogoals": "Allocate to Savings Goals",
+    "updatecarddetails": "Update Card Details",
+    "setcarddetails": "Set Card Details",
+    "cashbalancedset": "Balance set",
+    "cashbalanceinitial": "Set Initial Balance",
+    "cardbalancealert": "Low card balance alert: ${{balance}}",
+    "walletbalancealert": "Low wallet balance alert: ${{balance}}",
+    "modals": {
+      "addCard": {
+        "title": "Add Card Details",
+        "cardHolder": "Card Holder",
+        "cardHolderPlaceholder": "Enter card holder name",
+        "validThru": "Valid Thru",
+        "validThruPlaceholder": "MM/YY",
+        "cardNumber": "Card Number",
+        "cardNumberPlaceholder": "**** **** **** ****",
+        "initialBalance": "Initial Balance",
+        "initialBalancePlaceholder": "0.00",
+        "balanceSetWarning": "Note: The initial balance can only be set once. It will be updated through transactions.",
+        "save": "Save",
+        "cancel": "Cancel"
+      },
+      "addWallet": {
+        "title": "Add Wallet Details",
+        "balance": "Balance",
+        "balancePlaceholder": "0.00",
+        "balanceSetWarning": "Note: You can only set the initial balance once. It will be updated through transactions.",
+        "save": "Save",
+        "cancel": "Cancel"
+      }
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Manage your account preferences and settings",
+    "tabs": {
+      "profile": "Profile",
+      "security": "Security",
+      "help": "Help & Support"
+    },
+    "profile": {
+      "title": "Profile Settings",
+      "googleAccountNotice": "Some profile information can only be updated through your Google Account. Visit",
+      "googleAccountLink": "Google Account Settings",
+      "toModify": "to modify your email and password.",
+      "fullName": "Full Name",
+      "emailAddress": "Email Address",
+      "saveChanges": "Save Changes",
+      "profilePicture": "Profile picture can only be updated through Google"
+    },
+    "security": {
+      "title": "Security Settings",
+      "googleSecurityNotice": "Security settings for Google-authenticated users can only be managed through your Google Account. Please visit",
+      "googleSecurityLink": "Google Security Settings",
+      "toModify": "to modify your security preferences.",
+      "updateEmail": "Update Email",
+      "newEmailAddress": "New Email Address",
+      "changePassword": "Change Password",
+      "newPassword": "New Password",
+      "confirmNewPassword": "Confirm New Password",
+      "updateSecuritySettings": "Update Security Settings",
+      "passwordMismatch": "Passwords do not match"
+    },
+    "help": {
+      "title": "Help & Support",
+      "quickHelp": "Quick Help",
+      "faqs": {
+        "addTransaction": {
+          "question": "How do I add a new transaction?",
+          "answer": "Click the '+' button on the dashboard and fill in the transaction details."
+        },
+        "setupWalletCard": {
+          "question": "How do I set up my wallet or card?",
+          "answer": "Go to Income Sources and click 'Add New' to set up your payment methods."
+        }
+      },
+      "contactSupport": "Contact Support",
+      "subject": "Subject",
+      "subjectPlaceholder": "Select a topic",
+      "subjectOptions": {
+        "account": "Account Issue",
+        "transaction": "Transaction Problem",
+        "feature": "Feature Request",
+        "other": "Other"
+      },
+      "message": "Message",
+      "messagePlaceholder": "Describe your issue or question...",
+      "sendMessage": "Send Message",
+      "messageSent": "Message sent! We'll get back to you soon.",
+      "messageError": "Failed to send message. Please try again."
+    },
+    "notifications": {
+      "profileUpdated": "Profile updated successfully",
+      "profileUpdateFailed": "Failed to update profile",
+      "emailUpdated": "Email updated successfully",
+      "passwordUpdated": "Password updated successfully",
+      "securityUpdateFailed": "Failed to update security settings"
+    }
+  },
+  "modals": {
+    "addTransaction": {
+      "title": "Add Transaction",
+      "category": "Category",
+      "type": "Type",
+      "paymentMethod": "Payment Method",
+      "date": "Date",
+      "provider": "Provider",
+      "providerPlaceholder": "Enter Provider",
+      "amount": "Amount",
+      "amountPlaceholder": "0.00",
+      "save": "Add",
+      "cancel": "Cancel",
+      "walletBalance": "Wallet (Balance: ${{balance}})",
+      "cardBalance": "Card (Balance: ${{balance}})",
+      "errors": {
+        "noBalance": {
+          "title": "No Balance Available",
+          "content": "Please set up your wallet or card balance first to track transactions."
+        },
+        "categoryMismatch": {
+          "title": "Category Mismatch",
+          "incomeContent": "Please select an income category for income transactions.",
+          "expenseContent": "Please select an expense category for expense transactions."
+        }
+      }
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Welcome Back!",
+      "subtitle": "Please enter your details",
+      "email": "Email",
+      "emailPlaceholder": "Enter your email",
+      "password": "Password",
+      "passwordPlaceholder": "Enter your password",
+      "loginButton": "Login",
+      "orDivider": "or",
+      "googleLogin": "Login with Google",
+      "noAccount": "Don't have an account?",
+      "signUp": "Sign Up",
+      "forgotPassword": "Forgot password?"
+    },
+    "signup": {
+      "title": "Create an Account",
+      "subtitle": "Join us by filling in your details below.",
+      "name": "Name",
+      "namePlaceholder": "Enter your name",
+      "email": "Email",
+      "emailPlaceholder": "Enter your email",
+      "password": "Password",
+      "passwordPlaceholder": "Create a password",
+      "signUpButton": "Sign Up",
+      "haveAccount": "Already have an account?",
+      "login": "Login"
+    },
+    "welcome": "Welcome to StackUp Finance",
+    "tagline": "Your personal finance tracker for better money management",
+    "features": {
+      "tracking": "Track your income and expenses",
+      "insights": "Get insights into your spending habits",
+      "goals": "Set and achieve your savings goals"
+    },
+    "rights": "All rights reserved."
+  },
+  "common": {
+    "needHelp": "Need Help?",
+    "supportText": "Contact our support team for assistance",
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "add": "Add",
+    "update": "Update",
+    "delete": "Delete",
+    "logout": "Logout",
+    "profile": "Profile",
+    "settings": "Settings"
   }
 }
+

@@ -463,3 +463,90 @@ body {
   box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
 }
 
+/* Add specific styles for mobile transaction cards in dark mode */
+.dark .ant-card {
+  background-color: #1f2937;
+  border-color: #374151;
+  color: #e5e7eb;
+}
+
+.dark .ant-card-body {
+  color: #e5e7eb;
+}
+
+.dark .ant-typography {
+  color: #e5e7eb;
+}
+
+.dark .ant-list-item {
+  border-color: #374151;
+}
+
+.rbc-calendar {
+  @apply bg-white dark:bg-gray-800 rounded-lg shadow-sm;
+}
+
+.rbc-event {
+  @apply !bg-transparent !border-0;
+}
+
+.rbc-event-content {
+  @apply !h-full;
+}
+
+.rbc-row-segment {
+  @apply !px-1;
+}
+
+.calendar-tooltip .ant-tooltip-inner {
+  @apply bg-gray-800 dark:bg-gray-700;
+}
+
+/* Glassmorphism effect for cards */
+.glassmorphism {
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+}
+
+.dark .glassmorphism {
+  background: rgba(17, 24, 39, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Enhance the dashboard cards with subtle hover effects */
+.dashboard-card {
+  transition: all 0.3s ease;
+}
+
+.dashboard-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.dark .dashboard-card:hover {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+}
+
+/* Improve progress bars */
+.ant-progress-bg {
+  transition: all 0.5s ease;
+}
+
+.ant-progress:hover .ant-progress-bg {
+  filter: brightness(1.1);
+}
+
+/* Dotted border buttons */
+.btn-dotted {
+  border: 2px dashed;
+  background-color: transparent;
+  transition: all 0.3s ease;
+}
+
+.btn-dotted:hover {
+  border-style: solid;
+}
+
