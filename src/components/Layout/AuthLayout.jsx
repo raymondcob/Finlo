@@ -97,7 +97,12 @@ const AuthLayout = () => {
               <div className="absolute inset-0 bg-gradient-to-br from-finance-blue-600/80 to-finance-blue-800/80 z-10"></div>
               <img src="/Finance-Img.png" alt="Finance" className="w-full h-full object-cover" />
               <div className="absolute inset-0 flex flex-col justify-center items-center z-20 p-10 text-white">
-                <h2 className="text-3xl font-bold mb-4">{t("auth.welcome")}</h2>
+                <h2 className="text-3xl font-bold mb-4 flex items-center">
+                  <div className="w-10 h-10 rounded-full bg-white/90 flex items-center justify-center mr-3 shadow-lg ">
+                    <img src="/favicon.ico" alt="Finlo" className="w-7 h-7 object-contain" />
+                  </div>
+                  Finlo
+                </h2>
                 <p className="text-lg text-center mb-6">{t("auth.tagline")}</p>
                 <div className="space-y-4">
                   <div className="flex items-center gap-3">
@@ -166,11 +171,11 @@ const AuthLayout = () => {
 
       {/* Footer */}
       <div className="w-full p-4 text-center text-gray-600 dark:text-gray-400">
-        <p>© 2025 StackUp Finance. {t("auth.rights")}</p>
+        <p>© 2025 Finlo. {t("auth.rights")}</p>
       </div>
     </div>
   )
 }
 
-export default AuthLayout;
+export default AuthLayout
 

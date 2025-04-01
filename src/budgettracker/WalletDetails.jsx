@@ -1,5 +1,3 @@
-"use client"
-
 import { useState } from "react"
 import { FaPiggyBank } from "react-icons/fa"
 import AllocateToGoalModal from "./modals/AllocateToGoalModal"
@@ -53,23 +51,25 @@ const WalletDetails = ({ name, balance, onSetDetails, isDetailsSet, goals, userI
   }
 
   return (
-    <div className="w-full max-w-[460px] min-w-[300px] h-[283px] flex justify-center items-center relative p-[10px] box-border">
-      <div className="w-full h-[240px] bg-gradient-to-b from-finance-green-700 to-finance-green-500 dark:from-finance-green-800 dark:to-finance-green-600 rounded-xl p-6 flex flex-col justify-between box-border shadow-lg relative">
+    <div className="w-full max-w-[460px] min-w-[300px] h-auto min-h-[283px] flex justify-center items-center relative p-[10px] box-border">
+      <div className="w-full h-auto min-h-[240px] bg-gradient-to-b from-finance-green-700 to-finance-green-500 dark:from-finance-green-800 dark:to-finance-green-600 rounded-xl p-6 flex flex-col justify-between box-border shadow-lg relative">
         <div>
-          <div className="font-title text-3xl font-inter font-semibold text-white mb-2">
+          <div className="font-title text-2xl sm:text-3xl font-inter font-semibold text-white mb-2 truncate">
             {t("incomesources.walletholder", { username: name })}
           </div>
         </div>
-        <div>
+        <div className="mt-4">
           <div className="w-full h-[1px] bg-white/30 my-4" />
-          <div className="text-[30px] font-inter font-semibold text-white/90">{t("incomesources.cashbalance")}</div>
-          <div className="text-[28px] font-inter font-semibold text-white">$ {balance}</div>
+          <div className="text-2xl sm:text-[30px] font-inter font-semibold text-white/90">
+            {t("incomesources.cashbalance")}
+          </div>
+          <div className="text-2xl sm:text-[28px] font-inter font-semibold text-white">$ {balance}</div>
         </div>
 
         {/* Set Wallet Details Button */}
-        <div className="flex justify-center">
+        <div className="flex justify-center mt-4">
           <button
-            className="px-3 py-1.5 bg-white/10 backdrop-blur-sm border border-white/30 text-white rounded-full transition-colors duration-200 hover:bg-white/20 text-sm"
+            className="px-3 py-1.5 bg-white/10 backdrop-blur-sm border border-white/30 text-white rounded-full transition-colors duration-200 hover:bg-white/20 text-xs sm:text-sm whitespace-nowrap"
             onClick={onSetDetails}
             disabled={isDetailsSet}
           >
@@ -102,5 +102,5 @@ const WalletDetails = ({ name, balance, onSetDetails, isDetailsSet, goals, userI
   )
 }
 
-export default WalletDetails;
+export default WalletDetails
 

@@ -5,7 +5,8 @@
     "reports": "Reports",
     "income": "Income Sources",
     "savingsGoals": "Savings Goals",
-    "settings": "Settings"
+    "settings": "Settings",
+    "budgetLimits": "Budget Limits"
   },
   "dashboard": {
     "welcome": "{{greeting}}, {{username}}!",
@@ -24,7 +25,8 @@
     "incomevsexpenses": "Income vs Expenses",
     "quickactions": {
       "quickadd": "Quick Add",
-      "quickview": "View All",
+      "setBudgets": "Set Budget Limits",
+      "viewBudgets": "View Budget Limits",
       "reports": "Reports",
       "sources": "Income Sources"
     },
@@ -33,7 +35,8 @@
       "financialHealth": "Financial Health",
       "expensesWarning": "⚠️ Your expenses are over 80% of your income",
       "savingsProgress": "🎯 You're making progress on your savings!",
-      "goodFinances": "👍 Your finances are looking good!"
+      "goodFinances": "👍 Your finances are looking good!",
+      "setBudgetLimits": "💡 Set budget limits to better track your spending"
     },
     "noRecentTransactions": "No recent transactions",
     "noActiveGoals": "No active savings goals",
@@ -52,7 +55,17 @@
     "insufficientBalance": "Transaction amount exceeds available balance.",
     "lowBalancealert": "Low balance alert: ${{balance}} remaining in your {{method}}",
     "transactionadded": "{{type}}: ${{amount}} {{action}} {{method}}",
-    "error": "Transaction failed",
+    "error": {
+      "noPaymentMethods": "No payment methods available",
+      "noPaymentMethodsMessage": "No payment methods available. Please set up your income sources first.",
+      "setupSources": "Set Up Sources",
+      "insufficientBalance": "Insufficient balance in your {{method}}",
+      "insufficientBalanceMessage": "Insufficient balance in your {{method}}",
+      "addingTransactionMessage": "Error adding transaction. Please try again."
+    },
+    "success": {
+      "addedMessage": "Transaction added successfully"
+    },
     "categories": {
       "income": {
         "title": "Income",
@@ -65,7 +78,8 @@
         "interestincome": "Interest Income",
         "gifts": "Gifts",
         "refunds": "Refunds",
-        "otherincome": "Other Income"
+        "otherincome": "Other Income",
+        "description": "All sources of income"
       },
       "essential": {
         "title": "Essential Expenses",
@@ -78,7 +92,8 @@
         "internet": "Internet",
         "phonebill": "Phone Bill",
         "childcare": "Childcare",
-        "loanpayments": "Loan Payments"
+        "loanpayments": "Loan Payments",
+        "description": "Basic expenses necessary for daily life"
       },
       "lifestyle": {
         "title": "Lifestyle Expenses",
@@ -91,7 +106,8 @@
         "gifts/donations": "Gifts/Donations",
         "personalcare": "Personal Care",
         "petexpenses": "Pet Expenses",
-        "otherexpenses": "Other Expenses"
+        "otherexpenses": "Other Expenses",
+        "description": "Discretionary spending and entertainment"
       }
     },
     "type": {
@@ -106,6 +122,25 @@
       "last7days": "Last 7 days",
       "last30days": "Last 30 days",
       "last90days": "Last 90 days"
+    },
+    "tabs": {
+      "all": "All Transactions",
+      "recurring": "Recurring Transactions"
+    },
+    "recurring": {
+      "frequency": "Frequency",
+      "endDate": "End Date",
+      "noEndDate": "No end date",
+      "endRecurring": "End Recurring",
+      "confirmEnd": "End Recurring Transaction",
+      "confirmEndMessage": "Are you sure you want to end this recurring transaction?",
+      "endedSuccess": "Recurring transaction ended successfully",
+      "endedError": "Failed to end recurring transaction",
+      "details": {
+        "category": "Category",
+        "amount": "Amount",
+        "frequency": "Frequency"
+      }
     }
   },
   "reports": {
@@ -304,7 +339,12 @@
         "initialBalancePlaceholder": "0.00",
         "balanceSetWarning": "Note: The initial balance can only be set once. It will be updated through transactions.",
         "save": "Save",
-        "cancel": "Cancel"
+        "cancel": "Cancel",
+        "securityNotice": "This is a mock card for demonstration purposes only. Do not enter real card information. All data is simulated for the app experience.",
+        "cardNumberHelp": "Enter any 4 digits for mock card number",
+        "cardNumberPlaceholder": "Enter last 4 digits only",
+        "validThruFormat": "Format: MM/YY",
+        "cardNumberPrefix": "**** **** ****"
       },
       "addWallet": {
         "title": "Add Wallet Details",
@@ -385,6 +425,7 @@
   },
   "modals": {
     "addTransaction": {
+      "setupRequired": "Setup Required",
       "title": "Add Transaction",
       "category": "Category",
       "type": "Type",
@@ -392,12 +433,25 @@
       "date": "Date",
       "provider": "Provider",
       "providerPlaceholder": "Enter Provider",
+      "providerRequired": "Please enter a provider",
       "amount": "Amount",
       "amountPlaceholder": "0.00",
+      "amountRequired": "Please enter an amount",
+      "amountInvalid": "Please enter a valid amount",
       "save": "Add",
       "cancel": "Cancel",
       "walletBalance": "Wallet (Balance: ${{balance}})",
       "cardBalance": "Card (Balance: ${{balance}})",
+      "recurring": {
+        "label": "Transaction Frequency",
+        "required": "Please select transaction frequency",
+        "oneTime": "One-time transaction",
+        "monthly": "Repeat monthly",
+        "weekly": "Repeat weekly",
+        "yearly": "Repeat yearly",
+        "endDate": "End Date",
+        "endDatePlaceholder": "Select end date for recurring transaction"
+      },
       "errors": {
         "noBalance": {
           "title": "No Balance Available",
@@ -439,7 +493,7 @@
       "haveAccount": "Already have an account?",
       "login": "Login"
     },
-    "welcome": "Welcome to StackUp Finance",
+    "welcome": "Welcome to Finlo!",
     "tagline": "Your personal finance tracker for better money management",
     "features": {
       "tracking": "Track your income and expenses",
@@ -460,6 +514,33 @@
     "logout": "Logout",
     "profile": "Profile",
     "settings": "Settings"
+  },
+  "budgets": {
+    "title": "Budget Limits",
+    "subtitle": "Set and manage your spending limits by category",
+    "setLimit": "Set Limit",
+    "setLimitTitle": "Set Budget Limit",
+    "category": "Category",
+    "limit": "Budget Limit",
+    "frequency": "Reset Frequency",
+    "categoryRequired": "Please select a category",
+    "limitRequired": "Please enter a budget limit",
+    "limitInvalid": "Please enter a valid amount",
+    "frequencyRequired": "Please select a frequency",
+    "limitSet": "Budget limit set successfully",
+    "limitSetError": "Error setting budget limit",
+    "needsReset": "Budget for {{category}} has expired. Please set a new limit.",
+    "spentOfBudget": "${spent} of ${budget}",
+    "resetOn": "Resets on ${date}",
+    "frequency": {
+      "weekly": "Weekly",
+      "monthly": "Monthly",
+      "yearly": "Yearly"
+    },
+    "progress": {
+      "danger": "Over budget",
+      "warning": "Near limit",
+      "good": "Within budget"
+    }
   }
 }
-

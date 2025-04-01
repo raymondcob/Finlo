@@ -5,6 +5,7 @@ import "moment/locale/es";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { db } from "../../config/firebase";
 import { Modal } from "antd";
+import PropTypes from "prop-types";
 import {
   ShoppingCartOutlined,
   CoffeeOutlined,
@@ -224,29 +225,29 @@ const CustomCalendar = ({ userId }) => {
         .replace(/\s+/g, "")}`;
     }
 
-    // Essential expenses categories
+    // Define essential categories (keep special characters)
     const essentialCategories = [
-      "Rent",
-      "Mortgage",
-      "Utilities",
-      "Groceries",
-      "Transportation",
-      "Insurance",
-      "Medical",
-      "Internet",
-      "Phone",
-      "Childcare",
-      "Loan Payments",
+      "rent/mortgage",
+      "utilities",
+      "groceries",
+      "transportation",
+      "insurance",
+      "medicalexpenses",
+      "internet",
+      "phonebill",
+      "childcare",
+      "loanpayments",
     ];
 
-    const category = transaction.category;
-    const isEssential = essentialCategories.some(
-      (ec) => ec.toLowerCase() === category.toLowerCase()
-    );
+    // Normalize the category for comparison
+    const normalizedCategory = transaction.category
+      .toLowerCase()
+      .replace(/\s+/g, "");
+    const isEssential = essentialCategories.includes(normalizedCategory);
 
     return `transactions.categories.${
       isEssential ? "essential" : "lifestyle"
-    }.${transaction.category.toLowerCase().replace(/\s+/g, "")}`;
+    }.${normalizedCategory}`;
   };
 
   // Render the modal content with transactions
@@ -492,6 +493,10 @@ const CustomCalendar = ({ userId }) => {
       </Modal>
     </div>
   );
+};
+
+CustomCalendar.propTypes = {
+  userId: PropTypes.string.isRequired,
 };
 
 export default CustomCalendar;

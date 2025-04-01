@@ -1,11 +1,9 @@
-"use client"
-
 import { useState, useEffect } from "react"
 import { FaPiggyBank } from "react-icons/fa"
 import { FcSimCardChip } from "react-icons/fc"
 import AllocateToGoalModal from "./modals/AllocateToGoalModal"
 import { db } from "../config/firebase"
-import { doc, getDoc, setDoc } from "firebase/firestore"
+import { doc, setDoc, getDoc } from "firebase/firestore"
 import { message } from "antd"
 import { useTranslation } from "react-i18next"
 
@@ -21,7 +19,7 @@ const CardDetails = ({
   setGoals,
   setBalance,
   setCardDetails,
-  isBalanceSet, // Add this prop
+  isBalanceSet,
 }) => {
   const [isAllocateModalOpen, setIsAllocateModalOpen] = useState(false)
   const { t } = useTranslation()
@@ -89,52 +87,70 @@ const CardDetails = ({
     }
   }
 
+  // Format the card number to show asterisks and last 4 digits
+  const formatCardNumber = (number) => {
+    // If it's already in the correct format (with asterisks), return as is
+    if (number.includes("*")) return number
+
+    // If it's just 4 digits, add the asterisks
+    if (number.length === 4) return `**** **** **** ${number}`
+
+    // Fallback
+    return "**** **** **** 1234"
+  }
+
   return (
-    <div className="w-full max-w-[445px] h-[283px] rounded-[20px] bg-gradient-to-r from-finance-blue-800 to-finance-blue-500 dark:from-finance-blue-900 dark:to-finance-blue-700 p-6 flex flex-col justify-between box-border shadow-lg relative">
+    <div className="w-full max-w-[445px] h-auto min-h-[283px] rounded-[20px] bg-gradient-to-r from-finance-blue-800 to-finance-blue-500 dark:from-finance-blue-900 dark:to-finance-blue-700 p-6 flex flex-col justify-between box-border shadow-lg relative">
       {/* Balance Section */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-2 mb-4">
         <div className="flex flex-col">
-          <span className="text-white text-2xl font-lato font-normal mb-2">{t("incomesources.cardbalance")}</span>
-          <span className="text-white text-[22px] font-inter font-semibold">$ {balance}</span>
+          <span className="text-white text-xl sm:text-2xl font-lato font-normal mb-2">
+            {t("incomesources.cardbalance")}
+          </span>
+          <span className="text-white text-xl sm:text-[22px] font-inter font-semibold">$ {balance}</span>
         </div>
         {/* Set Card Details Button */}
         <button
-          className="mr-2 px-2 py-1.5 bg-white/10 backdrop-blur-sm border border-white/30 text-white rounded-full transition-colors duration-200 hover:bg-white/20 text-sm"
-          onClick={onSetDetails} // Always allow opening the modal
+          className="px-2 py-1.5 bg-white/10 backdrop-blur-sm border border-white/30 text-white rounded-full transition-colors duration-200 hover:bg-white/20 text-xs sm:text-sm whitespace-nowrap"
+          onClick={onSetDetails}
         >
           {isDetailsSet ? t("incomesources.updatecarddetails") : t("incomesources.setcarddetails")}
         </button>
       </div>
 
       {/* Chip Image */}
-      <div className="self-end">
-        <FcSimCardChip className="text-white text-4xl w-[70.87px] h-[57.28px]" />
+      <div className="self-end mb-4">
+        <FcSimCardChip className="text-white text-3xl sm:text-4xl w-[60px] sm:w-[70.87px] h-[45px] sm:h-[57.28px]" />
       </div>
 
       {/* Card Details Section */}
-      <div className="flex flex-col gap-2">
-        <div className="flex justify-between">
-          <div>
-            <div className="text-white/70 text-[16px] font-inter font-semibold mb-1">
+      <div className="flex flex-col gap-2 mt-auto">
+        <div className="flex justify-between flex-wrap gap-2">
+          <div className="min-w-[120px]">
+            <div className="text-white/70 text-sm sm:text-[16px] font-inter font-semibold mb-1">
               {t("incomesources.cardholder")}
             </div>
-            <div className="text-white text-lg font-inter font-medium">{cardHolder}</div>
+            <div className="text-white text-base sm:text-lg font-inter font-medium truncate max-w-[150px]">
+              {cardHolder}
+            </div>
           </div>
           <div>
-            <div className="text-white/70 text-[16px] font-inter font-semibold mb-1">
+            <div className="text-white/70 text-sm sm:text-[16px] font-inter font-semibold mb-1">
               {t("incomesources.validthru")}
             </div>
-            <div className="text-white text-lg font-inter font-medium">{validThru}</div>
+            <div className="text-white text-base sm:text-lg font-inter font-medium">{validThru}</div>
           </div>
         </div>
 
         {/* Card Number */}
-        <div className="flex justify-between items-center bg-white/10 backdrop-blur-sm p-2 rounded-[10px]">
-          <span className="text-white text-[18px] font-inter font-semibold">{cardNumber}</span>
+        <div className="flex justify-between items-center bg-white/10 backdrop-blur-sm p-2 rounded-[10px] mt-2 flex-wrap gap-2">
+          <span className="text-white text-base sm:text-[18px] font-inter font-semibold truncate max-w-[200px]">
+            {formatCardNumber(cardNumber)}
+          </span>
           <img
             src="https://dashboard.codeparrot.ai/api/image/Z58GOjRi7Jes38uz/group-17.png"
             alt="Card Logo"
-            className="w-[70px] h-[45px]"
+            className="w-[60px] h-[40px] sm:w-[70px] sm:h-[45px]"
           />
         </div>
       </div>
@@ -163,5 +179,5 @@ const CardDetails = ({
   )
 }
 
-export default CardDetails;
+export default CardDetails
 

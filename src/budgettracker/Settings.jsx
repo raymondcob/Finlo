@@ -1,15 +1,13 @@
-
 import { useState, useContext } from "react"
 import { UserContext } from "../context/UserContext"
 import { motion } from "framer-motion"
-import { FiUser, FiLock, FiHelpCircle, FiUpload, FiMoon, FiSun } from "react-icons/fi"
+import { FiUser, FiLock, FiHelpCircle, FiUpload } from "react-icons/fi"
 import { auth } from "../config/firebase"
 import { updateProfile, updateEmail, updatePassword } from "firebase/auth"
 import { message } from "antd"
 import emailjs from "@emailjs/browser"
 import toast from "react-hot-toast"
 import { useTranslation } from "react-i18next"
-import LanguageSwitcher from "../components/LanguageSwitcher"
 
 const EMAIL_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID
 const EMAIL_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID
@@ -21,7 +19,6 @@ const Settings = () => {
   const [activeTab, setActiveTab] = useState("profile")
   const isGoogleUser = user?.providerData[0]?.providerId === "google.com"
   const [uploading, setUploading] = useState(false)
-  
 
   // Animation variants
   const containerVariants = {
@@ -52,8 +49,6 @@ const Settings = () => {
     { id: "security", label: t("settings.tabs.security"), icon: FiLock },
     { id: "help", label: t("settings.tabs.help"), icon: FiHelpCircle },
   ]
-
-  
 
   const handleProfileUpdate = async (e) => {
     e.preventDefault()
@@ -176,7 +171,6 @@ const Settings = () => {
             <h1 className="text-2xl font-semibold text-gray-800 dark:text-white mb-2">{t("settings.title")}</h1>
             <p className="text-gray-600 dark:text-gray-300">{t("settings.subtitle")}</p>
           </div>
-          
         </div>
       </motion.div>
 
@@ -474,5 +468,5 @@ const Settings = () => {
   )
 }
 
-export default Settings;
+export default Settings
 

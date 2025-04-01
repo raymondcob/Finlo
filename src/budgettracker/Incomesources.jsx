@@ -23,29 +23,33 @@ const IncomeSources = () => {
   useEffect(() => {
     if (user) {
       const fetchDetails = async () => {
-        const cardDoc = await getDoc(doc(db, "cardDetails", user.uid))
-        const walletDoc = await getDoc(doc(db, "walletDetails", user.uid))
-        const goalsDoc = await getDoc(doc(db, "savingsGoals", user.uid))
+        try {
+          const cardDoc = await getDoc(doc(db, "cardDetails", user.uid))
+          const walletDoc = await getDoc(doc(db, "walletDetails", user.uid))
+          const goalsDoc = await getDoc(doc(db, "savingsGoals", user.uid))
 
-        if (cardDoc.exists()) {
-          const cardData = cardDoc.data()
-          setCardDetails(cardData)
-          setIsBalanceSet(!!cardData.balance)
-          if (Number(cardData.balance) < 100) {
-            toast.error(t("incomesources.cardbalancealert", { balance: cardData.balance }))
+          if (cardDoc.exists()) {
+            const cardData = cardDoc.data()
+            setCardDetails(cardData)
+            setIsBalanceSet(!!cardData.balance)
+            if (Number(cardData.balance) < 100) {
+              toast.error(t("incomesources.cardbalancealert", { balance: cardData.balance }))
+            }
           }
-        }
 
-        if (walletDoc.exists()) {
-          const walletData = walletDoc.data()
-          setWalletDetails(walletData)
-          if (Number(walletData.balance) < 100) {
-            toast.error(t("incomesources.walletbalancealert", { balance: walletData.balance }))
+          if (walletDoc.exists()) {
+            const walletData = walletDoc.data()
+            setWalletDetails(walletData)
+            if (Number(walletData.balance) < 100) {
+              toast.error(t("incomesources.walletbalancealert", { balance: walletData.balance }))
+            }
           }
-        }
 
-        if (goalsDoc.exists()) {
-          setGoals(goalsDoc.data().goals || [])
+          if (goalsDoc.exists()) {
+            setGoals(goalsDoc.data().goals || [])
+          }
+        } catch (error) {
+          console.error("Error fetching details: ", error)
         }
       }
       fetchDetails()
@@ -109,15 +113,17 @@ const IncomeSources = () => {
   }
 
   return (
-    <motion.div variants={containerVariants} initial="hidden" animate="visible" className="space-y-6">
-      <motion.div variants={itemVariants} className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm mb-6">
-        <h1 className="text-2xl font-semibold text-gray-800 dark:text-white mb-2">{t("incomesources.title")}</h1>
+    <motion.div variants={containerVariants} initial="hidden" animate="visible" className="space-y-6 p-4">
+      <motion.div variants={itemVariants} className="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-xl shadow-sm mb-6">
+        <h1 className="text-xl sm:text-2xl font-semibold text-gray-800 dark:text-white mb-2">
+          {t("incomesources.title")}
+        </h1>
         <p className="text-gray-600 dark:text-gray-300">{t("incomesources.subtitle")}</p>
       </motion.div>
 
-      <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="space-y-4">
-          <h2 className="text-xl font-semibold text-finance-blue-700 dark:text-finance-blue-400 px-2">
+      <motion.div variants={itemVariants} className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="space-y-4 flex flex-col">
+          <h2 className="text-xl font-semibold text-finance-blue-700 dark:text-finance-blue-400 px-2 self-start">
             {t("incomesources.mycard")}
           </h2>
           <CardDetails
@@ -134,8 +140,8 @@ const IncomeSources = () => {
             setCardDetails={setCardDetails}
           />
         </div>
-        <div className="space-y-4">
-          <h2 className="text-xl font-semibold text-finance-green-700 dark:text-finance-green-400 px=2">
+        <div className="space-y-4 flex flex-col">
+          <h2 className="text-xl font-semibold text-finance-green-700 dark:text-finance-green-400 px-2 self-start">
             {t("incomesources.mywallet")}
           </h2>
           <WalletDetails
@@ -167,5 +173,5 @@ const IncomeSources = () => {
   )
 }
 
-export default IncomeSources;
+export default IncomeSources
 
