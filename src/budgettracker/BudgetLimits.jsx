@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext, useCallback } from "react";
 import { UserContext } from "../context/UserContext";
 import { Card, Progress, Button, Input, Modal, Form, Select } from "antd";
 import {
@@ -45,6 +45,7 @@ const BudgetLimits = () => {
   const [spending, setSpending] = useState({});
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [form] = Form.useForm();
+  const [isLoading, setIsLoading] = useState(true);
 
   // Add frequency options
   const frequencies = [
@@ -98,6 +99,49 @@ const BudgetLimits = () => {
       default:
         return new Date(0); // Return earliest date if frequency is unknown
     }
+  };
+
+  // Add this helper function to properly compare dates
+  const isBetweenDates = (date, startDate, endDate) => {
+    const checkDate = date instanceof Date ? date : date.toDate();
+    const start = startDate instanceof Date ? startDate : startDate.toDate();
+    const end = endDate instanceof Date ? endDate : endDate.toDate();
+
+    // Reset hours to compare just the dates
+    checkDate.setHours(0, 0, 0, 0);
+    start.setHours(0, 0, 0, 0);
+    end.setHours(0, 0, 0, 0);
+
+    return checkDate >= start && checkDate <= end;
+  };
+
+  // Add this helper function at the top of your component
+  const isWithinPeriod = (transactionDate, budget) => {
+    if (!transactionDate || !budget.nextResetDate) return false;
+
+    const resetDate = budget.nextResetDate.toDate();
+    let periodStart = new Date(resetDate);
+
+    // Normalize dates to start of day for comparison
+    transactionDate.setHours(0, 0, 0, 0);
+    resetDate.setHours(0, 0, 0, 0);
+
+    switch (budget.frequency) {
+      case "weekly":
+        periodStart.setDate(resetDate.getDate() - 7);
+        break;
+      case "monthly":
+        periodStart.setMonth(resetDate.getMonth() - 1);
+        break;
+      case "yearly":
+        periodStart.setFullYear(resetDate.getFullYear() - 1);
+        break;
+      default:
+        return false;
+    }
+
+    periodStart.setHours(0, 0, 0, 0);
+    return transactionDate >= periodStart && transactionDate <= resetDate;
   };
 
   // Categories with their icons
@@ -385,67 +429,173 @@ const BudgetLimits = () => {
     }
   };
 
-  // Combine the transaction and budget listeners into a single useEffect
+  // Update the transaction listener useEffect
   useEffect(() => {
     if (!user) return;
 
-    // Set up listeners for both budgets and transactions
+    setIsLoading(true);
     const budgetDocRef = doc(db, "budgetLimits", user.uid);
     const transactionsRef = collection(db, "transactions");
 
-    const unsubscribeBudgets = onSnapshot(budgetDocRef, (doc) => {
-      if (doc.exists()) {
-        const budgetData = doc.data();
-        setBudgets(budgetData);
-      } else {
-        setBudgets({});
+    // Create a composite listener for both budgets and transactions
+    const unsubscribe = onSnapshot(budgetDocRef, async (budgetDoc) => {
+      try {
+        const currentBudgets = budgetDoc.exists() ? budgetDoc.data() : {};
+        setBudgets(currentBudgets);
+
+        // Fetch all relevant transactions
+        const q = query(
+          transactionsRef,
+          where("userId", "==", user.uid),
+          where("type", "==", "Expense")
+        );
+
+        const transactionDocs = await getDocs(q);
+        const currentSpending = {};
+
+        transactionDocs.forEach((doc) => {
+          const transaction = doc.data();
+          const transactionDate = transaction.date?.toDate();
+          const categoryKey = findCategoryKeyByName(transaction.category);
+
+          if (categoryKey && currentBudgets[categoryKey]) {
+            const budget = currentBudgets[categoryKey];
+
+            // Calculate period dates
+            const resetDate = budget.nextResetDate?.toDate();
+            let periodStart;
+
+            switch (budget.frequency) {
+              case "weekly":
+                periodStart = new Date(resetDate);
+                periodStart.setDate(resetDate.getDate() - 7);
+                break;
+              case "monthly":
+                periodStart = new Date(resetDate);
+                periodStart.setMonth(resetDate.getMonth() - 1);
+                break;
+              case "yearly":
+                periodStart = new Date(resetDate);
+                periodStart.setFullYear(resetDate.getFullYear() - 1);
+                break;
+              default:
+                return;
+            }
+
+            // Normalize all dates to start of day
+            const normalizedTransactionDate = new Date(transactionDate);
+            const normalizedPeriodStart = new Date(periodStart);
+            const normalizedResetDate = new Date(resetDate);
+
+            [
+              normalizedTransactionDate,
+              normalizedPeriodStart,
+              normalizedResetDate,
+            ].forEach((date) => {
+              date.setHours(0, 0, 0, 0);
+            });
+
+            // Check if transaction is within period
+            if (
+              normalizedTransactionDate >= normalizedPeriodStart &&
+              normalizedTransactionDate <= normalizedResetDate
+            ) {
+              currentSpending[categoryKey] =
+                (currentSpending[categoryKey] || 0) +
+                Number(transaction.amount || 0);
+
+              console.log(`Adding transaction for ${categoryKey}:`, {
+                amount: transaction.amount,
+                date: transactionDate,
+                periodStart,
+                resetDate,
+                total: currentSpending[categoryKey],
+              });
+            }
+          }
+        });
+
+        // Update spending state with new totals
+        setSpending(currentSpending);
+        setIsLoading(false);
+
+        // Debug log the final state
+        console.log("Updated spending state:", {
+          budgets: currentBudgets,
+          spending: currentSpending,
+        });
+      } catch (error) {
+        console.error("Error processing budgets and transactions:", error);
+        setIsLoading(false);
       }
     });
 
-    const q = query(
-      transactionsRef,
-      where("userId", "==", user.uid),
-      where("type", "==", "Expense")
-    );
+    return () => unsubscribe();
+  }, [user]);
 
-    const unsubscribeTransactions = onSnapshot(q, (snapshot) => {
-      const currentSpending = {};
+  // Add this helper function to validate spending calculations
+  const validateSpendingCalculations = useCallback(
+    (categoryKey) => {
+      if (!budgets[categoryKey]) return;
 
-      snapshot.forEach((doc) => {
-        const transaction = doc.data();
-        const transactionDate = parseTransactionDate(transaction.date);
-        const categoryKey = findCategoryKeyByName(transaction.category);
+      console.log(`Validating spending for ${categoryKey}:`, {
+        budget: budgets[categoryKey],
+        currentSpending: spending[categoryKey],
+        period: {
+          start: getStartDateForFrequency(
+            budgets[categoryKey].frequency,
+            budgets[categoryKey].nextResetDate
+          ),
+          end: budgets[categoryKey].nextResetDate?.toDate(),
+        },
+      });
+    },
+    [budgets, spending]
+  );
 
-        if (categoryKey && budgets[categoryKey]) {
-          const budget = budgets[categoryKey];
-          const resetDate = budget.nextResetDate?.toDate();
-          const startDate = getStartDateForFrequency(
-            budget.frequency,
-            budget.nextResetDate
-          );
+  // Add this effect to validate calculations when spending changes
+  useEffect(() => {
+    Object.keys(budgets).forEach(validateSpendingCalculations);
+  }, [spending, validateSpendingCalculations]);
 
-          if (
-            transactionDate &&
-            resetDate &&
-            transactionDate >= startDate &&
-            transactionDate <= resetDate
-          ) {
-            currentSpending[categoryKey] =
-              (currentSpending[categoryKey] || 0) +
-              Number(transaction.amount || 0);
+  // Add this debug effect to monitor changes
+  useEffect(() => {
+    console.log("Budget limits:", budgets);
+    console.log("Current spending:", spending);
+  }, [budgets, spending]);
+
+  // Update the useEffect for checkAndResetBudgets to use proper date comparison
+  useEffect(() => {
+    if (!user) return;
+
+    const checkAndUpdate = () => {
+      const now = new Date();
+      now.setHours(0, 0, 0, 0);
+
+      Object.entries(budgets).forEach(([category, budget]) => {
+        if (budget.nextResetDate) {
+          const resetDate = budget.nextResetDate.toDate();
+          resetDate.setHours(0, 0, 0, 0);
+
+          if (resetDate <= now) {
+            toast(
+              t("budgets.needsReset", {
+                category: findCategoryNameByKey(category),
+              }),
+              {
+                icon: "⚠️",
+                duration: 4000,
+              }
+            );
           }
         }
       });
-
-      setSpending(currentSpending);
-    });
-
-    // Cleanup both listeners
-    return () => {
-      unsubscribeBudgets();
-      unsubscribeTransactions();
     };
-  }, [user]);
+
+    checkAndUpdate();
+    const interval = setInterval(checkAndUpdate, 3600000);
+    return () => clearInterval(interval);
+  }, [user, budgets]);
 
   // Update findCategoryKeyByName to reduce console logging
   const findCategoryKeyByName = (categoryName) => {
@@ -540,9 +690,21 @@ const BudgetLimits = () => {
     return t("budgets.progress.good");
   };
 
+  // Update the renderCategoryCard function to handle loading state
   const renderCategoryCard = (item) => {
     const budget = budgets[item.key];
     const spendingValue = Number(spending[item.key] || 0);
+
+    if (isLoading) {
+      return (
+        <Card key={item.key} className="dark:bg-gray-700 shadow-sm">
+          <div className="animate-pulse">
+            <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded w-3/4 mb-4"></div>
+            <div className="h-8 bg-gray-200 dark:bg-gray-600 rounded"></div>
+          </div>
+        </Card>
+      );
+    }
 
     if (!budget || !budget.nextResetDate) {
       return (
