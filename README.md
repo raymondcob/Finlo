@@ -1,6 +1,6 @@
-# Stack Up.
+# Finlo.
 
-Stacked Up is a user-friendly budget tracker designed to help you manage your finances efficiently. With a clean interface and intuitive features, Stacked Up makes tracking income and expenses seamless.
+Finlo is a user-friendly budget tracker designed to help you manage your finances efficiently. With a clean interface and intuitive features, Stacked Up makes tracking income and expenses seamless.
 
 ## Features
 - **Simple Budget Tracking** – Add and categorize income and expenses effortlessly.
