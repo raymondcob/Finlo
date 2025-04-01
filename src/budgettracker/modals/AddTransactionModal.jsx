@@ -1,115 +1,191 @@
-import {
-  FaWallet,
-  FaCreditCard,
-  FaShoppingCart,
-  FaMoneyBill,
-  FaPiggyBank,
-  FaHome,
-  FaCar,
-  FaBriefcase,
-  FaPlane,
-  FaGift,
-  FaHeart,
-  FaDumbbell,
-  FaFilm,
-  FaHamburger,
-  FaWifi,
-  FaPhone,
-  FaChild,
-  FaPaw,
-  FaStethoscope,
-  FaUniversity,
-  FaCoins,
-  FaChartLine,
-  FaHandHoldingUsd,
-} from "react-icons/fa"
-import { DatePicker, Select, Input, Form, Modal } from "antd"
+import { FaWallet, FaCreditCard } from "react-icons/fa"
+import { DatePicker, Select, Input, Form, Modal, Button } from "antd"
 import moment from "moment"
-import { useState } from "react"
+import { useState, useContext, useEffect } from "react"
 import { useTranslation } from "react-i18next"
+import { toast } from "react-hot-toast"
+import { useNavigate } from "react-router-dom"
+import { UserContext } from "../../context/UserContext"
+import { categoryIcons } from "../Transactions"
 
 const { Option } = Select
 
 const AddTransactionModal = ({ open, onClose, onAddTransaction, cardBalance, walletBalance }) => {
   const { t } = useTranslation()
+  const { user } = useContext(UserContext)
+  const navigate = useNavigate()
   const [form] = Form.useForm()
   const [selectedType, setSelectedType] = useState("Income")
+  const [error, setError] = useState("")
 
-  // Income Categories with Icons
+  // Add check for payment methods
+  useEffect(() => {
+    if (open && cardBalance === 0 && walletBalance === 0) {
+      // Close modal
+      onClose()
+      // Show error toast with the correct translation key
+      toast.error(t("transactions.error.noPaymentMethodsMessage"), {
+        duration: 5000,
+        action: {
+          label: t("transactions.error.setupSources"),
+          onClick: () => navigate("/income"),
+        },
+      })
+    }
+  }, [open, cardBalance, walletBalance, navigate, t, onClose])
+
+  // Reset form when modal is opened/closed
+  useEffect(() => {
+    if (open) {
+      form.resetFields()
+      setError("")
+      form.setFieldsValue({
+        category: "salary",
+        type: "Income",
+        paymentMethod: "Wallet",
+        date: moment(),
+      })
+    }
+  }, [open, form])
+
+  // Define category options
   const incomeCategories = [
-    { label: "Salary", icon: <FaMoneyBill />, color: "#fdaa60" },
-    { label: "Freelance Income", icon: <FaBriefcase />, color: "#fdaa60" },
-    { label: "Bonus", icon: <FaCoins />, color: "#fdaa60" },
-    { label: "Investment Income", icon: <FaChartLine />, color: "#fdaa60" },
-    { label: "Rental Income", icon: <FaHome />, color: "#fdaa60" },
-    { label: "Dividends", icon: <FaHandHoldingUsd />, color: "#fdaa60" },
-    { label: "Interest Income", icon: <FaPiggyBank />, color: "#fdaa60" },
-    { label: "Gifts", icon: <FaGift />, color: "#fdaa60" },
-    { label: "Refunds", icon: <FaUniversity />, color: "#fdaa60" },
-    { label: "Other Income", icon: <FaWallet />, color: "#fdaa60" },
+    { label: t("transactions.categories.income.salary"), value: "salary" },
+    {
+      label: t("transactions.categories.income.freelanceincome"),
+      value: "freelanceincome",
+    },
+    { label: t("transactions.categories.income.bonus"), value: "bonus" },
+    {
+      label: t("transactions.categories.income.investmentincome"),
+      value: "investmentincome",
+    },
+    {
+      label: t("transactions.categories.income.rentalincome"),
+      value: "rentalincome",
+    },
+    {
+      label: t("transactions.categories.income.dividends"),
+      value: "dividends",
+    },
+    {
+      label: t("transactions.categories.income.interestincome"),
+      value: "interestincome",
+    },
+    { label: t("transactions.categories.income.gifts"), value: "gifts" },
+    { label: t("transactions.categories.income.refunds"), value: "refunds" },
+    {
+      label: t("transactions.categories.income.otherincome"),
+      value: "otherincome",
+    },
   ]
 
-  // Essential Expenses with Icons
   const essentialExpenses = [
-    { label: "Rent/Mortgage", icon: <FaHome />, color: "#fdaa60" },
-    { label: "Utilities", icon: <FaWifi />, color: "#fdaa60" },
-    { label: "Groceries", icon: <FaShoppingCart />, color: "#fdaa60" },
-    { label: "Transportation", icon: <FaCar />, color: "#fdaa60" },
-    { label: "Insurance", icon: <FaStethoscope />, color: "#fdaa60" },
-    { label: "Medical Expenses", icon: <FaStethoscope />, color: "#fdaa60" },
-    { label: "Internet", icon: <FaWifi />, color: "#fdaa60" },
-    { label: "Phone Bill", icon: <FaPhone />, color: "#fdaa60" },
-    { label: "Childcare", icon: <FaChild />, color: "#fdaa60" },
-    { label: "Loan Payments", icon: <FaUniversity />, color: "#fdaa60" },
+    {
+      label: t("transactions.categories.essential.rent/mortgage"),
+      value: "rent/mortgage",
+    },
+    {
+      label: t("transactions.categories.essential.utilities"),
+      value: "utilities",
+    },
+    {
+      label: t("transactions.categories.essential.groceries"),
+      value: "groceries",
+    },
+    {
+      label: t("transactions.categories.essential.transportation"),
+      value: "transportation",
+    },
+    {
+      label: t("transactions.categories.essential.insurance"),
+      value: "insurance",
+    },
+    {
+      label: t("transactions.categories.essential.medicalexpenses"),
+      value: "medicalexpenses",
+    },
+    {
+      label: t("transactions.categories.essential.internet"),
+      value: "internet",
+    },
+    {
+      label: t("transactions.categories.essential.phonebill"),
+      value: "phonebill",
+    },
+    {
+      label: t("transactions.categories.essential.childcare"),
+      value: "childcare",
+    },
+    {
+      label: t("transactions.categories.essential.loanpayments"),
+      value: "loanpayments",
+    },
   ]
 
-  // Lifestyle Expenses with Icons
   const lifestyleExpenses = [
-    { label: "Dining Out", icon: <FaHamburger />, color: "#fdaa60" },
-    { label: "Entertainment", icon: <FaFilm />, color: "#fdaa60" },
-    { label: "Shopping", icon: <FaShoppingCart />, color: "#fdaa60" },
-    { label: "Travel", icon: <FaPlane />, color: "#fdaa60" },
-    { label: "Gym/Fitness", icon: <FaDumbbell />, color: "#fdaa60" },
-    { label: "Subscriptions", icon: <FaFilm />, color: "#fdaa60" },
-    { label: "Gifts/Donations", icon: <FaGift />, color: "#fdaa60" },
-    { label: "Personal Care", icon: <FaHeart />, color: "#fdaa60" },
-    { label: "Pet Expenses", icon: <FaPaw />, color: "#fdaa60" },
-    { label: "Other Expenses", icon: <FaWallet />, color: "#fdaa60" },
+    {
+      label: t("transactions.categories.lifestyle.diningout"),
+      value: "diningout",
+    },
+    {
+      label: t("transactions.categories.lifestyle.entertainment"),
+      value: "entertainment",
+    },
+    {
+      label: t("transactions.categories.lifestyle.shopping"),
+      value: "shopping",
+    },
+    { label: t("transactions.categories.lifestyle.travel"), value: "travel" },
+    {
+      label: t("transactions.categories.lifestyle.gym/fitness"),
+      value: "gym/fitness",
+    },
+    {
+      label: t("transactions.categories.lifestyle.subscriptions"),
+      value: "subscriptions",
+    },
   ]
 
-  // Combine all categories
-  const allCategories = [
-    { group: t("transactions.categories.income.title"), items: incomeCategories },
-    { group: t("transactions.categories.essential.title"), items: essentialExpenses },
-    { group: t("transactions.categories.lifestyle.title"), items: lifestyleExpenses },
-  ]
+  // Get categories based on selected type
+  const getCategoryOptions = () => {
+    switch (selectedType) {
+      case "Income":
+        return incomeCategories
+      case "Expense":
+        return [
+          {
+            label: t("transactions.categories.essential.title"),
+            options: essentialExpenses,
+          },
+          {
+            label: t("transactions.categories.lifestyle.title"),
+            options: lifestyleExpenses,
+          },
+        ]
+      default:
+        return []
+    }
+  }
 
   // Custom option render for dropdown items
   const optionRender = (item) => {
+    const IconComponent = categoryIcons[item.value] || FaWallet
+
     return (
       <div className="flex items-center gap-2">
-        <div className="h-8 w-8 rounded-full flex items-center justify-center" style={{ backgroundColor: item.color }}>
-          {item.icon}
+        <div className="h-8 w-8 rounded-full flex items-center justify-center" style={{ backgroundColor: "#fdaa60" }}>
+          <IconComponent className="text-white" />
         </div>
-        <span className="text-sm">
-          {t(`transactions.categories.${getCategoryType(item.label)}.${item.label.toLowerCase().replace(/\s+/g, "")}`)}
-        </span>
+        <span className="text-sm">{item.label}</span>
       </div>
     )
   }
 
-  // Helper function to get category type
-  const getCategoryType = (category) => {
-    if (incomeCategories.some((cat) => cat.label === category)) return "income"
-    if (essentialExpenses.some((cat) => cat.label === category)) return "essential"
-    if (lifestyleExpenses.some((cat) => cat.label === category)) return "lifestyle"
-    return ""
-  }
-
   // Watch for category changes to auto-update type
   const handleCategoryChange = (value) => {
-    const isIncomeCategory = incomeCategories.some((cat) => cat.label === value)
-    const isExpenseCategory = [...essentialExpenses, ...lifestyleExpenses].some((cat) => cat.label === value)
+    const isIncomeCategory = incomeCategories.some((cat) => cat.value === value)
+    const isExpenseCategory = [...essentialExpenses, ...lifestyleExpenses].some((cat) => cat.value === value)
 
     if (isIncomeCategory && selectedType !== "Income") {
       form.setFieldsValue({ type: "Income" })
@@ -120,56 +196,44 @@ const AddTransactionModal = ({ open, onClose, onAddTransaction, cardBalance, wal
     }
   }
 
-  // Validate balances before submission
-  const handleSubmit = (values) => {
-    if (!cardBalance && !walletBalance) {
-      Modal.error({
-        title: t("modals.addTransaction.errors.noBalance.title"),
-        content: t("modals.addTransaction.errors.noBalance.content"),
-      })
-      return
+  // Handle form submission
+  const handleSubmit = async (values) => {
+    try {
+      setError("")
+      const { type, category, amount, provider, paymentMethod, date } = values
+
+      // Validation for payment method balances
+      if (type.toLowerCase() === "expense") {
+        const balance = paymentMethod === "Wallet" ? walletBalance : cardBalance
+        if (Number(amount) > balance) {
+          setError(
+            t("transactions.error.insufficientBalanceMessage", {
+              method: paymentMethod.toLowerCase(),
+            })
+          )
+          return
+        }
+      }
+
+      // Create transaction object with proper fields
+      const transaction = {
+        type,
+        category,
+        amount: Number(amount),
+        provider: provider.trim(),
+        paymentMethod,
+        date: date.toDate(),
+        userId: user.uid,
+      }
+
+      await onAddTransaction(transaction)
+      toast.success(t("transactions.success.addedMessage"))
+      form.resetFields()
+      onClose()
+    } catch (error) {
+      console.error("Error adding transaction:", error)
+      setError(t("transactions.error.addingTransactionMessage"))
     }
-
-    // Validate category and type match
-    const isIncomeCategory = incomeCategories.some((cat) => cat.label === values.category)
-    const isExpenseCategory = [...essentialExpenses, ...lifestyleExpenses].some((cat) => cat.label === values.category)
-
-    if (values.type === "Income" && !isIncomeCategory) {
-      Modal.error({
-        title: t("modals.addTransaction.errors.categoryMismatch.title"),
-        content: t("modals.addTransaction.errors.categoryMismatch.incomeContent"),
-      })
-      return
-    }
-
-    if (values.type === "Expense" && !isExpenseCategory) {
-      Modal.error({
-        title: t("modals.addTransaction.errors.categoryMismatch.title"),
-        content: t("modals.addTransaction.errors.categoryMismatch.expenseContent"),
-      })
-      return
-    }
-
-    // Get local date components
-    const dateValue = values.date.toDate()
-    const localDate = new Date(
-      dateValue.getFullYear(),
-      dateValue.getMonth(),
-      dateValue.getDate(),
-      12, // Set to noon to avoid timezone issues
-      0,
-      0,
-      0,
-    )
-
-    const transactionData = {
-      ...values,
-      date: localDate,
-      amount: Number.parseFloat(values.amount),
-    }
-
-    onAddTransaction(transactionData)
-    onClose()
   }
 
   return (
@@ -182,12 +246,22 @@ const AddTransactionModal = ({ open, onClose, onAddTransaction, cardBalance, wal
             className="w-10 h-10"
           />
           <span className="text-2xl font-semibold text-gray-700 dark:text-gray-200">
-            {t("modals.addTransaction.title")}
+            {cardBalance === 0 && walletBalance === 0
+              ? t("modals.addTransaction.setupRequired")
+              : t("modals.addTransaction.title")}
           </span>
         </div>
       }
-      open={open}
-      onCancel={onClose}
+      open={open && (cardBalance > 0 || walletBalance > 0)} // Only show if payment methods exist
+      onCancel={() => {
+        form.resetFields()
+        setError("")
+        onClose()
+      }}
+      afterClose={() => {
+        form.resetFields()
+        setError("")
+      }}
       footer={null}
       width={900}
       className="add-transaction-modal"
@@ -201,162 +275,217 @@ const AddTransactionModal = ({ open, onClose, onAddTransaction, cardBalance, wal
         },
       }}
     >
-      <Form
-        form={form}
-        layout="vertical"
-        initialValues={{
-          category: "Salary",
-          type: "Income",
-          paymentMethod: "Wallet",
-          date: moment(),
-        }}
-        onFinish={handleSubmit}
-        className="space-y-6"
-      >
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Form.Item
-            name="category"
-            label={
-              <span className="text-lg font-medium text-gray-700 dark:text-gray-200">
-                {t("modals.addTransaction.category")}
-              </span>
-            }
-            rules={[{ required: true, message: "Category is required" }]}
-          >
-            <Select
-              className="w-full h-12"
-              optionLabelProp="label"
-              dropdownStyle={{ maxHeight: 400 }}
-              onChange={handleCategoryChange}
+      {cardBalance === 0 && walletBalance === 0 ? (
+        <div className="text-center py-8">
+          <FaWallet className="mx-auto text-4xl text-gray-400 mb-4" />
+          <p className="text-gray-600 dark:text-gray-300 mb-4">{t("transactions.error.noPaymentMethodsMessage")}</p>
+          <Button type="primary" onClick={() => navigate("/income")} className="bg-finance-blue-600">
+            {t("transactions.error.setupSources")}
+          </Button>
+        </div>
+      ) : (
+        <Form form={form} layout="vertical" onFinish={handleSubmit} className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <Form.Item
+              name="category"
+              label={
+                <span className="text-lg font-medium text-gray-700 dark:text-gray-200">
+                  {t("modals.addTransaction.category")}
+                </span>
+              }
+              rules={[
+                {
+                  required: true,
+                  message: t("modals.addTransaction.categoryRequired"),
+                },
+              ]}
             >
-              {allCategories.map((group) => (
-                <Select.OptGroup key={group.group} label={group.group}>
-                  {group.items.map((cat) => (
-                    <Option key={cat.label} value={cat.label} label={cat.label}>
-                      {optionRender(cat)}
-                    </Option>
-                  ))}
-                </Select.OptGroup>
-              ))}
-            </Select>
-          </Form.Item>
+              <Select
+                className="w-full h-12"
+                optionLabelProp="label"
+                dropdownStyle={{ maxHeight: 400 }}
+                onChange={handleCategoryChange}
+                dropdownClassName="dark:bg-gray-800 dark:text-white"
+              >
+                {getCategoryOptions().map((group) => {
+                  if (group.options) {
+                    return (
+                      <Select.OptGroup key={group.label} label={group.label}>
+                        {group.options.map((cat) => (
+                          <Option key={cat.value} value={cat.value} label={cat.label}>
+                            {optionRender(cat)}
+                          </Option>
+                        ))}
+                      </Select.OptGroup>
+                    )
+                  } else {
+                    return (
+                      <Option key={group.value} value={group.value} label={group.label}>
+                        {optionRender(group)}
+                      </Option>
+                    )
+                  }
+                })}
+              </Select>
+            </Form.Item>
 
-          <Form.Item
-            name="type"
-            label={
-              <span className="text-lg font-medium text-gray-700 dark:text-gray-200">
-                {t("modals.addTransaction.type")}
-              </span>
-            }
-            rules={[{ required: true, message: "Type is required" }]}
-          >
-            <Select className="w-full h-12 text-lg" onChange={(value) => setSelectedType(value)}>
-              <Option value="Income" className="text-lg">
-                {t("transactions.type.income")}
-              </Option>
-              <Option value="Expense" className="text-lg">
-                {t("transactions.type.expense")}
-              </Option>
-            </Select>
-          </Form.Item>
-
-          <Form.Item
-            name="paymentMethod"
-            label={
-              <span className="text-lg font-medium text-gray-700 dark:text-gray-200">
-                {t("modals.addTransaction.paymentMethod")}
-              </span>
-            }
-            rules={[{ required: true, message: "Payment Method is required" }]}
-          >
-            <Select className="w-full h-12 text-lg">
-              {walletBalance > 0 && (
-                <Option value="Wallet" className="text-lg">
-                  <div className="flex items-center gap-2">
-                    <FaWallet />
-                    {t("modals.addTransaction.walletBalance", { balance: walletBalance })}
-                  </div>
+            <Form.Item
+              name="type"
+              label={
+                <span className="text-lg font-medium text-gray-700 dark:text-gray-200">
+                  {t("modals.addTransaction.type")}
+                </span>
+              }
+              rules={[
+                {
+                  required: true,
+                  message: t("modals.addTransaction.typeRequired"),
+                },
+              ]}
+            >
+              <Select
+                className="w-full h-12 text-lg"
+                onChange={(value) => setSelectedType(value)}
+                dropdownClassName="dark:bg-gray-800 dark:text-white"
+              >
+                <Option value="Income" className="text-lg">
+                  {t("transactions.type.income")}
                 </Option>
-              )}
-              {cardBalance > 0 && (
-                <Option value="Card" className="text-lg">
-                  <div className="flex items-center gap-2">
-                    <FaCreditCard />
-                    {t("modals.addTransaction.cardBalance", { balance: cardBalance })}
-                  </div>
+                <Option value="Expense" className="text-lg">
+                  {t("transactions.type.expense")}
                 </Option>
-              )}
-            </Select>
-          </Form.Item>
-        </div>
+              </Select>
+            </Form.Item>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Form.Item
-            name="date"
-            label={
-              <span className="text-lg font-medium text-gray-700 dark:text-gray-200">
-                {t("modals.addTransaction.date")}
-              </span>
-            }
-            rules={[{ required: true, message: "Date is required" }]}
-          >
-            <DatePicker className="w-full h-12 text-lg" />
-          </Form.Item>
+            <Form.Item
+              name="paymentMethod"
+              label={
+                <span className="text-lg font-medium text-gray-700 dark:text-gray-200">
+                  {t("modals.addTransaction.paymentMethod")}
+                </span>
+              }
+              rules={[
+                {
+                  required: true,
+                  message: t("modals.addTransaction.paymentMethodRequired"),
+                },
+              ]}
+            >
+              <Select className="w-full h-12 text-lg" dropdownClassName="dark:bg-gray-800 dark:text-white">
+                {walletBalance > 0 && (
+                  <Option value="Wallet" className="text-lg">
+                    <div className="flex items-center gap-2">
+                      <FaWallet />
+                      {t("modals.addTransaction.walletBalance", {
+                        balance: walletBalance,
+                      })}
+                    </div>
+                  </Option>
+                )}
+                {cardBalance > 0 && (
+                  <Option value="Card" className="text-lg">
+                    <div className="flex items-center gap-2">
+                      <FaCreditCard />
+                      {t("modals.addTransaction.cardBalance", {
+                        balance: cardBalance,
+                      })}
+                    </div>
+                  </Option>
+                )}
+              </Select>
+            </Form.Item>
+          </div>
 
-          <Form.Item
-            name="provider"
-            label={
-              <span className="text-lg font-medium text-gray-700 dark:text-gray-200">
-                {t("modals.addTransaction.provider")}
-              </span>
-            }
-            rules={[{ required: true, message: "Provider is required" }]}
-          >
-            <Input placeholder={t("modals.addTransaction.providerPlaceholder")} className="w-full h-12 text-lg px-4" />
-          </Form.Item>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <Form.Item
+              name="date"
+              label={
+                <span className="text-lg font-medium text-gray-700 dark:text-gray-200">
+                  {t("modals.addTransaction.date")}
+                </span>
+              }
+              rules={[
+                {
+                  required: true,
+                  message: t("modals.addTransaction.dateRequired"),
+                },
+              ]}
+            >
+              <DatePicker className="w-full h-12 text-lg dark:bg-gray-700 dark:text-white dark:border-gray-600" />
+            </Form.Item>
 
-          <Form.Item
-            name="amount"
-            label={
-              <span className="text-lg font-medium text-gray-700 dark:text-gray-200">
-                {t("modals.addTransaction.amount")}
-              </span>
-            }
-            rules={[
-              { required: true, message: "Amount is required" },
-              {
-                pattern: /^[0-9]+(\.[0-9]{1,2})?$/,
-                message: "Please enter a valid amount",
-              },
-            ]}
-          >
-            <Input
-              prefix="$"
-              placeholder={t("modals.addTransaction.amountPlaceholder")}
-              className="w-full h-12 text-lg px-4"
-            />
-          </Form.Item>
-        </div>
+            <Form.Item
+              name="provider"
+              label={
+                <span className="text-lg font-medium text-gray-700 dark:text-gray-200">
+                  {t("modals.addTransaction.provider")}
+                </span>
+              }
+              rules={[
+                {
+                  required: true,
+                  message: t("modals.addTransaction.providerRequired"),
+                },
+              ]}
+            >
+              <Input
+                placeholder={t("modals.addTransaction.providerPlaceholder")}
+                className="w-full h-12 text-lg px-4 dark:bg-gray-700 dark:text-white dark:border-gray-600"
+              />
+            </Form.Item>
 
-        <div className="flex justify-end gap-4 mt-6">
-          <button
-            type="button"
-            onClick={onClose}
-            className="px-6 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors duration-200 text-lg dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
-          >
-            {t("modals.addTransaction.cancel")}
-          </button>
-          <button
-            type="submit"
-            className="px-6 py-2 rounded-lg bg-finance-blue-600 text-white hover:bg-finance-blue-700 transition-colors duration-200 text-lg"
-          >
-            {t("modals.addTransaction.save")}
-          </button>
-        </div>
-      </Form>
+            <Form.Item
+              name="amount"
+              label={
+                <span className="text-lg font-medium text-gray-700 dark:text-gray-200">
+                  {t("modals.addTransaction.amount")}
+                </span>
+              }
+              rules={[
+                {
+                  required: true,
+                  message: t("modals.addTransaction.amountRequired"),
+                },
+                {
+                  pattern: /^[0-9]+(\.[0-9]{1,2})?$/,
+                  message: t("modals.addTransaction.amountInvalid"),
+                },
+              ]}
+            >
+              <Input
+                prefix="$"
+                placeholder={t("modals.addTransaction.amountPlaceholder")}
+                className="w-full h-12 text-lg px-4 dark:bg-gray-700 dark:text-white dark:border-gray-600"
+              />
+            </Form.Item>
+          </div>
+
+          {error && (
+            <div className="bg-red-50 dark:bg-red-900/30 text-red-800 dark:text-red-300 p-3 rounded-lg text-sm">
+              {error}
+            </div>
+          )}
+
+          <div className="flex justify-end gap-4 mt-6">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-6 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors duration-200 text-lg dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+            >
+              {t("modals.addTransaction.cancel")}
+            </button>
+            <button
+              type="submit"
+              className="px-6 py-2 rounded-lg bg-finance-blue-600 text-white hover:bg-finance-blue-700 transition-colors duration-200 text-lg"
+            >
+              {t("modals.addTransaction.save")}
+            </button>
+          </div>
+        </Form>
+      )}
     </Modal>
   )
 }
 
-export default AddTransactionModal;
+export default AddTransactionModal
 

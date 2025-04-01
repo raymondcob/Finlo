@@ -2,7 +2,7 @@ import { useNavigate, useLocation } from "react-router-dom"
 import { useState, useContext, useEffect } from "react"
 import { AiFillHome } from "react-icons/ai"
 import { FaMoneyBillTransfer } from "react-icons/fa6"
-import { FaFileInvoiceDollar } from "react-icons/fa"
+import { FaFileInvoiceDollar, FaChartBar } from "react-icons/fa"
 import { GiWallet } from "react-icons/gi"
 import { IoMdSettings } from "react-icons/io"
 import { PageTitleContext } from "../context/PageTitleContext"
@@ -43,12 +43,48 @@ const Sidebar = ({ isOpen, onMenuClick }) => {
   }, [location.pathname, setPageTitle])
 
   const menuItems = [
-    { id: "dashboard", label: t("navigation.dashboard"), icon: AiFillHome, path: "/dashboard" },
-    { id: "transactions", label: t("navigation.transactions"), icon: FaMoneyBillTransfer, path: "/transactions" },
-    { id: "reports", label: t("navigation.reports"), icon: FaFileInvoiceDollar, path: "/reports" },
-    { id: "income", label: t("navigation.income"), icon: GiWallet, path: "/income" },
-    { id: "savings-goals", label: t("navigation.savingsGoals"), icon: PiTipJarLight, path: "/savings-goals" },
-    { id: "settings", label: t("navigation.settings"), icon: IoMdSettings, path: "/settings" },
+    {
+      id: "dashboard",
+      label: t("navigation.dashboard"),
+      icon: AiFillHome,
+      path: "/dashboard",
+    },
+    {
+      id: "transactions",
+      label: t("navigation.transactions"),
+      icon: FaMoneyBillTransfer,
+      path: "/transactions",
+    },
+    {
+      id: "reports",
+      label: t("navigation.reports"),
+      icon: FaFileInvoiceDollar,
+      path: "/reports",
+    },
+    {
+      id: "income",
+      label: t("navigation.income"),
+      icon: GiWallet,
+      path: "/income",
+    },
+    {
+      id: "budget-limits",
+      label: t("navigation.budgetLimits"),
+      icon: FaChartBar,
+      path: "/budget-limits",
+    },
+    {
+      id: "savings-goals",
+      label: t("navigation.savingsGoals"),
+      icon: PiTipJarLight,
+      path: "/savings-goals",
+    },
+    {
+      id: "settings",
+      label: t("navigation.settings"),
+      icon: IoMdSettings,
+      path: "/settings",
+    },
   ]
 
   const handleMenuClick = (path, id, label) => {
@@ -107,11 +143,15 @@ const Sidebar = ({ isOpen, onMenuClick }) => {
         >
           <div className="p-4 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 rounded-full bg-finance-blue-600 flex items-center justify-center text-white font-bold">
-                SU
-              </div>
+              {isMobile ? (
+                <img src="/favicon.ico" alt="Finlo" className="w-6 h-6 object-contain" />
+              ) : (
+                <div className="w-8 h-8 rounded-full bg-finance-blue-600 flex items-center justify-center text-white font-bold">
+                  FL
+                </div>
+              )}
               {(!isCollapsed || isMobile) && (
-                <h2 className="text-lg font-semibold text-finance-blue-700 dark:text-finance-blue-300">StackUp</h2>
+                <h2 className="text-lg font-semibold text-finance-blue-700 dark:text-finance-blue-300">Finlo</h2>
               )}
             </div>
             {!isMobile && (
@@ -153,7 +193,9 @@ const Sidebar = ({ isOpen, onMenuClick }) => {
                   </span>
                   {activeItem === item.id && (
                     <motion.div
-                      className={`ml-auto w-1.5 h-5 rounded-full bg-finance-blue-600 dark:bg-finance-blue-400 ${isCollapsed && !isMobile ? "hidden" : ""}`}
+                      className={`ml-auto w-1.5 h-5 rounded-full bg-finance-blue-600 dark:bg-finance-blue-400 ${
+                        isCollapsed && !isMobile ? "hidden" : ""
+                      }`}
                       layoutId="activeIndicator"
                     />
                   )}
@@ -176,5 +218,5 @@ const Sidebar = ({ isOpen, onMenuClick }) => {
   )
 }
 
-export default Sidebar;
+export default Sidebar
 

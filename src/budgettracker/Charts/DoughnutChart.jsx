@@ -1,41 +1,125 @@
-"use client";
-
 import { useEffect, useState } from "react";
 import { Doughnut } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { db } from "../../config/firebase";
-import {
-  FaMoneyBill,
-  FaBriefcase,
-  FaCoins,
-  FaChartLine,
-  FaHome,
-  FaHandHoldingUsd,
-  FaPiggyBank,
-  FaGift,
-  FaUniversity,
-  FaWallet,
-  FaWifi,
-  FaShoppingCart,
-  FaCar,
-  FaStethoscope,
-  FaPhone,
-  FaChild,
-  FaHamburger,
-  FaFilm,
-  FaPlane,
-  FaDumbbell,
-  FaHeart,
-  FaPaw,
-  FaChartPie,
-} from "react-icons/fa";
+import { categoryIcons } from "../Transactions";
 import { useTranslation } from "react-i18next";
+import { FaChartPie, FaWallet } from "react-icons/fa";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
+// Category mappings for translations and icons
+const CATEGORIES = {
+  income: {
+    en: {
+      salary: ["Salary", "salary"],
+      freelanceincome: ["Freelance Income", "freelanceincome"],
+      bonus: ["Bonus", "bonus"],
+      investmentincome: ["Investment Income", "investmentincome"],
+      rentalincome: ["Rental Income", "rentalincome"],
+      dividends: ["Dividends", "dividends"],
+      interestincome: ["Interest Income", "interestincome"],
+      gifts: ["Gifts", "gifts"],
+      refunds: ["Refunds", "refunds"],
+      otherincome: ["Other Income", "otherincome"],
+    },
+    es: {
+      salary: ["Salario", "salary"],
+      freelanceincome: ["Ingresos Freelance", "freelanceincome"],
+      bonus: ["Bonificación", "bonus"],
+      investmentincome: ["Ingresos de Inversión", "investmentincome"],
+      rentalincome: ["Ingresos por Alquiler", "rentalincome"],
+      dividends: ["Dividendos", "dividends"],
+      interestincome: ["Ingresos por Intereses", "interestincome"],
+      gifts: ["Regalos", "gifts"],
+      refunds: ["Reembolsos", "refunds"],
+      otherincome: ["Otros Ingresos", "otherincome"],
+    },
+  },
+  essential: {
+    en: {
+      "rent/mortgage": ["Rent/Mortgage", "rentmortgage"],
+      utilities: ["Utilities", "utilities"],
+      groceries: ["Groceries", "groceries"],
+      transportation: ["Transportation", "transportation"],
+      insurance: ["Insurance", "insurance"],
+      medicalexpenses: ["Medical Expenses", "medicalexpenses"],
+      internet: ["Internet", "internet"],
+      phonebill: ["Phone Bill", "phonebill"],
+      childcare: ["Childcare", "childcare"],
+      loanpayments: ["Loan Payments", "loanpayments"],
+    },
+    es: {
+      "rent/mortgage": ["Alquiler/Hipoteca", "rentmortgage"],
+      utilities: ["Servicios Públicos", "utilities"],
+      groceries: ["Comestibles", "groceries"],
+      transportation: ["Transporte", "transportation"],
+      insurance: ["Seguro", "insurance"],
+      medicalexpenses: ["Gastos Médicos", "medicalexpenses"],
+      internet: ["Internet", "internet"],
+      phonebill: ["Teléfono", "phonebill"],
+      childcare: ["Cuidado Infantil", "childcare"],
+      loanpayments: ["Pagos de Préstamos", "loanpayments"],
+    },
+  },
+  lifestyle: {
+    en: {
+      diningout: ["Dining Out", "diningout"],
+      entertainment: ["Entertainment", "entertainment"],
+      shopping: ["Shopping", "shopping"],
+      travel: ["Travel", "travel"],
+      gymfitness: ["Gym/Fitness", "gymfitness"],
+      subscriptions: ["Subscriptions", "subscriptions"],
+      giftsdonations: ["Gifts/Donations", "giftsdonations"],
+      personalcare: ["Personal Care", "personalcare"],
+      petexpenses: ["Pet Expenses", "petexpenses"],
+      otherexpenses: ["Other Expenses", "otherexpenses"],
+    },
+    es: {
+      diningout: ["Restaurantes", "diningout"],
+      entertainment: ["Entretenimiento", "entertainment"],
+      shopping: ["Compras", "shopping"],
+      travel: ["Viajes", "travel"],
+      gymfitness: ["Gimnasio/Fitness", "gymfitness"],
+      subscriptions: ["Suscripciones", "subscriptions"],
+      giftsdonations: ["Regalos/Donaciones", "giftsdonations"],
+      personalcare: ["Cuidado Personal", "personalcare"],
+      petexpenses: ["Gastos de Mascotas", "petexpenses"],
+      otherexpenses: ["Otros Gastos", "otherexpenses"],
+    },
+  },
+};
+
+const generateColors = (count) => {
+  const baseColors = [
+    "#FF6384",
+    "#36A2EB",
+    "#FFCE56",
+    "#4BC0C0",
+    "#9966FF",
+    "#FF9F40",
+    "#33CC99",
+    "#FF99CC",
+    "#66CCFF",
+    "#FFCC99",
+  ];
+
+  if (count <= baseColors.length) {
+    return baseColors.slice(0, count);
+  }
+
+  const colors = [...baseColors];
+  for (let i = baseColors.length; i < count; i++) {
+    const hue = (i * 137.508) % 360;
+    colors.push(`hsl(${hue}, 70%, 60%)`);
+  }
+
+  return colors;
+};
+
 const DoughnutChart = ({ userId, type }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [data, setData] = useState({
     labels: [],
     datasets: [
@@ -48,120 +132,89 @@ const DoughnutChart = ({ userId, type }) => {
     ],
   });
 
-  const categoryIcons = {
-    // Income Categories
-    [t("reports.charts.categories.income.Salary")]: FaMoneyBill,
-    [t("reports.charts.categories.income.Freelance Income")]: FaBriefcase,
-    [t("reports.charts.categories.income.Bonus")]: FaCoins,
-    [t("reports.charts.categories.income.Investment Income")]: FaChartLine,
-    [t("reports.charts.categories.income.Rental Income")]: FaHome,
-    [t("reports.charts.categories.income.Dividends")]: FaHandHoldingUsd,
-    [t("reports.charts.categories.income.Interest Income")]: FaPiggyBank,
-    [t("reports.charts.categories.income.Gifts")]: FaGift,
-    [t("reports.charts.categories.income.Refunds")]: FaUniversity,
-    [t("reports.charts.categories.income.Other Income")]: FaWallet,
+  const getCategoryInfo = (category, type) => {
+    const lang = i18n.language.split("-")[0];
+    const normalizedCategory = category.toLowerCase().replace(/\s+/g, "");
 
-    // Expense Categories
-    [t("reports.charts.categories.expense.Rent/Mortgage")]: FaHome,
-    [t("reports.charts.categories.expense.Utilities")]: FaWifi,
-    [t("reports.charts.categories.expense.Groceries")]: FaShoppingCart,
-    [t("reports.charts.categories.expense.Transportation")]: FaCar,
-    [t("reports.charts.categories.expense.Insurance")]: FaStethoscope,
-    [t("reports.charts.categories.expense.Medical Expenses")]: FaStethoscope,
-    [t("reports.charts.categories.expense.Internet")]: FaWifi,
-    [t("reports.charts.categories.expense.Phone Bill")]: FaPhone,
-    [t("reports.charts.categories.expense.Childcare")]: FaChild,
-    [t("reports.charts.categories.expense.Loan Payments")]: FaUniversity,
-    [t("reports.charts.categories.expense.Dining Out")]: FaHamburger,
-    [t("reports.charts.categories.expense.Entertainment")]: FaFilm,
-    [t("reports.charts.categories.expense.Shopping")]: FaShoppingCart,
-    [t("reports.charts.categories.expense.Travel")]: FaPlane,
-    [t("reports.charts.categories.expense.Gym/Fitness")]: FaDumbbell,
-    [t("reports.charts.categories.expense.Subscriptions")]: FaFilm,
-    [t("reports.charts.categories.expense.Gifts/Donations")]: FaGift,
-    [t("reports.charts.categories.expense.Personal Care")]: FaHeart,
-    [t("reports.charts.categories.expense.Pet Expenses")]: FaPaw,
-    [t("reports.charts.categories.expense.Other Expenses")]: FaWallet,
-  };
+    if (type === "Income") {
+      return (
+        CATEGORIES.income[lang]?.[normalizedCategory] || [
+          category,
+          normalizedCategory,
+        ]
+      );
+    }
 
-  const categoryColors = {
-    // Income Categories
-    [t("reports.charts.categories.income.Salary")]: "rgba(255, 99, 132, 0.8)",
-    [t("reports.charts.categories.income.Freelance Income")]: "rgba(54, 162, 235, 0.8)",
-    [t("reports.charts.categories.income.Bonus")]: "rgba(255, 206, 86, 0.8)",
-    [t("reports.charts.categories.income.Investment Income")]: "rgba(75, 192, 192, 0.8)",
-    [t("reports.charts.categories.income.Rental Income")]: "rgba(153, 102, 255, 0.8)",
-    [t("reports.charts.categories.income.Dividends")]: "rgba(255, 159, 64, 0.8)",
-    [t("reports.charts.categories.income.Interest Income")]: "rgba(201, 203, 207, 0.8)",
-    [t("reports.charts.categories.income.Gifts")]: "rgba(255, 99, 132, 0.8)",
-    [t("reports.charts.categories.income.Refunds")]: "rgba(54, 162, 235, 0.8)",
-    [t("reports.charts.categories.income.Other Income")]: "rgba(255, 206, 86, 0.8)",
+    const essentialInfo = CATEGORIES.essential[lang]?.[normalizedCategory];
+    if (essentialInfo) return essentialInfo;
 
-    // Expense Categories
-    [t("reports.charts.categories.expense.Rent/Mortgage")]: "rgba(75, 192, 192, 0.8)",
-    [t("reports.charts.categories.expense.Utilities")]: "rgba(153, 102, 255, 0.8)",
-    [t("reports.charts.categories.expense.Groceries")]: "rgba(255, 159, 64, 0.8)",
-    [t("reports.charts.categories.expense.Transportation")]: "rgba(201, 203, 207, 0.8)",
-    [t("reports.charts.categories.expense.Insurance")]: "rgba(255, 99, 132, 0.8)",
-    [t("reports.charts.categories.expense.Medical Expenses")]: "rgba(54, 162, 235, 0.8)",
-    [t("reports.charts.categories.expense.Internet")]: "rgba(255, 206, 86, 0.8)",
-    [t("reports.charts.categories.expense.Phone Bill")]: "rgba(75, 192, 192, 0.8)",
-    [t("reports.charts.categories.expense.Childcare")]: "rgba(153, 102, 255, 0.8)",
-    [t("reports.charts.categories.expense.Loan Payments")]: "rgba(255, 159, 64, 0.8)",
-    [t("reports.charts.categories.expense.Dining Out")]: "rgba(201, 203, 207, 0.8)",
-    [t("reports.charts.categories.expense.Entertainment")]: "rgba(255, 99, 132, 0.8)",
-    [t("reports.charts.categories.expense.Shopping")]: "rgba(54, 162, 235, 0.8)",
-    [t("reports.charts.categories.expense.Travel")]: "rgba(255, 206, 86, 0.8)",
-    [t("reports.charts.categories.expense.Gym/Fitness")]: "rgba(75, 192, 192, 0.8)",
-    [t("reports.charts.categories.expense.Subscriptions")]: "rgba(153, 102, 255, 0.8)",
-    [t("reports.charts.categories.expense.Gifts/Donations")]: "rgba(255, 159, 64, 0.8)",
-    [t("reports.charts.categories.expense.Personal Care")]: "rgba(201, 203, 207, 0.8)",
-    [t("reports.charts.categories.expense.Pet Expenses")]: "rgba(255, 99, 132, 0.8)",
-    [t("reports.charts.categories.expense.Other Expenses")]: "rgba(54, 162, 235, 0.8)",
+    return (
+      CATEGORIES.lifestyle[lang]?.[normalizedCategory] || [
+        category,
+        normalizedCategory,
+      ]
+    );
   };
 
   useEffect(() => {
     const fetchData = async () => {
       if (!userId) return;
 
-      const q = query(
-        collection(db, "transactions"),
-        where("userId", "==", userId),
-        where("type", "==", type)
-      );
-      const querySnapshot = await getDocs(q);
-      const transactions = querySnapshot.docs.map((doc) => doc.data());
+      try {
+        const transactionsRef = collection(db, "transactions");
+        const q = query(
+          transactionsRef,
+          where("userId", "==", userId),
+          where("type", "==", type)
+        );
+        const querySnapshot = await getDocs(q);
+        const categoryTotals = {};
 
-      const categoryData = {};
+        querySnapshot.forEach((doc) => {
+          const transaction = doc.data();
+          if (!transaction.category) return;
 
-      transactions.forEach((transaction) => {
-        const translatedCategory = t(`reports.charts.categories.${type.toLowerCase()}.${transaction.category}`);
-        categoryData[translatedCategory] =
-          (categoryData[translatedCategory] || 0) + transaction.amount;
-      });
+          const [translatedName, iconKey] = getCategoryInfo(
+            transaction.category,
+            type
+          );
 
-      const labels = Object.keys(categoryData);
-      const values = labels.map((category) => categoryData[category]);
-      const backgroundColors = labels.map((label) => categoryColors[label]);
-      const borderColors = backgroundColors.map((color) =>
-        color.replace("0.8", "1")
-      );
+          if (!categoryTotals[translatedName]) {
+            categoryTotals[translatedName] = {
+              amount: 0,
+              iconKey,
+            };
+          }
+          categoryTotals[translatedName].amount +=
+            Number(transaction.amount) || 0;
+        });
 
-      setData({
-        labels,
-        datasets: [
-          {
-            data: values,
-            backgroundColor: backgroundColors,
-            borderColor: borderColors,
-            borderWidth: 1,
-          },
-        ],
-      });
+        if (Object.keys(categoryTotals).length > 0) {
+          const labels = Object.keys(categoryTotals);
+          const amounts = labels.map((label) => categoryTotals[label].amount);
+          const iconKeys = labels.map((label) => categoryTotals[label].iconKey);
+
+          setData({
+            labels,
+            datasets: [
+              {
+                data: amounts,
+                backgroundColor: generateColors(labels.length),
+                iconKeys,
+              },
+            ],
+          });
+        } else {
+          setData(null);
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        setData(null);
+      }
     };
 
     fetchData();
-  }, [userId, type, t]);
+  }, [userId, type, t, i18n.language]);
 
   const options = {
     responsive: true,
@@ -196,7 +249,7 @@ const DoughnutChart = ({ userId, type }) => {
     },
   };
 
-  const hasData = data.datasets[0].data.length > 0;
+  const hasData = data && data.datasets[0].data.length > 0;
 
   const renderNoData = () => {
     return (
@@ -216,7 +269,9 @@ const DoughnutChart = ({ userId, type }) => {
     return (
       <div className="flex flex-wrap justify-center gap-2 mt-4 max-h-24 overflow-y-auto px-2">
         {data.labels.map((label, index) => {
-          const Icon = categoryIcons[label] || FaWallet;
+          const iconKey = data.datasets[0].iconKeys[index];
+          const IconComponent = categoryIcons[iconKey] || FaWallet;
+
           return (
             <div
               key={index}
@@ -228,7 +283,7 @@ const DoughnutChart = ({ userId, type }) => {
                   backgroundColor: data.datasets[0].backgroundColor[index],
                 }}
               >
-                <Icon className="w-2.5 h-2.5 text-white" />
+                <IconComponent className="w-2.5 h-2.5 text-white" />
               </div>
               <span className="dark:text-white">{label}</span>
             </div>

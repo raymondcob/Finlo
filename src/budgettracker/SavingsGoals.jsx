@@ -299,7 +299,7 @@ const SavingsGoals = () => {
                   {activeGoals.map(renderGoalCard)}
                 </div>
               ) : (
-                <div className="text-center py-8 bg-white dark:bg-gray-800 rounded-full shadow-sm p-6">
+                <div className="text-center py-8 bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
                   <p className="text-gray-500 dark:text-gray-400">{t("savingsGoals.noActiveGoals")}</p>
                 </div>
               )}
@@ -312,7 +312,7 @@ const SavingsGoals = () => {
                   {completedGoals.map(renderGoalCard)}
                 </div>
               ) : (
-                <div className="text-center py-8 bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+                <div className="text-center py-8 bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
                   <p className="text-gray-500 dark:text-gray-400">{t("savingsGoals.noCompletedGoals")}</p>
                 </div>
               )}

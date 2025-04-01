@@ -3,13 +3,14 @@ import { UserContext } from "../context/UserContext"
 import { collection, query, where, getDocs, addDoc, doc, updateDoc, getDoc } from "firebase/firestore"
 import { db } from "../config/firebase"
 import AddTransactionModal from "./modals/AddTransactionModal"
-import { Card, List, Typography, Table, Tag } from "antd"
+import { Card, List, Typography, Table, Tag, Button } from "antd"
 import { motion } from "framer-motion"
 import { useTranslation } from "react-i18next"
 import { format } from "date-fns"
 import { enUS, es, fr } from "date-fns/locale"
 import {
   FaMoneyBill,
+  FaHandHoldingMedical,
   FaBriefcase,
   FaCoins,
   FaChartLine,
@@ -31,50 +32,51 @@ import {
   FaDumbbell,
   FaHeart,
   FaPaw,
-} from "react-icons/fa" // Add missing imports
+  FaPlus,
+  FaHandHoldingWater,
+} from "react-icons/fa"
 import toast from "react-hot-toast"
 
 const { Title, Text } = Typography
 
-// Define or import these variables
-const incomeCategories = [
-  { label: "Salary" },
-  { label: "Freelance Income" },
-  { label: "Bonus" },
-  { label: "Investment Income" },
-  { label: "Rental Income" },
-  { label: "Dividends" },
-  { label: "Interest Income" },
-  { label: "Gifts" },
-  { label: "Refunds" },
-  { label: "Other Income" },
-]
+// Consistent icon mapping for all components
+export const categoryIcons = {
+  // Income Categories
+  salary: FaBriefcase,
+  freelanceincome: FaMoneyBill,
+  bonus: FaCoins,
+  investmentincome: FaChartLine,
+  rentalincome: FaHome,
+  dividends: FaHandHoldingUsd,
+  interestincome: FaPiggyBank,
+  gifts: FaGift,
+  refunds: FaUniversity,
+  otherincome: FaWallet,
 
-const essentialExpenses = [
-  { label: "Rent/Mortgage" },
-  { label: "Utilities" },
-  { label: "Groceries" },
-  { label: "Transportation" },
-  { label: "Insurance" },
-  { label: "Medical Expenses" },
-  { label: "Internet" },
-  { label: "Phone Bill" },
-  { label: "Childcare" },
-  { label: "Loan Payments" },
-]
+  // Essential expenses
+  "rent/mortgage": FaHome,
+  utilities: FaHandHoldingWater,
+  groceries: FaShoppingCart,
+  transportation: FaCar,
+  insurance: FaHandHoldingMedical,
+  medicalexpenses: FaStethoscope,
+  internet: FaWifi,
+  phonebill: FaPhone,
+  childcare: FaChild,
+  loanpayments: FaUniversity,
 
-const lifestyleExpenses = [
-  { label: "Dining Out" },
-  { label: "Entertainment" },
-  { label: "Shopping" },
-  { label: "Travel" },
-  { label: "Gym/Fitness" },
-  { label: "Subscriptions" },
-  { label: "Gifts/Donations" },
-  { label: "Personal Care" },
-  { label: "Pet Expenses" },
-  { label: "Other Expenses" },
-]
+  // Lifestyle expenses
+  diningout: FaHamburger,
+  entertainment: FaFilm,
+  shopping: FaShoppingCart,
+  travel: FaPlane,
+  "gym/fitness": FaDumbbell,
+  subscriptions: FaFilm,
+  "gifts/donations": FaGift,
+  personalcare: FaHeart,
+  petexpenses: FaPaw,
+  otherexpenses: FaWallet,
+}
 
 const Transactions = () => {
   const { t, i18n } = useTranslation()
@@ -85,22 +87,139 @@ const Transactions = () => {
   const [walletDetails, setWalletDetails] = useState({ balance: 0 })
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
 
-  useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth < 768)
-    window.addEventListener("resize", handleResize)
-    return () => window.removeEventListener("resize", handleResize)
-  }, [])
+  // Define category options - matching exactly with translation file
+  const incomeCategories = [
+    { label: t("transactions.categories.income.salary"), value: "salary" },
+    {
+      label: t("transactions.categories.income.freelanceincome"),
+      value: "freelanceincome",
+    },
+    { label: t("transactions.categories.income.bonus"), value: "bonus" },
+    {
+      label: t("transactions.categories.income.investmentincome"),
+      value: "investmentincome",
+    },
+    {
+      label: t("transactions.categories.income.rentalincome"),
+      value: "rentalincome",
+    },
+    {
+      label: t("transactions.categories.income.dividends"),
+      value: "dividends",
+    },
+    {
+      label: t("transactions.categories.income.interestincome"),
+      value: "interestincome",
+    },
+    { label: t("transactions.categories.income.gifts"), value: "gifts" },
+    { label: t("transactions.categories.income.refunds"), value: "refunds" },
+    {
+      label: t("transactions.categories.income.otherincome"),
+      value: "otherincome",
+    },
+  ]
+
+  const essentialExpenses = [
+    {
+      label: t("transactions.categories.essential.rent/mortgage"),
+      value: "rent/mortgage",
+    },
+    {
+      label: t("transactions.categories.essential.utilities"),
+      value: "utilities",
+    },
+    {
+      label: t("transactions.categories.essential.groceries"),
+      value: "groceries",
+    },
+    {
+      label: t("transactions.categories.essential.transportation"),
+      value: "transportation",
+    },
+    {
+      label: t("transactions.categories.essential.insurance"),
+      value: "insurance",
+    },
+    {
+      label: t("transactions.categories.essential.medicalexpenses"),
+      value: "medicalexpenses",
+    },
+    {
+      label: t("transactions.categories.essential.internet"),
+      value: "internet",
+    },
+    {
+      label: t("transactions.categories.essential.phonebill"),
+      value: "phonebill",
+    },
+    {
+      label: t("transactions.categories.essential.childcare"),
+      value: "childcare",
+    },
+    {
+      label: t("transactions.categories.essential.loanpayments"),
+      value: "loanpayments",
+    },
+  ]
+
+  const lifestyleExpenses = [
+    {
+      label: t("transactions.categories.lifestyle.diningout"),
+      value: "diningout",
+    },
+    {
+      label: t("transactions.categories.lifestyle.entertainment"),
+      value: "entertainment",
+    },
+    {
+      label: t("transactions.categories.lifestyle.shopping"),
+      value: "shopping",
+    },
+    { label: t("transactions.categories.lifestyle.travel"), value: "travel" },
+    {
+      label: t("transactions.categories.lifestyle.gym/fitness"),
+      value: "gym/fitness",
+    },
+    {
+      label: t("transactions.categories.lifestyle.subscriptions"),
+      value: "subscriptions",
+    },
+    {
+      label: t("transactions.categories.lifestyle.gifts/donations"),
+      value: "gifts/donations",
+    },
+    {
+      label: t("transactions.categories.lifestyle.personalcare"),
+      value: "personalcare",
+    },
+    {
+      label: t("transactions.categories.lifestyle.petexpenses"),
+      value: "petexpenses",
+    },
+    {
+      label: t("transactions.categories.lifestyle.otherexpenses"),
+      value: "otherexpenses",
+    },
+  ]
 
   useEffect(() => {
     if (user) {
       const fetchDetails = async () => {
-        const cardDoc = await getDoc(doc(db, "cardDetails", user.uid))
-        const walletDoc = await getDoc(doc(db, "walletDetails", user.uid))
-        if (cardDoc.exists()) {
-          setCardDetails(cardDoc.data())
-        }
-        if (walletDoc.exists()) {
-          setWalletDetails(walletDoc.data())
+        try {
+          const [cardDoc, walletDoc] = await Promise.all([
+            getDoc(doc(db, "cardDetails", user.uid)),
+            getDoc(doc(db, "walletDetails", user.uid)),
+          ])
+
+          if (cardDoc.exists()) {
+            setCardDetails(cardDoc.data())
+          }
+          if (walletDoc.exists()) {
+            setWalletDetails(walletDoc.data())
+          }
+        } catch (error) {
+          console.error("Error fetching details:", error)
+          toast.error("Failed to load account details")
         }
       }
       fetchDetails()
@@ -110,186 +229,269 @@ const Transactions = () => {
   useEffect(() => {
     if (user) {
       const fetchTransactions = async () => {
-        const q = query(collection(db, "transactions"), where("userId", "==", user.uid))
-        const querySnapshot = await getDocs(q)
-        const transactionsData = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }))
-        setTransactions(transactionsData)
+        try {
+          const q = query(collection(db, "transactions"), where("userId", "==", user.uid))
+          const querySnapshot = await getDocs(q)
+          const transactionsData = querySnapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }))
+          setTransactions(transactionsData)
+        } catch (error) {
+          console.error("Error fetching transactions:", error)
+          toast.error("Failed to load transactions")
+        }
       }
       fetchTransactions()
     }
   }, [user])
 
-  const handleAddTransaction = async (transaction) => {
-    if (user) {
-      const dateValue = new Date(transaction.date)
-      const localDate = new Date(dateValue.getFullYear(), dateValue.getMonth(), dateValue.getDate(), 12, 0, 0, 0)
+  // Add window resize listener with cleanup
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
 
-      const newTransaction = {
-        ...transaction,
-        userId: user.uid,
-        date: localDate,
-        amount: Number.parseFloat(transaction.amount),
-        category: transaction.category,
+    // Add event listener
+    window.addEventListener("resize", handleResize)
+
+    // Initial check
+    handleResize()
+
+    // Cleanup function to remove event listener
+    return () => {
+      window.removeEventListener("resize", handleResize)
+    }
+  }, [])
+
+  // Add this helper function for better date handling
+  const parseTransactionDate = (dateValue) => {
+    try {
+      // Handle Firestore Timestamp
+      if (dateValue?.toDate) {
+        return dateValue.toDate()
+      }
+      // Handle number (timestamp)
+      if (typeof dateValue === "number") {
+        const date = new Date(dateValue)
+        if (!isNaN(date.getTime())) return date
+      }
+      // Handle string date
+      if (typeof dateValue === "string") {
+        const date = new Date(dateValue)
+        if (!isNaN(date.getTime())) return date
+      }
+      // Handle Date object
+      if (dateValue instanceof Date && !isNaN(dateValue.getTime())) {
+        return dateValue
       }
 
-      // Check for balance before adding expense
-      if (transaction.type === "Expense") {
-        const currentBalance =
-          transaction.paymentMethod === "Card"
-            ? Number.parseFloat(cardDetails.balance)
-            : Number.parseFloat(walletDetails.balance)
-
-        if (newTransaction.amount > currentBalance) {
-          toast.error(t("transactions.insufficientBalance"))
-          return // Prevent adding the transaction
-        }
-      }
-
-      // Update balance and add notifications based on transaction type
-      if (transaction.type === "Income") {
-        if (transaction.paymentMethod === "Card") {
-          const newBalance = (Number.parseFloat(cardDetails.balance) + newTransaction.amount).toFixed(2)
-          setCardDetails((prevDetails) => ({
-            ...prevDetails,
-            balance: newBalance,
-          }))
-          await updateDoc(doc(db, "cardDetails", user.uid), {
-            balance: newBalance,
-          })
-          toast.success(
-            t("transactions.transactionadded", {
-              amount: newTransaction.amount,
-              action: t("transactions.type.income"),
-              method: t("transactions.payment.card").toLowerCase(),
-            }),
-          )
-        } else if (transaction.paymentMethod === "Wallet") {
-          const newBalance = (Number.parseFloat(walletDetails.balance) + newTransaction.amount).toFixed(2)
-          setWalletDetails((prevDetails) => ({
-            ...prevDetails,
-            balance: newBalance,
-          }))
-          await updateDoc(doc(db, "walletDetails", user.uid), {
-            balance: newBalance,
-          })
-          toast.success(
-            t("transactions.transactionadded", {
-              amount: newTransaction.amount,
-              action: t("transactions.type.income"),
-              method: t("transactions.payment.wallet").toLowerCase(),
-            }),
-          )
-        }
-      } else if (transaction.type === "Expense") {
-        if (transaction.paymentMethod === "Card") {
-          const newBalance = (Number.parseFloat(cardDetails.balance) - newTransaction.amount).toFixed(2)
-          setCardDetails((prevDetails) => ({
-            ...prevDetails,
-            balance: newBalance,
-          }))
-          await updateDoc(doc(db, "cardDetails", user.uid), {
-            balance: newBalance,
-          })
-          if (Number(newBalance) < 100) {
-            toast.error(
-              t("transactions.lowBalancealert", {
-                balance: newBalance,
-                method: t("transactions.payment.card").toLowerCase(),
-              }),
-            )
-          }
-          toast.success(
-            t("transactions.transactionadded", {
-              amount: newTransaction.amount,
-              action: t("transactions.type.expense"),
-              method: t("transactions.payment.card").toLowerCase(),
-            }),
-          )
-        } else if (transaction.paymentMethod === "Wallet") {
-          const newBalance = (Number.parseFloat(walletDetails.balance) - newTransaction.amount).toFixed(2)
-          setWalletDetails((prevDetails) => ({
-            ...prevDetails,
-            balance: newBalance,
-          }))
-          await updateDoc(doc(db, "walletDetails", user.uid), {
-            balance: newBalance,
-          })
-          if (Number(newBalance) < 100) {
-            toast.error(
-              t("transactions.lowBalancealert", {
-                balance: newBalance,
-                method: t("transactions.payment.wallet").toLowerCase(),
-              }),
-            )
-          }
-          toast.success(
-            t("transactions.transactionadded", {
-              amount: newTransaction.amount,
-              action: t("transactions.type.expense"),
-              method: t("transactions.payment.wallet").toLowerCase(),
-            }),
-          )
-        }
-      }
-
-      const docRef = await addDoc(collection(db, "transactions"), newTransaction)
-      setTransactions([...transactions, { id: docRef.id, ...newTransaction }])
+      console.error("Invalid date value:", dateValue)
+      return null
+    } catch (error) {
+      console.error("Error parsing date:", error, "Value:", dateValue)
+      return null
     }
   }
 
-  const renderCategoryTag = (category) => {
-    const getCategoryType = (cat) => {
-      if (incomeCategories.some((item) => item.label === cat)) return "income"
-      if (essentialExpenses.some((item) => item.label === cat)) return "essential"
-      if (lifestyleExpenses.some((item) => item.label === cat)) return "lifestyle"
-      return ""
+  // Add this helper function for category translation debugging
+  const getTranslatedCategory = (category, type) => {
+    try {
+      // Normalize the category name
+      const normalizedCategory = category
+        .toLowerCase()
+        .replace(/[^a-z0-9]/g, "")
+        .trim()
+
+      // Determine category type
+      let categoryType = "lifestyle"
+      if (type === "Income") {
+        categoryType = "income"
+      } else if (
+        essentialExpenses.some((c) => c.label.toLowerCase().replace(/[^a-z0-9]/g, "") === normalizedCategory)
+      ) {
+        categoryType = "essential"
+      }
+
+      const translationKey = `transactions.categories.${categoryType}.${normalizedCategory}`
+      const translated = t(translationKey)
+
+      // Debug log for translation
+      console.log("Category translation:", {
+        original: category,
+        normalized: normalizedCategory,
+        type: categoryType,
+        translationKey,
+        result: translated,
+      })
+
+      return translated
+    } catch (error) {
+      console.error("Error translating category:", error)
+      return category
+    }
+  }
+
+  const handleAddTransaction = async (transaction) => {
+    try {
+      if (user) {
+        const dateValue = new Date(transaction.date)
+        if (isNaN(dateValue.getTime())) {
+          throw new Error("Invalid transaction date")
+        }
+  
+        const newTransaction = {
+          ...transaction,
+          userId: user.uid,
+          date: dateValue,
+          amount: Number.parseFloat(transaction.amount),
+          category: transaction.category,
+        }
+  
+        if (transaction.type === "Income") {
+          if (transaction.paymentMethod === "Card") {
+            const newBalance = (Number.parseFloat(cardDetails.balance) + transaction.amount).toFixed(2)
+            setCardDetails((prevDetails) => ({
+              ...prevDetails,
+              balance: newBalance,
+            }))
+            await updateDoc(doc(db, "cardDetails", user.uid), {
+              balance: newBalance,
+            })
+          } else if (transaction.paymentMethod === "Wallet") {
+            const newBalance = (Number.parseFloat(walletDetails.balance) + transaction.amount).toFixed(2)
+            setWalletDetails((prevDetails) => ({
+              ...prevDetails,
+              balance: newBalance,
+            }))
+            await updateDoc(doc(db, "walletDetails", user.uid), {
+              balance: newBalance,
+            })
+          }
+        } else if (transaction.type === "Expense") {
+          if (transaction.paymentMethod === "Card") {
+            const currentBalance = Number.parseFloat(cardDetails.balance)
+            if (newTransaction.amount > currentBalance) {
+              return
+            }
+            const newBalance = (Number.parseFloat(cardDetails.balance) - transaction.amount).toFixed(2)
+            setCardDetails((prevDetails) => ({
+              ...prevDetails,
+              balance: newBalance,
+            }))
+            await updateDoc(doc(db, "cardDetails", user.uid), {
+              balance: newBalance,
+            })
+          } else if (transaction.paymentMethod === "Wallet") {
+            const currentBalance = Number.parseFloat(walletDetails.balance)
+            if (newTransaction.amount > currentBalance) {
+              return
+            }
+            const newBalance = (Number.parseFloat(walletDetails.balance) - transaction.amount).toFixed(2)
+            setWalletDetails((prevDetails) => ({
+              ...prevDetails,
+              balance: newBalance,
+            }))
+            await updateDoc(doc(db, "walletDetails", user.uid), {
+              balance: newBalance,
+            })
+          }
+        }
+  
+        await addDoc(collection(db, "transactions"), newTransaction)
+        setTransactions((prev) => [...prev, newTransaction])
+      }
+    } catch (error) {
+      console.error("Error adding transaction:", error)
+    }
+  }
+
+  // Helper function to map old category names to new ones
+  const mapLegacyCategory = (category) => {
+    const legacyMap = {
+      // Income categories
+      Salary: "salary",
+      "Freelance Income": "freelanceincome",
+      "Rental Income": "rentalincome",
+      "Investment Income": "investmentincome",
+      "Interest Income": "interestincome",
+      "Other Income": "otherincome",
+
+      // Essential categories
+      "Rent/Mortgage": "rent/mortgage",
+      "Medical Expenses": "medicalexpenses",
+      "Phone Bill": "phonebill",
+      "Loan Payments": "loanpayments",
+
+      // Lifestyle categories
+      "Dining Out": "diningout",
+      "Gym/Fitness": "gym/fitness",
+      "Gifts/Donations": "gifts/donations",
+      "Personal Care": "personalcare",
+      "Pet Expenses": "petexpenses",
+      "Other Expenses": "otherexpenses",
     }
 
-    const categoryType = getCategoryType(category)
-    const translationKey = `transactions.categories.${categoryType}.${category.toLowerCase().replace(/\s+/g, "")}`
+    return legacyMap[category] || category.toLowerCase().replace(/\s+/g, "")
+  }
 
-    const categoryIcons = {
-      Salary: <FaMoneyBill className="text-white" />,
-      "Freelance Income": <FaBriefcase className="text-white" />,
-      Bonus: <FaCoins className="text-white" />,
-      "Investment Income": <FaChartLine className="text-white" />,
-      "Rental Income": <FaHome className="text-white" />,
-      Dividends: <FaHandHoldingUsd className="text-white" />,
-      "Interest Income": <FaPiggyBank className="text-white" />,
-      Gifts: <FaGift className="text-white" />,
-      Refunds: <FaUniversity className="text-white" />,
-      "Other Income": <FaWallet className="text-white" />,
-      "Rent/Mortgage": <FaHome className="text-white" />,
-      Utilities: <FaWifi className="text-white" />,
-      Groceries: <FaShoppingCart className="text-white" />,
-      Transportation: <FaCar className="text-white" />,
-      Insurance: <FaStethoscope className="text-white" />,
-      "Medical Expenses": <FaStethoscope className="text-white" />,
-      Internet: <FaWifi className="text-white" />,
-      "Phone Bill": <FaPhone className="text-white" />,
-      Childcare: <FaChild className="text-white" />,
-      "Loan Payments": <FaUniversity className="text-white" />,
-      "Dining Out": <FaHamburger className="text-white" />,
-      Entertainment: <FaFilm className="text-white" />,
-      Shopping: <FaShoppingCart className="text-white" />,
-      Travel: <FaPlane className="text-white" />,
-      "Gym/Fitness": <FaDumbbell className="text-white" />,
-      Subscriptions: <FaFilm className="text-white" />,
-      "Gifts/Donations": <FaGift className="text-white" />,
-      "Personal Care": <FaHeart className="text-white" />,
-      "Pet Expenses": <FaPaw className="text-white" />,
-      "Other Expenses": <FaWallet className="text-white" />,
+  // Add this function before renderCategoryTag
+  const getCategoryColor = (type, categoryType) => {
+    if (type === "Income") {
+      return "#20b77c" // green for income
+    }
+    if (categoryType === "essential") {
+      return "#f96a16" // orange for essential expenses
+    }
+    return "#0c8de0" // blue for lifestyle expenses
+  }
+
+  // Also add getCategoryIcon function since it's used in renderCategoryTag
+  const getCategoryIcon = (category) => {
+    const IconComponent = categoryIcons[category] || FaWallet
+    return <IconComponent />
+  }
+
+  const renderCategoryTag = (transaction) => {
+    // Ensure we have a valid category
+    if (!transaction?.category) return null
+
+    // Normalize the category by converting to lowercase and removing spaces
+    const normalizedCategory = transaction.category
+      .toLowerCase()
+      .replace(/\s+/g, "")
+      .replace(/[^a-z0-9/]/g, "") // Keep slashes for categories like "gym/fitness"
+
+    // Determine category type
+    let categoryType = "lifestyle" // default
+    if (transaction.type === "Income") {
+      categoryType = "income"
+    } else {
+      // Check if category exists in essentialExpenses array using normalized comparison
+      const isEssential = essentialExpenses.some((cat) => cat.value.toLowerCase() === normalizedCategory)
+      categoryType = isEssential ? "essential" : "lifestyle"
     }
 
-    const icon = categoryIcons[category] || null
+    // Debug log to help identify category matching
+    console.log("Category matching:", {
+      originalCategory: transaction.category,
+      normalizedCategory,
+      categoryType,
+      translationKey: `transactions.categories.${categoryType}.${normalizedCategory}`,
+    })
 
     return (
-      <Tag color="#0c8de0" className="flex items-center gap-2 w-max rounded-full px-2 py-1">
-        {icon}
-        <span className="text-sm font-inter font-normal text-white">{t(translationKey)}</span>
+      <Tag
+        key={`${transaction.id}-${normalizedCategory}`}
+        color={getCategoryColor(transaction.type, categoryType)}
+        className="flex items-center gap-2 w-max rounded-full px-2 py-1"
+      >
+        {getCategoryIcon(normalizedCategory)}
+        <span className="text-sm font-inter font-normal text-white">
+          {transaction.type.toLowerCase() === "income"
+            ? t(`transactions.categories.income.${normalizedCategory}`)
+            : t(`transactions.categories.${categoryType}.${normalizedCategory}`)}
+        </span>
       </Tag>
     )
   }
@@ -304,6 +506,15 @@ const Transactions = () => {
     return locales[language] || enUS
   }
 
+  // Format date for mobile view - shorter format
+  const formatMobileDate = (date) => {
+    const parsedDate = parseTransactionDate(date)
+    if (!parsedDate) return "Invalid"
+
+    // Use a shorter date format for mobile
+    return format(parsedDate, "MMM d", { locale: getLocale(i18n.language) })
+  }
+
   const columns = [
     {
       title: t("transactions.category"),
@@ -314,38 +525,42 @@ const Transactions = () => {
           text: t("transactions.categories.income.title"),
           value: "Income",
           children: incomeCategories.map((cat) => ({
-            text: t(`transactions.categories.income.${cat.label.toLowerCase().replace(/\s+/g, "")}`),
-            value: cat.label,
+            text: cat.label,
+            value: cat.value,
+            key: `income-${cat.value}`,
           })),
         },
         {
           text: t("transactions.categories.essential.title"),
           value: "Essential Expenses",
           children: essentialExpenses.map((cat) => ({
-            text: t(`transactions.categories.essential.${cat.label.toLowerCase().replace(/\s+/g, "")}`),
-            value: cat.label,
+            text: cat.label,
+            value: cat.value,
+            key: `essential-${cat.value}`,
           })),
         },
         {
           text: t("transactions.categories.lifestyle.title"),
           value: "Lifestyle Expenses",
           children: lifestyleExpenses.map((cat) => ({
-            text: t(`transactions.categories.lifestyle.${cat.label.toLowerCase().replace(/\s+/g, "")}`),
-            value: cat.label,
+            text: cat.label,
+            value: cat.value,
+            key: `lifestyle-${cat.value}`,
           })),
         },
       ],
       onFilter: (value, record) => {
+        const normalizedCategory = mapLegacyCategory(record.category)
         if (value === "Income") {
-          return incomeCategories.some((cat) => cat.label === record.category)
+          return incomeCategories.some((cat) => cat.value === normalizedCategory)
         } else if (value === "Essential Expenses") {
-          return essentialExpenses.some((cat) => cat.label === record.category)
+          return essentialExpenses.some((cat) => cat.value === normalizedCategory)
         } else if (value === "Lifestyle Expenses") {
-          return lifestyleExpenses.some((cat) => cat.label === record.category)
+          return lifestyleExpenses.some((cat) => cat.value === normalizedCategory)
         }
-        return record.category.includes(value)
+        return normalizedCategory === value
       },
-      render: (category) => renderCategoryTag(category),
+      render: (category, record) => renderCategoryTag(record),
     },
     {
       title: t("transactions.tabletype"),
@@ -366,7 +581,9 @@ const Transactions = () => {
       title: t("transactions.provider"),
       dataIndex: "provider",
       key: "provider",
-      sorter: (a, b) => a.provider.localeCompare(b.provider),
+      render: (provider) => (
+        <span className="text-gray-800 dark:text-gray-200">{provider || t("transactions.untitled")}</span>
+      ),
     },
     {
       title: t("transactions.paymentMethod"),
@@ -389,14 +606,19 @@ const Transactions = () => {
       key: "date",
       defaultSortOrder: "descend",
       render: (date) => {
-        const timestamp = date?.toDate ? date.toDate() : new Date(date)
-        const locale = getLocale(i18n.language)
+        const parsedDate = parseTransactionDate(date)
+        if (!parsedDate) {
+          console.error("Invalid date in table:", date)
+          return "Invalid Date"
+        }
 
-        return format(timestamp, "PPP", { locale })
+        const locale = getLocale(i18n.language)
+        return format(parsedDate, "PPP", { locale })
       },
       sorter: (a, b) => {
-        const dateA = a.date?.toDate ? a.date.toDate() : new Date(a.date)
-        const dateB = b.date?.toDate ? b.date.toDate() : new Date(b.date)
+        const dateA = parseTransactionDate(a.date)
+        const dateB = parseTransactionDate(b.date)
+        if (!dateA || !dateB) return 0
         return dateB - dateA
       },
       filters: [
@@ -414,7 +636,7 @@ const Transactions = () => {
         },
       ],
       onFilter: (value, record) => {
-        const transactionDate = record.date?.toDate ? record.date.toDate() : new Date(record.date)
+        const transactionDate = parseTransactionDate(record.date)
         const now = new Date()
         const diffTime = Math.abs(now - transactionDate)
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
@@ -470,8 +692,9 @@ const Transactions = () => {
   const renderMobileList = () => (
     <List
       dataSource={transactions.sort((a, b) => {
-        const dateA = a.date?.toDate ? a.date.toDate() : new Date(a.date)
-        const dateB = b.date?.toDate ? b.date.toDate() : new Date(b.date)
+        const dateA = parseTransactionDate(a.date)
+        const dateB = parseTransactionDate(b.date)
+        if (!dateA || !dateB) return 0
         return dateB - dateA
       })}
       renderItem={(item) => (
@@ -479,26 +702,26 @@ const Transactions = () => {
           <Card className="w-full shadow-md dark:bg-gray-800 dark:border-gray-700">
             <div className="flex justify-between items-center mb-2">
               <div className="flex items-center">
-                {renderCategoryTag(item.category)}
+                {renderCategoryTag(item)}
                 <Tag color={item.type === "Income" ? "#20b77c" : "#f96a16"} className="ml-2 rounded-full px-3 py-1">
                   {t(`transactions.type.${item.type.toLowerCase()}`)}
                 </Tag>
               </div>
-              <Text strong className="dark:text-gray-200">
-                {format(item.date?.toDate ? item.date.toDate() : new Date(item.date), "PPP", {
-                  locale: getLocale(i18n.language),
-                })}
+              <Text strong className="dark:text-gray-200 text-xs">
+                {formatMobileDate(item.date)}
               </Text>
             </div>
             <div className="flex justify-between items-center mb-2">
-              <Text className="text-gray-600 dark:text-gray-300">{item.provider}</Text>
+              <Text className="text-gray-600 dark:text-gray-300 truncate max-w-[150px]">{item.provider}</Text>
               <Tag color={item.paymentMethod === "Card" ? "#0c8de0" : "#20b77c"} className="rounded-full px-3 py-1">
                 {t(`transactions.payment.${item.paymentMethod.toLowerCase()}`)}
               </Tag>
             </div>
             <div className="flex justify-end items-center">
               <Text
-                className={`text-lg font-semibold ${item.type === "Income" ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}`}
+                className={`text-lg font-semibold ${
+                  item.type === "Income" ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"
+                }`}
               >
                 {item.type === "Income" ? "+" : "-"}${item.amount.toFixed(2)}
               </Text>
@@ -510,58 +733,55 @@ const Transactions = () => {
   )
 
   return (
-    <motion.div variants={containerVariants} initial="hidden" animate="visible" className="space-y-6">
-      <motion.div variants={itemVariants} className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm mb-6">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div>
-            <h1 className="text-2xl font-semibold text-gray-800 dark:text-white mb-2">{t("transactions.title")}</h1>
-            <p className="text-gray-600 dark:text-gray-300">{t("transactions.subtitle")}</p>
-          </div>
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="px-4 py-2 bg-transparent border-2 border-dashed border-finance-blue-300 dark:border-finance-blue-700 hover:border-finance-blue-500 dark:hover:border-finance-blue-500 text-finance-blue-600 dark:text-finance-blue-400 rounded-xl transition-all duration-200 flex items-center gap-2"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-              <path
-                fillRule="evenodd"
-                d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
-                clipRule="evenodd"
-              />
-            </svg>
-            {t("transactions.addtransaction")}
-          </button>
-        </div>
+    <div className="p-4 sm:p-6">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="flex flex-col md:flex-row justify-between items-center mb-6 bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-xl shadow-sm"
+      >
+        <Title level={2} className="mb-4 md:mb-0 dark:text-gray-200">
+          {t("transactions.title")}
+        </Title>
+        <Button
+          type="primary"
+          onClick={() => setIsModalOpen(true)}
+          className="bg-finance-blue-500 hover:bg-finance-blue-600 flex items-center gap-2"
+          icon={<FaPlus />}
+        >
+          {t("transactions.addtransaction")}
+        </Button>
       </motion.div>
 
-      <motion.div variants={itemVariants}>
+      <motion.div
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+        className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4"
+      >
         {isMobile ? (
-          <motion.div variants={itemVariants} className="space-y-4">
-            {renderMobileList()}
-          </motion.div>
+          renderMobileList()
         ) : (
           <Table
             columns={columns}
             dataSource={transactions}
-            rowKey="id"
+            rowKey={(record) => record.id}
             pagination={{ pageSize: 6 }}
-            className="bg-white dark:bg-gray-800 rounded-xl shadow-sm"
             scroll={{ x: true }}
           />
         )}
       </motion.div>
 
-      {isModalOpen && (
-        <AddTransactionModal
-          open={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          onAddTransaction={handleAddTransaction}
-          cardBalance={cardDetails.balance}
-          walletBalance={walletDetails.balance}
-        />
-      )}
-    </motion.div>
+      <AddTransactionModal
+        open={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onAddTransaction={handleAddTransaction}
+        cardBalance={cardDetails.balance}
+        walletBalance={walletDetails.balance}
+      />
+    </div>
   )
 }
 
-export default Transactions;
+export default Transactions
 

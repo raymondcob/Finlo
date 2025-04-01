@@ -1,4 +1,4 @@
-import { Modal, Input, Select, Button, Form, Empty, Progress } from "antd"
+import { Modal, Input, Select, Button, Form, Empty } from "antd"
 import { useTranslation } from "react-i18next"
 
 const { Option } = Select
@@ -58,24 +58,20 @@ const AllocateToGoalModal = ({ open, onClose, onSave, goals }) => {
             <Select
               placeholder={t("savingsGoals.modals.allocate.selectGoal")}
               className="dark:bg-gray-700 dark:text-white dark:border-gray-600"
+              dropdownClassName="dark:bg-gray-800 dark:text-white"
             >
-              {incompleteGoals.map((goal, index) => {
-                const percentage = goal.goalAmount ? Math.floor(((goal.currentAmount || 0) / goal.goalAmount) * 100) : 0
-
-                return (
-                  <Option key={index} value={goal.goalName}>
-                    <div className="flex flex-col">
-                      <div className="flex justify-between">
-                        <span>{goal.goalName}</span>
-                        <span>
-                          ${goal.currentAmount || 0}/${goal.goalAmount}
-                        </span>
-                      </div>
-                      <Progress percent={percentage} size="small" showInfo={false} />
+              {incompleteGoals.map((goal, index) => (
+                <Option key={index} value={goal.goalName}>
+                  <div className="flex flex-col">
+                    <div className="flex justify-between">
+                      <span>{goal.goalName}</span>
+                      <span>
+                        ${goal.currentAmount || 0}/${goal.goalAmount}
+                      </span>
                     </div>
-                  </Option>
-                )
-              })}
+                  </div>
+                </Option>
+              ))}
             </Select>
           </Form.Item>
 
@@ -101,5 +97,5 @@ const AllocateToGoalModal = ({ open, onClose, onSave, goals }) => {
   )
 }
 
-export default AllocateToGoalModal;
+export default AllocateToGoalModal
 

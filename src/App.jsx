@@ -8,6 +8,9 @@ import { Toaster } from "react-hot-toast";
 import LoadingSpinner from "./components/LoadingSpinner";
 import AppRoutes from "./routes/AppRoutes";
 import "./config/i18n";
+import { LoadingProvider } from "./context/LoadingContext";
+import { I18nextProvider } from "react-i18next";
+import i18n from "./config/i18n";
 
 function App() {
   const [user, setUser] = useState(null);
@@ -27,14 +30,21 @@ function App() {
   }
 
   return (
-    <Router>
+    <LoadingProvider>
       <UserProvider>
-        <PageTitleProvider>
-          <Toaster position="top-right" />
-          <AppRoutes />
-        </PageTitleProvider>
+        <I18nextProvider i18n={i18n}>
+          <Router>
+            <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+              <LoadingSpinner />
+              <PageTitleProvider>
+                <Toaster position="top-right" />
+                <AppRoutes />
+              </PageTitleProvider>
+            </div>
+          </Router>
+        </I18nextProvider>
       </UserProvider>
-    </Router>
+    </LoadingProvider>
   );
 }
 

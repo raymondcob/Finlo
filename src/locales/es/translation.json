@@ -5,7 +5,8 @@
     "reports": "Informes",
     "income": "Fuentes",
     "savingsGoals": "Objetivos de Ahorro",
-    "settings": "Configuración"
+    "settings": "Configuración",
+    "budgetLimits": "Presupuesto"
   },
   "dashboard": {
     "welcome": "{{greeting}}, {{username}}!",
@@ -24,7 +25,8 @@
     "incomevsexpenses": "Ingresos vs Gastos",
     "quickactions": {
       "quickadd": "Agregar Rápido",
-      "quickview": "Ver Todo",
+      "setBudgets": "Establecer Límites",
+      "viewBudgets": "Ver Límites",
       "reports": "Informes",
       "sources": "Fuentes"
     },
@@ -36,7 +38,8 @@
       "goodFinances": "👍 ¡Tus finanzas se ven bien!",
       "noRecentTransactions": "No hay transacciones recientes",
       "noActiveGoals": "No hay objetivos de ahorro activos",
-      "recentTransactions": "Transacciones Recientes"
+      "recentTransactions": "Transacciones Recientes",
+      "setBudgetLimits": "💡 Establece límites de presupuesto para un mejor control de tus gastos"
     }
   },
   "transactions": {
@@ -52,20 +55,31 @@
     "insufficientBalance": "El monto de la transacción supera el saldo disponible.",
     "lowBalancealert": "Alerta de saldo bajo: ${{balance}} restante en tu {{method}}",
     "transactionadded": "{{type}}: ${{amount}} {{action}} {{method}}",
-    "error": "La transacción falló",
+    "error": {
+      "noPaymentMethods": "No hay métodos de pago disponibles",
+      "noPaymentMethodsMessage": "No hay métodos de pago disponibles. Por favor, configure sus fuentes de ingresos primero.",
+      "setupSources": "Configurar Fuentes",
+      "insufficientBalance": "Saldo insuficiente en tu {{method}}",
+      "insufficientBalanceMessage": "Saldo insuficiente en su {{method}}",
+      "addingTransactionMessage": "Error al agregar la transacción. Por favor, inténtelo de nuevo."
+    },
+    "success": {
+      "addedMessage": "Transacción agregada exitosamente"
+    },
     "categories": {
       "income": {
         "title": "Ingresos",
         "salary": "Salario",
         "freelanceincome": "Ingresos por Freelance",
-        "bonus": "Bono",
+        "bonus": "Bonificación",
         "investmentincome": "Ingresos por Inversiones",
         "rentalincome": "Ingresos por Alquiler",
         "dividends": "Dividendos",
         "interestincome": "Ingresos por Intereses",
         "gifts": "Regalos",
         "refunds": "Reembolsos",
-        "otherincome": "Otros Ingresos"
+        "otherincome": "Otros Ingresos",
+        "description": "Todas las fuentes de ingresos"
       },
       "essential": {
         "title": "Gastos Esenciales",
@@ -73,16 +87,17 @@
         "utilities": "Servicios Públicos",
         "groceries": "Comestibles",
         "transportation": "Transporte",
-        "insurance": "Seguro",
+        "insurance": "Seguros",
         "medicalexpenses": "Gastos Médicos",
         "internet": "Internet",
-        "phonebill": "Factura Telefónica",
-        "childcare": "Cuidado de Niños",
-        "loanpayments": "Pagos de Préstamos"
+        "phonebill": "Factura de Teléfono",
+        "childcare": "Cuidado Infantil",
+        "loanpayments": "Pagos de Préstamos",
+        "description": "Gastos básicos necesarios para la vida diaria"
       },
       "lifestyle": {
         "title": "Gastos de Estilo de Vida",
-        "diningout": "Comer Fuera",
+        "diningout": "Restaurantes",
         "entertainment": "Entretenimiento",
         "shopping": "Compras",
         "travel": "Viajes",
@@ -91,7 +106,8 @@
         "gifts/donations": "Regalos/Donaciones",
         "personalcare": "Cuidado Personal",
         "petexpenses": "Gastos de Mascotas",
-        "otherexpenses": "Otros Gastos"
+        "otherexpenses": "Otros Gastos",
+        "description": "Gastos discrecionales y de entretenimiento"
       }
     },
     "type": {
@@ -106,6 +122,25 @@
       "last7days": "Últimos 7 días",
       "last30days": "Últimos 30 días",
       "last90days": "Últimos 90 días"
+    },
+    "tabs": {
+      "all": "Todas las Transacciones",
+      "recurring": "Transacciones Recurrentes"
+    },
+    "recurring": {
+      "frequency": "Frecuencia",
+      "endDate": "Fecha de Finalización",
+      "noEndDate": "Sin fecha de finalización",
+      "endRecurring": "Finalizar Recurrencia",
+      "confirmEnd": "Finalizar Transacción Recurrente",
+      "confirmEndMessage": "¿Estás seguro de que deseas finalizar esta transacción recurrente?",
+      "endedSuccess": "Transacción recurrente finalizada con éxito",
+      "endedError": "Error al finalizar la transacción recurrente",
+      "details": {
+        "category": "Categoría",
+        "amount": "Cantidad",
+        "frequency": "Frecuencia"
+      }
     }
   },
   "reports": {
@@ -304,7 +339,12 @@
         "initialBalancePlaceholder": "0.00",
         "balanceSetWarning": "Nota: El saldo inicial solo se puede establecer una vez. Se actualizará a través de transacciones.",
         "save": "Guardar",
-        "cancel": "Cancelar"
+        "cancel": "Cancelar",
+        "securityNotice": "Esta es una tarjeta simulada solo para fines de demostración. No ingrese información real de tarjetas. Todos los datos son simulados para la experiencia de la aplicación.",
+        "cardNumberHelp": "Ingrese cualquier 4 dígitos para el número de tarjeta simulada",
+        "cardNumberPlaceholder": "Ingrese solo los últimos 4 dígitos",
+        "validThruFormat": "Formato: MM/AA",
+        "cardNumberPrefix": "**** **** ****"
       },
       "addWallet": {
         "title": "Agregar Detalles de Cartera",
@@ -385,6 +425,7 @@
   },
   "modals": {
     "addTransaction": {
+      "setupRequired": "Configuración Requerida",
       "title": "Agregar Transacción",
       "category": "Categoría",
       "type": "Tipo",
@@ -392,11 +433,14 @@
       "date": "Fecha",
       "provider": "Proveedor",
       "providerPlaceholder": "Ingrese Proveedor",
+      "providerRequired": "Por favor ingrese un proveedor",
       "amount": "Cantidad",
       "amountPlaceholder": "0.00",
+      "amountRequired": "Por favor ingrese una cantidad",
+      "amountInvalid": "Por favor ingrese una cantidad válida",
       "save": "Agregar",
       "cancel": "Cancelar",
-      "walletBalance": "Cartera (Saldo: ${{balance}})",
+      "walletBalance": "Billetera (Saldo: ${{balance}})",
       "cardBalance": "Tarjeta (Saldo: ${{balance}})",
       "errors": {
         "noBalance": {
@@ -408,6 +452,16 @@
           "incomeContent": "Por favor, selecciona una categoría de ingresos para transacciones de ingresos.",
           "expenseContent": "Por favor, selecciona una categoría de gastos para transacciones de gastos."
         }
+      },
+      "recurring": {
+        "label": "Frecuencia de Transacción",
+        "required": "Por favor selecciona la frecuencia de la transacción",
+        "oneTime": "Transacción única",
+        "monthly": "Repetir mensualmente",
+        "weekly": "Repetir semanalmente",
+        "yearly": "Repetir anualmente",
+        "endDate": "Fecha de Finalización",
+        "endDatePlaceholder": "Selecciona la fecha de finalización para la transacción recurrente"
       }
     }
   },
@@ -439,7 +493,7 @@
       "haveAccount": "¿Ya tienes una cuenta?",
       "login": "Iniciar Sesión"
     },
-    "welcome": "Bienvenido a StackUp Finance",
+    "welcome": "Bienvenido a Finlo!",
     "tagline": "Tu gestor de finanzas personal para un mejor manejo del dinero",
     "features": {
       "tracking": "Controla tus ingresos y gastos",
@@ -460,6 +514,75 @@
     "logout": "Cerrar Sesión",
     "profile": "Perfil",
     "settings": "Configuración"
+  },
+  "budgets": {
+    "title": "Límites de Presupuesto",
+    "subtitle": "Establece y gestiona tus límites de gastos por categoría",
+    "setLimit": "Establecer Límite",
+    "setLimitTitle": "Establecer Límite de Presupuesto",
+    "category": "Categoría",
+    "limit": "Límite de Presupuesto",
+    "frequency": "Frecuencia de Reinicio",
+    "categoryRequired": "Por favor selecciona una categoría",
+    "limitRequired": "Por favor ingresa un límite de presupuesto",
+    "limitInvalid": "Por favor ingresa una cantidad válida",
+    "frequencyRequired": "Por favor selecciona una frecuencia",
+    "limitSet": "Límite de presupuesto establecido con éxito",
+    "limitSetError": "Error al establecer el límite de presupuesto",
+    "needsReset": "El presupuesto para {{category}} ha expirado. Por favor, establezca un nuevo límite.",
+    "spentOfBudget": "${spent} de ${budget}",
+    "resetOn": "Se reinicia el ${date}",
+    "frequency": {
+      "weekly": "Semanal",
+      "monthly": "Mensual",
+      "yearly": "Anual"
+    },
+    "progress": {
+      "danger": "Excedido",
+      "warning": "Cerca del límite",
+      "good": "Dentro del presupuesto"
+    },
+    "spentAmount": "${amount} gastado",
+    "limitAmount": "límite de ${amount}",
+    "categories": {
+      "essential": {
+        "title": "Gastos Esenciales",
+        "description": "Gastos básicos y necesidades diarias",
+        "rent/mortgage": "Alquiler/Hipoteca",
+        "utilities": "Servicios Públicos",
+        "groceries": "Comestibles",
+        "transportation": "Transporte",
+        "insurance": "Seguros",
+        "medicalexpenses": "Gastos Médicos",
+        "internet": "Internet",
+        "phonebill": "Factura de Teléfono",
+        "childcare": "Cuidado Infantil",
+        "loanpayments": "Pagos de Préstamos"
+      },
+      "lifestyle": {
+        "title": "Gastos de Estilo de Vida",
+        "description": "Gastos discrecionales y entretenimiento",
+        "diningout": "Restaurantes",
+        "entertainment": "Entretenimiento",
+        "shopping": "Compras",
+        "travel": "Viajes",
+        "gym/fitness": "Gimnasio/Fitness",
+        "subscriptions": "Suscripciones",
+        "gifts/donations": "Regalos/Donaciones",
+        "personalcare": "Cuidado Personal",
+        "petexpenses": "Gastos de Mascotas",
+        "otherexpenses": "Otros Gastos"
+      }
+    },
+    "noLimits": "No hay límites de presupuesto establecidos",
+    "setFirstLimit": "Establece tu primer límite de presupuesto para comenzar el seguimiento",
+    "updateLimit": "Actualizar Límite",
+    "deleteLimit": "Eliminar Límite",
+    "confirmDelete": {
+      "title": "Eliminar Límite de Presupuesto",
+      "message": "¿Estás seguro de que deseas eliminar este límite de presupuesto?",
+      "success": "Límite de presupuesto eliminado exitosamente",
+      "error": "Error al eliminar el límite de presupuesto"
+    }
   }
 }
-

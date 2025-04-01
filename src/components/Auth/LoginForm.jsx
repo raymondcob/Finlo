@@ -1,4 +1,3 @@
-
 import { useState, useContext } from "react"
 import { useNavigate, Link } from "react-router-dom"
 import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from "firebase/auth"
@@ -29,7 +28,8 @@ const LoginForm = () => {
       setUser(userCredential.user)
       navigate("/dashboard")
     } catch (error) {
-      setError(error.message)
+      // Simplified error message
+      setError("Wrong email or password")
     } finally {
       setIsLoading(false)
     }
@@ -200,5 +200,5 @@ const LoginForm = () => {
   )
 }
 
-export default LoginForm;
+export default LoginForm
 

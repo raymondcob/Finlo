@@ -7,6 +7,7 @@ import Reports from "../budgettracker/Reports";
 import Income from "../budgettracker/Incomesources";
 import Settings from "../budgettracker/settings";
 import SavingsGoals from "../budgettracker/SavingsGoals";
+import BudgetLimits from "../budgettracker/BudgetLimits";
 import PrivateRoute from "./PrivateRoute";
 import MainLayout from "../components/Layout/MainLayout";
 import AuthLayout from "../components/Layout/AuthLayout";
@@ -36,6 +37,7 @@ const AppRoutes = () => {
         <Route path="income" element={<Income />} />
         <Route path="settings" element={<Settings />} />
         <Route path="savings-goals" element={<SavingsGoals />} />
+        <Route path="budget-limits" element={<BudgetLimits />} />
       </Route>
       <Route
         path="*"
