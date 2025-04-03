@@ -136,22 +136,24 @@ const Sidebar = ({ isOpen, onMenuClick }) => {
 
       <AnimatePresence>
         <motion.div
-          className="fixed inset-y-0 left-0 z-30 md:relative md:z-0 min-h-[90vh] bg-white shadow-lg flex flex-col dark:bg-gray-800 dark:text-white transition-all duration-200 ease-in-out overflow-hidden"
+          className="fixed inset-y-0 left-0 z-30 md:relative md:z-0 min-h-[90vh] bg-gradient-to-b from-white to-gray-50 shadow-lg flex flex-col dark:from-gray-800 dark:to-gray-900 dark:shadow-xl transition-all duration-200 ease-in-out overflow-hidden"
           initial={isMobile ? "closed" : "open"}
           animate={isOpen || !isMobile ? "open" : "closed"}
           variants={sidebarVariants}
         >
-          <div className="p-4 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
+          <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
             <div className="flex items-center space-x-2">
               {isMobile ? (
                 <img src="/favicon.ico" alt="Finlo" className="w-6 h-6 object-contain" />
               ) : (
-                <div className="w-8 h-8 rounded-full bg-finance-blue-600 flex items-center justify-center text-white font-bold">
+                <div className="w-8 h-8 rounded-full bg-gradient-to-r from-finance-blue-500 to-finance-blue-600 flex items-center justify-center text-white font-bold shadow-md">
                   FL
                 </div>
               )}
               {(!isCollapsed || isMobile) && (
-                <h2 className="text-lg font-semibold text-finance-blue-700 dark:text-finance-blue-300">Finlo</h2>
+                <h2 className="text-lg font-semibold text-gray-800 dark:text-white">
+                  Finlo
+                </h2>
               )}
             </div>
             {!isMobile && (
@@ -174,7 +176,7 @@ const Sidebar = ({ isOpen, onMenuClick }) => {
                   animate="open"
                   className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all duration-200 ${
                     activeItem === item.id
-                      ? "bg-finance-blue-50 text-finance-blue-700 dark:bg-finance-blue-900/30 dark:text-finance-blue-300 shadow-sm"
+                      ? "bg-gradient-to-r from-finance-blue-100 to-finance-blue-200 text-finance-blue-700 dark:from-finance-blue-800 dark:to-finance-blue-900 dark:text-white shadow-md"
                       : "text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
                   }`}
                   onClick={() => handleMenuClick(item.path, item.id, item.label)}
@@ -182,13 +184,17 @@ const Sidebar = ({ isOpen, onMenuClick }) => {
                   <div
                     className={`flex items-center justify-center w-8 h-8 rounded-full ${
                       activeItem === item.id
-                        ? "bg-finance-blue-100 text-finance-blue-700 dark:bg-finance-blue-800 dark:text-finance-blue-300"
+                        ? "bg-gradient-to-r from-finance-blue-500 to-finance-blue-600 text-white shadow-md"
                         : "text-gray-500 dark:text-gray-400"
                     }`}
                   >
                     <item.icon className="w-5 h-5" />
                   </div>
-                  <span className={`font-medium whitespace-nowrap ${isCollapsed && !isMobile ? "hidden" : ""}`}>
+                  <span
+                    className={`font-medium whitespace-nowrap ${
+                      isCollapsed && !isMobile ? "hidden" : ""
+                    }`}
+                  >
                     {item.label}
                   </span>
                   {activeItem === item.id && (
@@ -205,11 +211,17 @@ const Sidebar = ({ isOpen, onMenuClick }) => {
           </div>
 
           <div
-            className={`p-4 border-t border-gray-100 dark:border-gray-700 ${isCollapsed && !isMobile ? "hidden" : ""}`}
+            className={`p-4 border-t border-gray-200 dark:border-gray-700 ${
+              isCollapsed && !isMobile ? "hidden" : ""
+            }`}
           >
-            <div className="bg-finance-blue-50 dark:bg-finance-blue-900/30 p-3 rounded-lg">
-              <h3 className="text-sm font-medium text-finance-blue-700 dark:text-finance-blue-300 mb-1">Need Help?</h3>
-              <p className="text-xs text-gray-500 dark:text-gray-400">Contact our support team for assistance</p>
+            <div className="bg-gradient-to-r from-finance-blue-50 to-finance-blue-100 dark:from-finance-blue-800 dark:to-finance-blue-900 p-3 rounded-lg shadow-md">
+              <h3 className="text-sm font-medium text-finance-blue-700 dark:text-white mb-1">
+                Need Help?
+              </h3>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                Contact our support team for assistance
+              </p>
             </div>
           </div>
         </motion.div>

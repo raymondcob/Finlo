@@ -1,20 +1,10 @@
-import { useContext, useEffect, useState, useCallback } from "react";
-import { UserContext } from "../context/UserContext";
-import { motion } from "framer-motion";
-import { useTranslation } from "react-i18next";
-import {
-  collection,
-  query,
-  where,
-  getDocs,
-  getDoc,
-  doc,
-  onSnapshot,
-  runTransaction,
-  Timestamp,
-} from "firebase/firestore";
-import { db } from "../config/firebase";
-import IncomeExpenseDoughnutChart from "./Charts/IncomeExpenseDoughnutChart";
+import { useContext, useEffect, useState, useCallback } from "react"
+import { UserContext } from "../context/UserContext"
+import { motion } from "framer-motion"
+import { useTranslation } from "react-i18next"
+import { collection, query, where, getDocs, getDoc, doc, runTransaction, Timestamp } from "firebase/firestore"
+import { db } from "../config/firebase"
+import IncomeExpenseDoughnutChart from "./Charts/IncomeExpenseDoughnutChart"
 import {
   FaWallet,
   FaCreditCard,
@@ -31,15 +21,20 @@ import {
   FaHistory,
   FaArrowDown,
   FaArrowUp,
-} from "react-icons/fa";
-import { Progress } from "antd";
-import { useNavigate } from "react-router-dom";
-import AddTransactionModal from "./modals/AddTransactionModal";
-import toast from "react-hot-toast";
+  FaCalendarAlt,
+  FaExclamationTriangle,
+  FaCheckCircle,
+  FaInfoCircle,
+  FaRegLightbulb,
+} from "react-icons/fa"
+import { Progress, Tooltip } from "antd"
+import { useNavigate } from "react-router-dom"
+import AddTransactionModal from "./modals/AddTransactionModal"
+import toast from "react-hot-toast"
 
 function DashBoard() {
-  const { user } = useContext(UserContext);
-  const { t, i18n } = useTranslation();
+  const { user } = useContext(UserContext)
+  const { t, i18n } = useTranslation()
   const [financialData, setFinancialData] = useState({
     totalBalance: 0,
     totalIncome: 0,
@@ -50,43 +45,29 @@ function DashBoard() {
     walletBalance: 0,
     cardBalance: 0,
     recentTransactions: [],
-  });
-  const navigate = useNavigate();
-  const [isTransactionModalOpen, setIsTransactionModalOpen] = useState(false);
-  const [savingsGoals, setSavingsGoals] = useState([]);
-  const [budgetLimitsExist, setBudgetLimitsExist] = useState(false);
+  })
+  const navigate = useNavigate()
+  const [isTransactionModalOpen, setIsTransactionModalOpen] = useState(false)
+  const [savingsGoals, setSavingsGoals] = useState([])
+  const [budgetLimitsExist, setBudgetLimitsExist] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
 
   const fetchFinancialData = useCallback(async () => {
-    if (!user?.uid) return;
+    if (!user?.uid) return
 
     try {
+      setIsLoading(true)
       // Get all transactions for this user
-      const allTransactionsSnap = await getDocs(
-        query(collection(db, "transactions"), where("userId", "==", user.uid))
-      );
+      const allTransactionsSnap = await getDocs(query(collection(db, "transactions"), where("userId", "==", user.uid)))
 
       // Process transactions in memory with proper date handling
       const transactions = allTransactionsSnap.docs
         .map((doc) => {
-          const data = doc.data();
-          // Convert any date format to timestamp in milliseconds
-          const dateValue = data.date;
-          let timestamp;
-
-          if (dateValue instanceof Timestamp) {
-            timestamp = dateValue.toMillis();
-          } else if (typeof dateValue === "object" && dateValue.toDate) {
-            timestamp = dateValue.toDate().getTime();
-          } else if (typeof dateValue === "string") {
-            timestamp = new Date(dateValue).getTime();
-          } else if (typeof dateValue === "number") {
-            timestamp = dateValue;
-          } else {
-            timestamp = new Date().getTime();
-          }
+          const data = doc.data()
+          const timestamp = parseTransactionDate(data.date)?.getTime() || new Date().getTime()
 
           // Normalize the category: lowercase and replace spaces with no spaces
-          const category = data.category?.toLowerCase().replace(/\s+/g, ""); // Remove spaces
+          const category = data.category?.toLowerCase().replace(/\s+/g, "") // Remove spaces
 
           // Define essential categories (normalized format)
           const essentialCategories = [
@@ -100,19 +81,10 @@ function DashBoard() {
             "phonebill",
             "childcare",
             "loanpayments",
-          ];
+          ]
 
           // Determine category type using normalized comparison
-          const categoryType = essentialCategories.includes(category)
-            ? "essential"
-            : "lifestyle";
-
-          // Debug log to check category normalization
-          console.log("Category processing:", {
-            original: data.category,
-            normalized: category,
-            type: categoryType,
-          });
+          const categoryType = essentialCategories.includes(category) ? "essential" : "lifestyle"
 
           return {
             id: doc.id,
@@ -122,9 +94,11 @@ function DashBoard() {
             categoryType: categoryType,
             category: category, // Store normalized category
             provider: data.provider || t("transactions.untitled"),
-          };
+            type: data.type || "unknown", // Ensure type is always defined
+          }
         })
-        .sort((a, b) => b.timestamp - a.timestamp);
+        .filter((transaction) => transaction.type !== "unknown") // Filter out invalid transactions
+        .sort((a, b) => b.timestamp - a.timestamp)
 
       // Get the 5 most recent transactions with proper category handling
       const recentTransactions = transactions.slice(0, 5).map((transaction) => {
@@ -135,33 +109,33 @@ function DashBoard() {
           category: transaction.category,
           // Keep the original provider
           provider: transaction.provider,
-        };
+        }
 
-        return processedTransaction;
-      });
+        return processedTransaction
+      })
 
       // Calculate totals from all transactions with category tracking
       const totals = transactions.reduce(
         (acc, transaction) => {
-          const amount = Number(transaction.amount);
+          const amount = Number(transaction.amount)
           switch (transaction.type.toLowerCase()) {
             case "income":
-              acc.income += amount;
-              break;
+              acc.income += amount
+              break
             case "expense":
               // Track expenses by category type
               if (transaction.categoryType === "essential") {
-                acc.essentialExpenses += amount;
+                acc.essentialExpenses += amount
               } else {
-                acc.lifestyleExpenses += amount;
+                acc.lifestyleExpenses += amount
               }
-              acc.expenses += amount; // Total expenses
-              break;
+              acc.expenses += amount // Total expenses
+              break
             case "savings":
-              acc.savings += amount;
-              break;
+              acc.savings += amount
+              break
           }
-          return acc;
+          return acc
         },
         {
           income: 0,
@@ -169,41 +143,36 @@ function DashBoard() {
           essentialExpenses: 0,
           lifestyleExpenses: 0,
           savings: 0,
-        }
-      );
+        },
+      )
 
       // Fetch other data in parallel
       const [cardDoc, walletDoc, savingsGoalsDoc] = await Promise.all([
         getDoc(doc(db, "cardDetails", user.uid)),
         getDoc(doc(db, "walletDetails", user.uid)),
         getDoc(doc(db, "savingsGoals", user.uid)),
-      ]);
+      ])
 
       // Get wallet and card details
-      const cardDetails = cardDoc.exists() ? cardDoc.data() : null;
-      const walletDetails = walletDoc.exists() ? walletDoc.data() : null;
+      const cardDetails = cardDoc.exists() ? cardDoc.data() : null
+      const walletDetails = walletDoc.exists() ? walletDoc.data() : null
 
       // Get savings goals
       const savingsGoals = savingsGoalsDoc.exists()
         ? savingsGoalsDoc.data().goals.map((goal, index) => ({
             id: goal.id || `goal-${index}`,
             ...goal,
-            progress: (goal.currentAmount / goal.goalAmount) * 100,
+            progress: goal.goalAmount > 0 ? (goal.currentAmount / goal.goalAmount) * 100 : 0, // Avoid division by zero
           }))
-        : [];
-      setSavingsGoals(savingsGoals);
+        : []
+      setSavingsGoals(savingsGoals)
 
       // Calculate total savings from goals
-      const totalSavingsFromGoals = savingsGoals.reduce(
-        (total, goal) => total + (goal.currentAmount || 0),
-        0
-      );
+      const totalSavingsFromGoals = savingsGoals.reduce((total, goal) => total + (goal.currentAmount || 0), 0)
 
       // Set financial data
       setFinancialData({
-        totalBalance:
-          Number(walletDetails?.balance || 0) +
-          Number(cardDetails?.balance || 0),
+        totalBalance: Number(walletDetails?.balance || 0) + Number(cardDetails?.balance || 0),
         totalIncome: totals.income,
         totalExpenses: totals.expenses,
         essentialExpenses: totals.essentialExpenses,
@@ -212,53 +181,53 @@ function DashBoard() {
         walletBalance: Number(walletDetails?.balance || 0),
         cardBalance: Number(cardDetails?.balance || 0),
         recentTransactions: recentTransactions,
-      });
+      })
 
       // Check budget limits
-      const budgetLimitsDoc = await getDoc(doc(db, "budgetLimits", user.uid));
-      setBudgetLimitsExist(
-        budgetLimitsDoc.exists() &&
-          Object.keys(budgetLimitsDoc.data()).length > 0
-      );
+      const budgetLimitsDoc = await getDoc(doc(db, "budgetLimits", user.uid))
+      setBudgetLimitsExist(budgetLimitsDoc.exists() && Object.keys(budgetLimitsDoc.data()).length > 0)
+
+      setIsLoading(false)
     } catch (error) {
-      console.error("Error fetching financial data:", error);
-      toast.error(t("dashboard.error.fetchingData"));
+      console.error("Error fetching financial data:", error)
+      toast.error(t("dashboard.error.fetchingData"))
+      setIsLoading(false)
     }
-  }, [user?.uid, t]);
+  }, [user?.uid, t])
 
   useEffect(() => {
-    fetchFinancialData();
-  }, [fetchFinancialData]);
+    fetchFinancialData()
+  }, [fetchFinancialData])
 
   const greetingTime = () => {
-    const date = new Date();
-    const hour = date.getHours();
-    let greeting;
+    const date = new Date()
+    const hour = date.getHours()
+    let greeting
 
     if (hour < 12) {
-      greeting = t("greetings.morning");
+      greeting = t("greetings.morning")
     } else if (hour < 18) {
-      greeting = t("greetings.afternoon");
+      greeting = t("greetings.afternoon")
     } else {
-      greeting = t("greetings.evening");
+      greeting = t("greetings.evening")
     }
 
     return t("dashboard.welcome", {
       greeting: greeting,
       username: user?.displayName || "User",
-    });
-  };
+    })
+  }
 
   const getTimeIcon = () => {
-    const hour = new Date().getHours();
+    const hour = new Date().getHours()
     if (hour < 12) {
-      return <FaSun className="text-yellow-400 animate-spin-slow" />;
+      return <FaSun className="text-yellow-400 animate-spin-slow" />
     } else if (hour < 18) {
-      return <FaCloudSun className="text-orange-400 animate-pulse" />;
+      return <FaCloudSun className="text-orange-400 animate-pulse" />
     } else {
-      return <FaMoon className="text-blue-400 animate-bounce" />;
+      return <FaMoon className="text-blue-400 animate-bounce" />
     }
-  };
+  }
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -268,7 +237,7 @@ function DashBoard() {
         staggerChildren: 0.1,
       },
     },
-  };
+  }
 
   const itemVariants = {
     hidden: { y: 20, opacity: 0 },
@@ -281,48 +250,93 @@ function DashBoard() {
         damping: 24,
       },
     },
-  };
+  }
 
   const getFinancialInsights = (data) => {
-    const insights = [];
+    const insights = []
     if (data.totalExpenses > data.totalIncome * 0.8) {
-      insights.push(t("dashboard.insights.expensesWarning"));
+      insights.push({
+        text: t("dashboard.insights.expensesWarning"),
+        icon: <FaExclamationTriangle className="text-amber-500" />,
+        color: "text-amber-500 dark:text-amber-400",
+        bg: "bg-amber-50 dark:bg-amber-900/20",
+        border: "border-amber-200 dark:border-amber-800",
+      })
     }
     if (data.totalSavings > 0) {
-      insights.push(t("dashboard.insights.savingsProgress"));
+      insights.push({
+        text: t("dashboard.insights.savingsProgress"),
+        icon: <FaCheckCircle className="text-green-500" />,
+        color: "text-green-600 dark:text-green-400",
+        bg: "bg-green-50 dark:bg-green-900/20",
+        border: "border-green-200 dark:border-green-800",
+      })
     }
-    return insights[0] || t("dashboard.insights.goodFinances");
-  };
+    if (!budgetLimitsExist) {
+      insights.push({
+        text: t("dashboard.insights.setBudgetLimits"),
+        icon: <FaRegLightbulb className="text-blue-500" />,
+        color: "text-blue-600 dark:text-blue-400",
+        bg: "bg-blue-50 dark:bg-blue-900/20",
+        border: "border-blue-200 dark:border-blue-800",
+      })
+    }
+
+    if (insights.length === 0) {
+      insights.push({
+        text: t("dashboard.insights.goodFinances"),
+        icon: <FaCheckCircle className="text-green-500" />,
+        color: "text-green-600 dark:text-green-400",
+        bg: "bg-green-50 dark:bg-green-900/20",
+        border: "border-green-200 dark:border-green-800",
+      })
+    }
+
+    return insights
+  }
 
   const calculateHealthScore = (data) => {
     let score = 100;
-    if (data.totalExpenses > data.totalIncome) score -= 30;
-    if (data.totalSavings < data.totalIncome * 0.1) score -= 20;
+
+    // Deduct points if total income is zero
+    if (data.totalIncome === 0) {
+      return 0; // Financial health is 0 if no income
+    }
+
+    // Deduct points based on expenses exceeding income
+    if (data.totalExpenses > data.totalIncome) {
+      score -= 30;
+    }
+
+    // Deduct points if savings are less than 10% of income
+    if (data.totalSavings < data.totalIncome * 0.1) {
+      score -= 20;
+    }
+
+    // Ensure the score is not negative
     return Math.max(score, 0);
   };
 
   const handleAddTransaction = async (data) => {
-    if (!user?.uid) return;
+    if (!user?.uid) return
 
     try {
-      const paymentMethod = data.paymentMethod.toLowerCase();
-      const amount = Number(data.amount);
+      const paymentMethod = data.paymentMethod.toLowerCase()
+      const amount = Number(data.amount)
+
+      let newBalance = 0
 
       await runTransaction(db, async (transaction) => {
-        const collectionName =
-          paymentMethod === "wallet" ? "walletDetails" : "cardDetails";
-        const docRef = doc(db, collectionName, user.uid);
-        const balanceDoc = await transaction.get(docRef);
+        const collectionName = paymentMethod === "wallet" ? "walletDetails" : "cardDetails"
+        const docRef = doc(db, collectionName, user.uid)
+        const balanceDoc = await transaction.get(docRef)
 
         if (!balanceDoc.exists()) {
-          throw new Error(`${collectionName} document does not exist!`);
+          throw new Error(`${collectionName} document does not exist!`)
         }
 
-        const currentBalance = Number(balanceDoc.data().balance || 0);
-        const newBalance =
-          data.type === "Income"
-            ? currentBalance + amount
-            : currentBalance - amount;
+        const currentBalance = Number(balanceDoc.data().balance || 0)
+        newBalance = data.type === "Income" ? currentBalance + amount : currentBalance - amount
 
         const transactionDoc = {
           ...data,
@@ -330,30 +344,16 @@ function DashBoard() {
           date: data.date?.toDate?.() || data.date || new Date(),
           paymentMethod: paymentMethod,
           amount: amount,
-        };
+        }
 
-        transaction.update(docRef, { balance: newBalance });
-        const transactionRef = doc(collection(db, "transactions"));
-        transaction.set(transactionRef, transactionDoc);
-      });
+        transaction.update(docRef, { balance: newBalance })
+        const transactionRef = doc(collection(db, "transactions"))
+        transaction.set(transactionRef, transactionDoc)
+      })
 
       // Fetch updated data after successful transaction
-      await fetchFinancialData();
-      setIsTransactionModalOpen(false);
-
-      toast.success(
-        t("transactions.transactionadded", {
-          amount: amount,
-          action:
-            data.type === "Income"
-              ? t("transactions.type.income")
-              : t("transactions.type.expense"),
-          method:
-            paymentMethod === "wallet"
-              ? t("transactions.payment.wallet").toLowerCase()
-              : t("transactions.payment.card").toLowerCase(),
-        })
-      );
+      await fetchFinancialData()
+      setIsTransactionModalOpen(false)
 
       if (newBalance < 100) {
         toast.error(
@@ -363,357 +363,445 @@ function DashBoard() {
               paymentMethod === "wallet"
                 ? t("transactions.payment.wallet").toLowerCase()
                 : t("transactions.payment.card").toLowerCase(),
-          })
-        );
+          }),
+        )
       }
     } catch (error) {
-      console.error("Error:", error);
-      toast.error(t("transactions.error"));
+      console.error("Error:", error)
+      toast.error(t("transactions.error"))
     }
-  };
+  }
 
   const parseTransactionDate = (dateValue) => {
     try {
       if (dateValue?.toDate) {
-        return dateValue.toDate();
+        return dateValue.toDate()
       }
       if (typeof dateValue === "number") {
-        const date = new Date(dateValue);
-        if (!isNaN(date.getTime())) return date;
+        const date = new Date(dateValue)
+        if (!isNaN(date.getTime())) return date
       }
       if (typeof dateValue === "string") {
-        const date = new Date(dateValue);
-        if (!isNaN(date.getTime())) return date;
+        const date = new Date(dateValue)
+        if (!isNaN(date.getTime())) return date
       }
       if (dateValue instanceof Date && !isNaN(dateValue.getTime())) {
-        return dateValue;
+        return dateValue
       }
 
-      console.error("Invalid date value:", dateValue);
-      return null;
+      console.error("Invalid date value:", dateValue)
+      return null
     } catch (error) {
-      console.error("Error parsing date:", error, "Value:", dateValue);
-      return null;
+      console.error("Error parsing date:", error, "Value:", dateValue)
+      return null
     }
-  };
+  }
 
-  const formatCurrency = (amount) => {
-    return `$${amount.toLocaleString()}`;
-  };
+  const getHealthScoreColor = (score) => {
+    if (score >= 80) return "text-green-500"
+    if (score >= 60) return "text-yellow-500"
+    return "text-red-500"
+  }
+
+  const getHealthScoreBackground = (score) => {
+    if (score >= 80) return "bg-green-500"
+    if (score >= 60) return "bg-yellow-500"
+    return "bg-red-500"
+  }
+
+  // Loading skeleton for the dashboard
+  if (isLoading) {
+    return (
+      <div className="space-y-8 max-w-7xl mx-auto px-4 sm:px-6 py-4">
+        <div className="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-sm animate-pulse">
+          <div className="h-8 w-2/3 bg-gray-200 dark:bg-gray-700 rounded-lg mb-3"></div>
+          <div className="h-4 w-1/2 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
+        </div>
+
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm animate-pulse">
+              <div className="h-10 w-10 rounded-full bg-gray-200 dark:bg-gray-700 mb-4"></div>
+              <div className="h-4 w-1/2 bg-gray-200 dark:bg-gray-700 rounded-lg mb-2"></div>
+              <div className="h-6 w-1/3 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
+            </div>
+          ))}
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-pulse">
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm h-80"></div>
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm h-80">
+            <div className="h-6 w-1/3 bg-gray-200 dark:bg-gray-700 rounded-lg mb-4"></div>
+            <div className="space-y-4">
+              {[...Array(3)].map((_, i) => (
+                <div key={i} className="h-16 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <motion.div
       variants={containerVariants}
       initial="hidden"
       animate="visible"
-      className="space-y-6 max-w-7xl mx-auto px-2 sm:px-4"
+      className="space-y-10 max-w-7xl mx-auto px-4 sm:px-6 py-4 bg-gray-50 dark:bg-gray-900"
     >
+      {/* Welcome Header */}
       <motion.div
         variants={itemVariants}
-        className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm"
+        className="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-md border border-gray-200 dark:border-gray-700"
       >
-        <h1 className="text-2xl md:text-3xl font-semibold mb-2 text-gray-800 dark:text-white flex items-center gap-3">
-          <span className="inline-block">{getTimeIcon()}</span>
-          {greetingTime()}
-        </h1>
-        <h5 className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-          {t("dashboard.subtitle")}
-        </h5>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-5">
+            <div className="p-4 bg-blue-100 dark:bg-finance-blue-900/20 rounded-xl shadow-sm">
+              {getTimeIcon()}
+            </div>
+            <div>
+              <h1 className="text-2xl md:text-3xl font-semibold text-gray-800 dark:text-white mb-1.5">
+                {greetingTime()}
+              </h1>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                {t("dashboard.subtitle")}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-6">
+          <div className="p-6 rounded-xl bg-white dark:bg-gray-700 shadow-md border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:shadow-lg">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-finance-blue-900/50 flex items-center justify-center">
+                <FaWallet className="text-blue-600 dark:text-finance-blue-400" />
+              </div>
+              <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                {t("dashboard.totalbalance")}
+              </span>
+            </div>
+            <p className="text-2xl font-bold text-gray-800 dark:text-white">
+              ${financialData.totalBalance.toLocaleString()}
+            </p>
+          </div>
+
+          <div className="p-6 rounded-xl bg-white dark:bg-gray-700 shadow-md border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:shadow-lg">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/50 flex items-center justify-center">
+                <FaArrowUp className="text-green-600 dark:text-green-400" />
+              </div>
+              <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                {t("dashboard.totalIncome")}
+              </span>
+            </div>
+            <p className="text-2xl font-bold text-green-600 dark:text-green-400">
+              ${financialData.totalIncome.toLocaleString()}
+            </p>
+          </div>
+
+          <div className="p-6 rounded-xl bg-white dark:bg-gray-700 shadow-md border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:shadow-lg">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-900/50 flex items-center justify-center">
+                <FaArrowDown className="text-red-600 dark:text-red-400" />
+              </div>
+              <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                {t("dashboard.totalExpenses")}
+              </span>
+            </div>
+            <p className="text-2xl font-bold text-red-600 dark:text-red-400">
+              ${financialData.totalExpenses.toLocaleString()}
+            </p>
+          </div>
+
+          <div className="p-6 rounded-xl bg-white dark:bg-gray-700 shadow-md border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:shadow-lg">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-full bg-yellow-100 dark:bg-amber-900/50 flex items-center justify-center">
+                <FaPiggyBank className="text-yellow-600 dark:text-amber-400" />
+              </div>
+              <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                {t("dashboard.totalSavings")}
+              </span>
+            </div>
+            <p className="text-2xl font-bold text-yellow-600 dark:text-amber-400">
+              ${financialData.totalSavings.toLocaleString()}
+            </p>
+          </div>
+        </div>
       </motion.div>
 
-      <motion.div
-        variants={itemVariants}
-        className="grid grid-cols-2 md:grid-cols-4 gap-4"
-      >
+      {/* Quick Actions */}
+      <motion.div variants={itemVariants} className="grid grid-cols-2 md:grid-cols-4 gap-6">
         <button
           onClick={() => setIsTransactionModalOpen(true)}
-          className="flex flex-col items-center justify-center gap-3 p-5 bg-white dark:bg-gray-800 rounded-xl transition-all duration-300 shadow-sm hover:shadow-md group"
+          className="flex flex-col items-center justify-center gap-4 p-7 bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-all duration-300"
         >
-          <div className="w-12 h-12 rounded-full bg-finance-blue-50 dark:bg-finance-blue-900/30 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-            <FaPlus className="text-xl text-finance-blue-600 dark:text-finance-blue-400" />
+          <div className="w-14 h-14 rounded-full bg-blue-100 dark:bg-finance-blue-900/30 flex items-center justify-center">
+            <FaPlus className="text-blue-600 dark:text-finance-blue-400 text-xl" />
           </div>
-          <span className="font-medium text-gray-800 dark:text-gray-200">
-            {t("dashboard.quickactions.quickadd")}
+          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+            Quick Transaction
           </span>
         </button>
 
         <button
           onClick={() => navigate("/budget-limits")}
-          className="flex flex-col items-center justify-center gap-3 p-5 bg-white dark:bg-gray-800 rounded-xl transition-all duration-300 shadow-sm hover:shadow-md group"
+          className="flex flex-col items-center justify-center gap-4 p-7 bg-white dark:bg-gray-800 rounded-xl transition-all duration-300 shadow-md hover:shadow-lg border border-gray-200 dark:border-gray-700 hover:border-green-200 dark:hover:border-green-700 group"
         >
-          <div className="w-12 h-12 rounded-full bg-green-50 dark:bg-green-900/30 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-            <FaChartBar className="text-xl text-green-600 dark:text-green-400" />
+          <div className="w-14 h-14 rounded-full bg-green-50 dark:bg-green-900/30 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+            <FaChartBar className="text-green-600 dark:text-green-400 text-xl" />
           </div>
-          <span className="font-medium text-gray-800 dark:text-gray-200">
-            {budgetLimitsExist
-              ? t("dashboard.quickactions.viewBudgets")
-              : t("dashboard.quickactions.setBudgets")}
+          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+            {budgetLimitsExist ? t("dashboard.quickactions.viewBudgets") : t("dashboard.quickactions.setBudgets")}
           </span>
         </button>
 
         <button
           onClick={() => navigate("/reports")}
-          className="flex flex-col items-center justify-center gap-3 p-5 bg-white dark:bg-gray-800 rounded-xl transition-all duration-300 shadow-sm hover:shadow-md group"
+          className="flex flex-col items-center justify-center gap-4 p-7 bg-white dark:bg-gray-800 rounded-xl transition-all duration-300 shadow-md hover:shadow-lg border border-gray-200 dark:border-gray-700 hover:border-purple-200 dark:hover:border-purple-700 group"
         >
-          <div className="w-12 h-12 rounded-full bg-purple-50 dark:bg-purple-900/30 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-            <FaChartBar className="text-xl text-purple-600 dark:text-purple-400" />
+          <div className="w-14 h-14 rounded-full bg-purple-50 dark:bg-purple-900/30 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+            <FaChartLine className="text-purple-600 dark:text-purple-400 text-xl" />
           </div>
-          <span className="font-medium text-gray-800 dark:text-gray-200">
+          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
             {t("dashboard.quickactions.reports")}
           </span>
         </button>
 
         <button
           onClick={() => navigate("/income")}
-          className="flex flex-col items-center justify-center gap-3 p-5 bg-white dark:bg-gray-800 rounded-xl transition-all duration-300 shadow-sm hover:shadow-md group"
+          className="flex flex-col items-center justify-center gap-4 p-7 bg-white dark:bg-gray-800 rounded-xl transition-all duration-300 shadow-md hover:shadow-lg border border-gray-200 dark:border-gray-700 hover:border-orange-200 dark:hover:border-orange-700 group"
         >
-          <div className="w-12 h-12 rounded-full bg-orange-50 dark:bg-orange-900/30 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-            <FaMoneyBillWave className="text-xl text-orange-600 dark:text-orange-400" />
+          <div className="w-14 h-14 rounded-full bg-orange-50 dark:bg-orange-900/30 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+            <FaMoneyBillWave className="text-orange-600 dark:text-orange-400 text-xl" />
           </div>
-          <span className="font-medium text-gray-800 dark:text-gray-200">
+          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
             {t("dashboard.quickactions.sources")}
           </span>
         </button>
       </motion.div>
 
-      <motion.div
-        variants={itemVariants}
-        className="grid grid-cols-1 md:grid-cols-4 gap-4"
-      >
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow h-auto">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-finance-blue-100 dark:bg-finance-blue-900/30 flex items-center justify-center">
-              <FaWallet className="text-finance-blue-500 text-xl" />
-            </div>
-            <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                {t("dashboard.totalbalance")}
-              </p>
-              <p className="text-xl font-semibold text-gray-800 dark:text-white">
-                ${financialData.totalBalance.toLocaleString()}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
-              <FaCreditCard className="text-green-500 text-xl" />
-            </div>
-            <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                {t("dashboard.totalIncome")}
-              </p>
-              <p className="text-xl font-semibold text-green-500">
-                ${financialData.totalIncome.toLocaleString()}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
-              <FaCreditCard className="text-red-500 text-xl" />
-            </div>
-            <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                {t("dashboard.totalExpenses")}
-              </p>
-              <p className="text-xl font-semibold text-red-500">
-                ${financialData.totalExpenses.toLocaleString()}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-finance-blue-100 dark:bg-finance-blue-900/30 flex items-center justify-center">
-              <FaPiggyBank className="text-finance-blue-500 text-xl" />
-            </div>
-            <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                {t("dashboard.totalSavings")}
-              </p>
-              <p className="text-xl font-semibold text-finance-blue-500">
-                ${financialData.totalSavings.toLocaleString()}
-              </p>
-            </div>
-          </div>
-        </div>
-      </motion.div>
-
-      <motion.div
-        variants={itemVariants}
-        className="grid grid-cols-1 md:grid-cols-2 gap-6"
-      >
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow h-auto">
-          <h3 className="text-lg font-semibold mb-6 text-gray-800 dark:text-white text-center">
+      {/* Main Content */}
+      <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {/* Chart Section */}
+        <div className="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-md border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:shadow-lg">
+          <h3 className="text-base font-medium text-gray-700 dark:text-gray-300 mb-8 flex items-center gap-2">
+            <FaChartBar className="text-blue-500" />
             {t("dashboard.incomevsexpenses")}
           </h3>
-          <div
-            className="flex items-center justify-center"
-            style={{ height: "280px" }}
-          >
-            <div className="w-full max-w-[280px] aspect-square">
+          <div className="flex items-center justify-center" style={{ height: "260px" }}>
+            <div className="w-full max-w-[260px] aspect-square">
               <IncomeExpenseDoughnutChart userId={user?.uid} />
             </div>
           </div>
+
+          {/* Expense Breakdown */}
+          {financialData.totalExpenses > 0 && (
+            <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
+              <h4 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-6">
+                {t("dashboard.expenseBreakdown")}
+              </h4>
+              <div className="flex flex-col gap-6">
+                <div>
+                  <div className="flex justify-between text-xs mb-3">
+                    <span className="text-gray-500 dark:text-gray-400">
+                      {t("transactions.categories.essential.title")}
+                    </span>
+                    <span className="font-medium text-gray-700 dark:text-gray-300">
+                      ${financialData.essentialExpenses.toLocaleString()}
+                    </span>
+                  </div>
+                  <div className="w-full h-1 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-blue-500 rounded-full"
+                      style={{
+                        width: `${(financialData.essentialExpenses / financialData.totalExpenses) * 100}%`,
+                      }}
+                    ></div>
+                  </div>
+                </div>
+
+                <div>
+                  <div className="flex justify-between text-xs mb-3">
+                    <span className="text-gray-500 dark:text-gray-400">
+                      {t("transactions.categories.lifestyle.title")}
+                    </span>
+                    <span className="font-medium text-gray-700 dark:text-gray-300">
+                      ${financialData.lifestyleExpenses.toLocaleString()}
+                    </span>
+                  </div>
+                  <div className="w-full h-1 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-purple-500 rounded-full"
+                      style={{
+                        width: `${(financialData.lifestyleExpenses / financialData.totalExpenses) * 100}%`,
+                      }}
+                    ></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow">
-          <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-            <FaHistory className="text-finance-blue-500" />
+        {/* Recent Transactions */}
+        <div className="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-md border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:shadow-lg">
+          <h3 className="text-base font-medium text-gray-700 dark:text-gray-300 mb-6 flex items-center gap-2">
+            <FaHistory className="text-blue-500" />
             {t("dashboard.recentTransactions")}
           </h3>
-          <div className="space-y-4 max-h-[280px] overflow-y-auto pr-2">
+          <div className="space-y-4 max-h-[320px] overflow-y-auto pr-2 scrollbar-thin">
             {financialData.recentTransactions.length > 0 ? (
               financialData.recentTransactions.map((transaction) => (
                 <div
                   key={transaction.id}
-                  className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
+                  className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors border border-gray-200 dark:border-gray-700"
                 >
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
-                      <span
-                        className={`w-2 h-2 rounded-full ${
-                          transaction.type === "Income"
-                            ? "bg-green-500"
-                            : "bg-red-500"
+                      <div
+                        className={`w-1.5 h-1.5 rounded-full ${
+                          transaction.type === "Income" ? "bg-green-500" : "bg-red-500"
                         }`}
                       />
-                      <p className="font-medium text-gray-800 dark:text-white">
-                        {transaction.provider}
-                      </p>
+                      <p className="font-medium text-gray-700 dark:text-gray-300">{transaction.provider}</p>
                     </div>
-                    <div className="flex gap-4 mt-1 text-sm text-gray-500 dark:text-gray-400">
-                      <span>
+                    <div className="flex gap-4 mt-1.5 text-xs text-gray-500 dark:text-gray-400">
+                      <span className="flex items-center gap-1">
+                        <FaCalendarAlt className="text-xs" />
                         {(() => {
-                          const parsedDate = parseTransactionDate(
-                            transaction.date
-                          );
+                          const parsedDate = parseTransactionDate(transaction.date)
                           return parsedDate
                             ? parsedDate.toLocaleDateString(i18n.language, {
                                 year: "numeric",
                                 month: "short",
                                 day: "numeric",
                               })
-                            : t("transactions.invalidDate");
+                            : t("transactions.invalidDate")
                         })()}
                       </span>
-                      <span className="capitalize">
-                        {t(
-                          `transactions.type.${transaction.type.toLowerCase()}`
+                      <span className="capitalize flex items-center gap-1">
+                        {transaction.type.toLowerCase() === "income" ? (
+                          <FaArrowUp className="text-xs text-green-500" />
+                        ) : (
+                          <FaArrowDown className="text-xs text-red-500" />
                         )}
-                      </span>
-                      <span className="capitalize">
-                        {transaction.type.toLowerCase() === "income"
-                          ? t(
-                              `transactions.categories.income.${transaction.category}`
-                            )
-                          : t(
-                              `transactions.categories.${transaction.categoryType}.${transaction.category}`
-                            )}
+                        {t(`transactions.type.${transaction.type.toLowerCase()}`)}
                       </span>
                     </div>
                   </div>
                   <div className="text-right">
                     <span
-                      className={`font-semibold ${
-                        transaction.type === "Income"
-                          ? "text-green-500"
-                          : "text-red-500"
-                      }`}
+                      className={`font-semibold ${transaction.type === "Income" ? "text-green-600" : "text-red-600"}`}
                     >
-                      {transaction.type === "Income" ? "+" : "-"}$
-                      {transaction.amount.toLocaleString()}
+                      {transaction.type === "Income" ? "+" : "-"}${transaction.amount.toLocaleString()}
                     </span>
                   </div>
                 </div>
               ))
             ) : (
-              <p className="text-center text-gray-500 dark:text-gray-400 py-4">
-                {t("dashboard.noRecentTransactions")}
-              </p>
+              <div className="text-center py-10 bg-gray-50 dark:bg-gray-700/50 rounded-xl border border-gray-200 dark:border-gray-700">
+                <FaInfoCircle className="mx-auto text-gray-400 text-xl mb-3" />
+                <p className="text-gray-500 dark:text-gray-400">{t("dashboard.noRecentTransactions")}</p>
+              </div>
             )}
           </div>
+
+          <button
+            onClick={() => navigate("/transactions")}
+            className="w-full mt-6 py-3 text-blue-600 dark:text-finance-blue-400 border border-blue-100 dark:border-finance-blue-800 rounded-xl hover:bg-blue-50 dark:hover:bg-finance-blue-900/20 transition-colors text-sm font-medium"
+          >
+            Show All Transactions
+          </button>
         </div>
       </motion.div>
 
-      <motion.div
-        variants={itemVariants}
-        className="grid grid-cols-1 md:grid-cols-2 gap-4"
-      >
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow">
-          <h3 className="text-lg font-semibold mb-4 text-gray-800 dark:text-white flex items-center gap-2">
+      {/* Financial Insights and Goals */}
+      <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {/* Financial Insights */}
+        <div className="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-md border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:shadow-lg">
+          <h3 className="text-base font-medium text-gray-700 dark:text-gray-300 mb-6 flex items-center gap-2">
             <FaChartLine className="text-finance-blue-500" />
             {t("dashboard.insights.title")}
           </h3>
-          <p className="text-gray-600 dark:text-gray-300">
-            {getFinancialInsights(financialData)}
-          </p>
 
-          <div className="mt-4">
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              {t("dashboard.insights.financialHealth")}
-            </p>
-            <div className="flex items-center gap-2 mt-2">
-              <span className="text-2xl font-bold text-finance-blue-500">
+          <div className="space-y-4">
+            {getFinancialInsights(financialData).map((insight, index) => (
+              <div
+                key={index}
+                className={`p-4 rounded-xl flex items-start gap-3 ${insight.bg} border ${insight.border}`}
+              >
+                <div className="mt-0.5">{insight.icon}</div>
+                <p className={`${insight.color} text-sm`}>{insight.text}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
+            <div className="flex justify-between items-center mb-3">
+              <p className="text-sm text-gray-600 dark:text-gray-400">{t("dashboard.insights.financialHealth")}</p>
+              <span className={`text-lg font-bold ${getHealthScoreColor(calculateHealthScore(financialData))}`}>
                 {calculateHealthScore(financialData)}%
               </span>
-              <Progress
-                percent={calculateHealthScore(financialData)}
-                showInfo={false}
-                strokeColor="#0c8de0"
-                className="flex-1"
-              />
+            </div>
+            <div className="w-full h-1.5 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
+              <div
+                className={`h-full ${getHealthScoreBackground(calculateHealthScore(financialData))} rounded-full`}
+                style={{ width: `${calculateHealthScore(financialData)}%` }}
+              ></div>
             </div>
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow">
-          <h3 className="text-lg font-semibold mb-4 text-gray-800 dark:text-white flex items-center gap-2">
+        {/* Savings Goals */}
+        <div className="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-md border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:shadow-lg">
+          <h3 className="text-base font-medium text-gray-700 dark:text-gray-300 mb-6 flex items-center gap-2">
             <FaBullseye className="text-finance-blue-500" />
             {t("savingsGoals.title")}
           </h3>
-          <div className="space-y-4">
-            {savingsGoals?.filter(
-              (goal) => goal.currentAmount < goal.goalAmount
-            ).length > 0 ? (
+          <div className="space-y-5">
+            {savingsGoals?.filter((goal) => goal.currentAmount < goal.goalAmount).length > 0 ? (
               savingsGoals
                 ?.filter((goal) => goal.currentAmount < goal.goalAmount)
+                .slice(0, 3)
                 .map((goal) => (
-                  <div key={goal.id} className="space-y-2">
+                  <div key={goal.id} className="space-y-3">
                     <div className="flex justify-between text-sm">
-                      <span className="text-gray-600 dark:text-gray-300">
-                        {goal.goalName}
-                      </span>
-                      <span className="text-gray-500 dark:text-gray-400">
-                        ${goal.currentAmount?.toLocaleString()} / $
-                        {goal.goalAmount?.toLocaleString()}
+                      <Tooltip title={goal.goalName}>
+                        <span className="text-gray-700 dark:text-gray-300 truncate max-w-[200px] font-medium">
+                          {goal.goalName}
+                        </span>
+                      </Tooltip>
+                      <span className="text-gray-600 dark:text-gray-400 whitespace-nowrap text-xs">
+                        ${goal.currentAmount.toLocaleString()} / ${goal.goalAmount.toLocaleString()}
                       </span>
                     </div>
                     <Progress
-                      percent={Math.round(
-                        (goal.currentAmount / goal.goalAmount) * 100
-                      )}
+                      percent={Math.round((goal.currentAmount / goal.goalAmount) * 100)}
                       strokeColor="#0c8de0"
                       size="small"
+                      showInfo={false}
+                      strokeWidth={3}
                     />
+                    <div className="flex justify-end">
+                      <span className="text-xs text-gray-500 dark:text-gray-400">
+                        {Math.round((goal.currentAmount / goal.goalAmount) * 100)}% of your goal achieved
+                      </span>
+                    </div>
                   </div>
                 ))
             ) : (
-              <p className="text-center text-gray-500 dark:text-gray-400 py-4">
-                {t("dashboard.noActiveGoals")}
-              </p>
+              <div className="text-center py-8 bg-gray-50 dark:bg-gray-700/50 rounded-xl border border-gray-200 dark:border-gray-700">
+                <FaInfoCircle className="mx-auto text-gray-400 text-xl mb-2" />
+                <p className="text-gray-500 dark:text-gray-400 text-sm">{t("dashboard.noActiveGoals")}</p>
+              </div>
             )}
+
             <button
               onClick={() => navigate("/savings-goals")}
-              className="mt-2 w-full py-2 bg-transparent border-2 border-dashed border-finance-blue-300 dark:border-finance-blue-700 hover:border-finance-blue-500 dark:hover:border-finance-blue-500 text-finance-blue-600 dark:text-finance-blue-400 rounded-lg transition-all duration-200 text-sm font-medium"
+              className="mt-4 w-full py-3 bg-transparent border border-finance-blue-100 dark:border-finance-blue-800 text-finance-blue-600 dark:text-finance-blue-400 rounded-xl hover:bg-finance-blue-50 dark:hover:bg-finance-blue-900/20 transition-all duration-200 text-sm font-medium"
             >
-              {t("savingsGoals.addGoal")}
+              {savingsGoals.length > 0 ? "Manage Savings Goals" : "Add a savings goal"}
             </button>
           </div>
         </div>
@@ -727,7 +815,8 @@ function DashBoard() {
         walletBalance={financialData.walletBalance}
       />
     </motion.div>
-  );
+  )
 }
 
-export default DashBoard;
+export default DashBoard
+

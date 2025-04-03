@@ -164,8 +164,11 @@ const Settings = () => {
   }
 
   return (
-    <motion.div variants={containerVariants} initial="hidden" animate="visible" className="space-y-6">
-      <motion.div variants={itemVariants} className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm mb-6">
+    <motion.div variants={containerVariants} initial="hidden" animate="visible" className="space-y-6 bg-gray-50 dark:bg-gray-900">
+      <motion.div
+        variants={itemVariants}
+        className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 mb-6"
+      >
         <div className="flex justify-between items-center">
           <div>
             <h1 className="text-2xl font-semibold text-gray-800 dark:text-white mb-2">{t("settings.title")}</h1>

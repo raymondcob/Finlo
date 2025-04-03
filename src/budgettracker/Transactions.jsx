@@ -733,20 +733,20 @@ const Transactions = () => {
   )
 
   return (
-    <div className="p-4 sm:p-6">
+    <div className="p-4 sm:p-6 bg-gray-50 dark:bg-gray-900">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="flex flex-col md:flex-row justify-between items-center mb-6 bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-xl shadow-sm"
+        className="flex flex-col md:flex-row justify-between items-center mb-6 bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700"
       >
-        <Title level={2} className="mb-4 md:mb-0 dark:text-gray-200">
+        <Title level={2} className="mb-4 md:mb-0 text-gray-800 dark:text-white">
           {t("transactions.title")}
         </Title>
         <Button
-          type="primary"
+          type="default"
           onClick={() => setIsModalOpen(true)}
-          className="bg-finance-blue-500 hover:bg-finance-blue-600 flex items-center gap-2"
+          className="bg-transparent hover:bg-finance-blue-50 dark:hover:bg-finance-blue-900/30 text-finance-blue-600 dark:text-finance-blue-400 border-2 border-dashed border-finance-blue-300 dark:border-finance-blue-700 hover:border-finance-blue-500 dark:hover:border-finance-blue-500 flex items-center gap-2"
           icon={<FaPlus />}
         >
           {t("transactions.addtransaction")}
@@ -757,7 +757,7 @@ const Transactions = () => {
         variants={containerVariants}
         initial="hidden"
         animate="visible"
-        className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4"
+        className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 border border-gray-200 dark:border-gray-700"
       >
         {isMobile ? (
           renderMobileList()
