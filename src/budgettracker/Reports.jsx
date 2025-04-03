@@ -105,11 +105,11 @@ const Reports = () => {
       variants={animations.containerVariants}
       initial="hidden"
       animate="visible"
-      className="space-y-8"
+      className="space-y-8 bg-gray-50 dark:bg-gray-900"
     >
       <motion.div
         variants={animations.itemVariants}
-        className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm"
+        className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700"
       >
         <h1 className="text-2xl font-semibold text-gray-800 dark:text-white mb-2">
           {t("reports.title")}
@@ -123,7 +123,7 @@ const Reports = () => {
         activeKey={activeTab}
         onChange={setActiveTab}
         items={tabItems}
-        className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-2 sm:p-4 md:p-6"
+        className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-2 sm:p-4 md:p-6 border border-gray-200 dark:border-gray-700"
       />
     </motion.div>
   );

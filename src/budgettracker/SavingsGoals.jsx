@@ -68,7 +68,7 @@ const SavingsGoals = () => {
         handleGoalCompletion(goal)
       } else if (goal.currentAmount > goal.goalAmount && !goalStatus[goal.goalName]?.surpassed) {
         handleGoalSurpassed(goal)
-      } else if (new Date(goal.deadline) < new Date() && percentage < 100 && !goalStatus[goal.goalName]?.missed) {
+      } else if (goal.deadline && new Date(goal.deadline) < new Date() && percentage < 100 && !goalStatus[goal.goalName]?.missed) {
         handleMissedDeadline(goal)
       }
     })
@@ -255,7 +255,7 @@ const SavingsGoals = () => {
   }
 
   return (
-    <motion.div variants={containerVariants} initial="hidden" animate="visible" className="relative space-y-6">
+    <motion.div variants={containerVariants} initial="hidden" animate="visible" className="relative space-y-6 bg-gray-50 dark:bg-gray-900">
       {showConfetti && (
         <div className="fixed inset-0 z-50 pointer-events-none">
           <Confetti
@@ -273,7 +273,7 @@ const SavingsGoals = () => {
       {/* Update the Add Savings Goal button to have dotted borders */}
       <motion.div
         variants={itemVariants}
-        className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm flex justify-between items-center"
+        className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 flex justify-between items-center"
       >
         <div>
           <h2 className="text-2xl font-semibold text-gray-800 dark:text-white">{t("savingsGoals.title")}</h2>

@@ -716,12 +716,13 @@ const BudgetLimits = () => {
             </span>
           </div>
           <Button
-            type="dashed"
+            type="default"
             block
             onClick={() => {
               setIsModalVisible(true);
               form.setFieldsValue({ category: item.key });
             }}
+            className="bg-transparent hover:bg-finance-blue-50 dark:hover:bg-finance-blue-900/30 text-finance-blue-600 dark:text-finance-blue-400 border-2 border-dashed border-finance-blue-300 dark:border-finance-blue-700 hover:border-finance-blue-500 dark:hover:border-finance-blue-500"
           >
             {t("budgets.setLimit")}
           </Button>
@@ -801,9 +802,9 @@ const BudgetLimits = () => {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="space-y-6"
+      className="space-y-6 bg-gray-50 dark:bg-gray-900"
     >
-      <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm">
+      <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
         <div className="flex justify-between items-center mb-6">
           <div>
             <h1 className="text-2xl font-semibold text-gray-800 dark:text-white">
@@ -814,9 +815,9 @@ const BudgetLimits = () => {
             </p>
           </div>
           <Button
-            type="primary"
+            type="default"
             onClick={() => setIsModalVisible(true)}
-            className="bg-finance-blue-600 hover:bg-finance-blue-700"
+            className="bg-transparent hover:bg-finance-blue-50 dark:hover:bg-finance-blue-900/30 text-finance-blue-600 dark:text-finance-blue-400 border-2 border-dashed border-finance-blue-300 dark:border-finance-blue-700 hover:border-finance-blue-500 dark:hover:border-finance-blue-500"
           >
             {t("budgets.setLimit")}
           </Button>

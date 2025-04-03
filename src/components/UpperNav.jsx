@@ -52,9 +52,9 @@ const UpperNav = ({ onMenuClick, isDarkMode, toggleDarkMode }) => {
         </button>
         <div className="hidden md:flex items-center">
           <div className="w-6 h-6 flex items-center justify-center">
-            <img src="/favicon.ico" alt="Finlo" className="w-6 h-6 object-contain" />
+            <img src="/favicon.ico" alt="Finlo" className="w-8 h-8 object-contain" />
           </div>
-          <h2 className="text-lg font-semibold text-finance-blue-700 dark:text-finance-blue-300 ml-2">Finlo</h2>
+          
         </div>
       </div>
 
