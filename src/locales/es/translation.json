@@ -40,6 +40,10 @@
       "noActiveGoals": "No hay objetivos de ahorro activos",
       "recentTransactions": "Transacciones Recientes",
       "setBudgetLimits": "💡 Establece límites de presupuesto para un mejor control de tus gastos"
+    },
+    "buttons": {
+      "showAllTransactions": "Mostrar todas las transacciones",
+      "manageSavingsGoals": "Gestionar metas de ahorro"
     }
   },
   "transactions": {
@@ -583,6 +587,7 @@
       "message": "¿Estás seguro de que deseas eliminar este límite de presupuesto?",
       "success": "Límite de presupuesto eliminado exitosamente",
       "error": "Error al eliminar el límite de presupuesto"
-    }
+    },
+    "setBudgetFrequency": "Establecer Frecuencia de Presupuesto"
   }
 }

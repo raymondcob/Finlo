@@ -443,6 +443,15 @@ function DashBoard() {
     )
   }
 
+  // Sort savings goals by percentage completed in descending order
+  const sortedSavingsGoals = savingsGoals
+    .filter((goal) => goal.currentAmount < goal.goalAmount)
+    .sort((a, b) => (b.currentAmount / b.goalAmount) - (a.currentAmount / a.goalAmount))
+    .slice(0, 3); // Take the top 3 goals
+
+  // Take the last 3 recent transactions
+  const recentTransactions = financialData.recentTransactions.slice(0, 3);
+
   return (
     <motion.div
       variants={containerVariants}
@@ -594,54 +603,6 @@ function DashBoard() {
               <IncomeExpenseDoughnutChart userId={user?.uid} />
             </div>
           </div>
-
-          {/* Expense Breakdown */}
-          {financialData.totalExpenses > 0 && (
-            <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
-              <h4 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-6">
-                {t("dashboard.expenseBreakdown")}
-              </h4>
-              <div className="flex flex-col gap-6">
-                <div>
-                  <div className="flex justify-between text-xs mb-3">
-                    <span className="text-gray-500 dark:text-gray-400">
-                      {t("transactions.categories.essential.title")}
-                    </span>
-                    <span className="font-medium text-gray-700 dark:text-gray-300">
-                      ${financialData.essentialExpenses.toLocaleString()}
-                    </span>
-                  </div>
-                  <div className="w-full h-1 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-blue-500 rounded-full"
-                      style={{
-                        width: `${(financialData.essentialExpenses / financialData.totalExpenses) * 100}%`,
-                      }}
-                    ></div>
-                  </div>
-                </div>
-
-                <div>
-                  <div className="flex justify-between text-xs mb-3">
-                    <span className="text-gray-500 dark:text-gray-400">
-                      {t("transactions.categories.lifestyle.title")}
-                    </span>
-                    <span className="font-medium text-gray-700 dark:text-gray-300">
-                      ${financialData.lifestyleExpenses.toLocaleString()}
-                    </span>
-                  </div>
-                  <div className="w-full h-1 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-purple-500 rounded-full"
-                      style={{
-                        width: `${(financialData.lifestyleExpenses / financialData.totalExpenses) * 100}%`,
-                      }}
-                    ></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
         </div>
 
         {/* Recent Transactions */}
@@ -651,8 +612,8 @@ function DashBoard() {
             {t("dashboard.recentTransactions")}
           </h3>
           <div className="space-y-4 max-h-[320px] overflow-y-auto pr-2 scrollbar-thin">
-            {financialData.recentTransactions.length > 0 ? (
-              financialData.recentTransactions.map((transaction) => (
+            {recentTransactions.length > 0 ? (
+              recentTransactions.map((transaction) => (
                 <div
                   key={transaction.id}
                   className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors border border-gray-200 dark:border-gray-700"
@@ -711,7 +672,7 @@ function DashBoard() {
             onClick={() => navigate("/transactions")}
             className="w-full mt-6 py-3 text-blue-600 dark:text-finance-blue-400 border border-blue-100 dark:border-finance-blue-800 rounded-xl hover:bg-blue-50 dark:hover:bg-finance-blue-900/20 transition-colors text-sm font-medium"
           >
-            Show All Transactions
+            {t("dashboard.buttons.showAllTransactions")}
           </button>
         </div>
       </motion.div>
@@ -760,36 +721,33 @@ function DashBoard() {
             {t("savingsGoals.title")}
           </h3>
           <div className="space-y-5">
-            {savingsGoals?.filter((goal) => goal.currentAmount < goal.goalAmount).length > 0 ? (
-              savingsGoals
-                ?.filter((goal) => goal.currentAmount < goal.goalAmount)
-                .slice(0, 3)
-                .map((goal) => (
-                  <div key={goal.id} className="space-y-3">
-                    <div className="flex justify-between text-sm">
-                      <Tooltip title={goal.goalName}>
-                        <span className="text-gray-700 dark:text-gray-300 truncate max-w-[200px] font-medium">
-                          {goal.goalName}
-                        </span>
-                      </Tooltip>
-                      <span className="text-gray-600 dark:text-gray-400 whitespace-nowrap text-xs">
-                        ${goal.currentAmount.toLocaleString()} / ${goal.goalAmount.toLocaleString()}
+            {sortedSavingsGoals.length > 0 ? (
+              sortedSavingsGoals.map((goal) => (
+                <div key={goal.id} className="space-y-3">
+                  <div className="flex justify-between text-sm">
+                    <Tooltip title={goal.goalName}>
+                      <span className="text-gray-700 dark:text-gray-300 truncate max-w-[200px] font-medium">
+                        {goal.goalName}
                       </span>
-                    </div>
-                    <Progress
-                      percent={Math.round((goal.currentAmount / goal.goalAmount) * 100)}
-                      strokeColor="#0c8de0"
-                      size="small"
-                      showInfo={false}
-                      strokeWidth={3}
-                    />
-                    <div className="flex justify-end">
-                      <span className="text-xs text-gray-500 dark:text-gray-400">
-                        {Math.round((goal.currentAmount / goal.goalAmount) * 100)}% of your goal achieved
-                      </span>
-                    </div>
+                    </Tooltip>
+                    <span className="text-gray-600 dark:text-gray-400 whitespace-nowrap text-xs">
+                      ${goal.currentAmount.toLocaleString()} / ${goal.goalAmount.toLocaleString()}
+                    </span>
                   </div>
-                ))
+                  <Progress
+                    percent={Math.round((goal.currentAmount / goal.goalAmount) * 100)}
+                    strokeColor="#0c8de0"
+                    size="small"
+                    showInfo={false}
+                    strokeWidth={3}
+                  />
+                  <div className="flex justify-end">
+                    <span className="text-xs text-gray-500 dark:text-gray-400">
+                      {Math.round((goal.currentAmount / goal.goalAmount) * 100)}% of your goal achieved
+                    </span>
+                  </div>
+                </div>
+              ))
             ) : (
               <div className="text-center py-8 bg-gray-50 dark:bg-gray-700/50 rounded-xl border border-gray-200 dark:border-gray-700">
                 <FaInfoCircle className="mx-auto text-gray-400 text-xl mb-2" />
@@ -801,7 +759,7 @@ function DashBoard() {
               onClick={() => navigate("/savings-goals")}
               className="mt-4 w-full py-3 bg-transparent border border-finance-blue-100 dark:border-finance-blue-800 text-finance-blue-600 dark:text-finance-blue-400 rounded-xl hover:bg-finance-blue-50 dark:hover:bg-finance-blue-900/20 transition-all duration-200 text-sm font-medium"
             >
-              {savingsGoals.length > 0 ? "Manage Savings Goals" : "Add a savings goal"}
+              {t("dashboard.buttons.manageSavingsGoals")}
             </button>
           </div>
         </div>
