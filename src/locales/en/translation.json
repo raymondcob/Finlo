@@ -40,7 +40,11 @@
     },
     "noRecentTransactions": "No recent transactions",
     "noActiveGoals": "No active savings goals",
-    "recentTransactions": "Recent Transactions"
+    "recentTransactions": "Recent Transactions",
+    "buttons": {
+      "showAllTransactions": "Show All Transactions",
+      "manageSavingsGoals": "Manage Savings Goals"
+    }
   },
   "transactions": {
     "title": "Transactions",
@@ -541,6 +545,7 @@
       "danger": "Over budget",
       "warning": "Near limit",
       "good": "Within budget"
-    }
+    },
+    "setBudgetFrequency": "Set Budget Frequency"
   }
 }

@@ -17,6 +17,7 @@ const AddTransactionModal = ({ open, onClose, onAddTransaction, cardBalance, wal
   const [form] = Form.useForm()
   const [selectedType, setSelectedType] = useState("Income")
   const [error, setError] = useState("")
+  const [isSubmitting, setIsSubmitting] = useState(false) // Add a state for submission status
 
   // Add check for payment methods
   useEffect(() => {
@@ -196,10 +197,18 @@ const AddTransactionModal = ({ open, onClose, onAddTransaction, cardBalance, wal
     }
   }
 
+  const handleTypeChange = (value) => {
+    setSelectedType(value)
+    // Automatically set the category based on the selected type
+    const defaultCategory = value === "Income" ? "salary" : "rent/mortgage"
+    form.setFieldsValue({ category: defaultCategory })
+  }
+
   // Handle form submission
   const handleSubmit = async (values) => {
     try {
       setError("")
+      setIsSubmitting(true) // Set submitting state to true
       const { type, category, amount, provider, paymentMethod, date } = values
 
       // Validation for payment method balances
@@ -211,6 +220,7 @@ const AddTransactionModal = ({ open, onClose, onAddTransaction, cardBalance, wal
               method: paymentMethod.toLowerCase(),
             })
           )
+          setIsSubmitting(false) // Reset submitting state
           return
         }
       }
@@ -233,6 +243,8 @@ const AddTransactionModal = ({ open, onClose, onAddTransaction, cardBalance, wal
     } catch (error) {
       console.error("Error adding transaction:", error)
       setError(t("transactions.error.addingTransactionMessage"))
+    } finally {
+      setIsSubmitting(false) // Reset submitting state
     }
   }
 
@@ -345,7 +357,7 @@ const AddTransactionModal = ({ open, onClose, onAddTransaction, cardBalance, wal
             >
               <Select
                 className="w-full h-12 text-lg"
-                onChange={(value) => setSelectedType(value)}
+                onChange={handleTypeChange} // Use the updated handler
                 dropdownClassName="dark:bg-gray-800 dark:text-white"
               >
                 <Option value="Income" className="text-lg">
@@ -455,7 +467,7 @@ const AddTransactionModal = ({ open, onClose, onAddTransaction, cardBalance, wal
               <Input
                 prefix="$"
                 placeholder={t("modals.addTransaction.amountPlaceholder")}
-                className="w-full h-12 text-lg px-4 dark:bg-gray-700 dark:text-white dark:border-gray-600"
+                className="w-full h-12 text-lg px-4 dark:bg-gray-700 dark:text-white dark:border-gray-600" // Added dark mode styles
               />
             </Form.Item>
           </div>
@@ -476,7 +488,10 @@ const AddTransactionModal = ({ open, onClose, onAddTransaction, cardBalance, wal
             </button>
             <button
               type="submit"
-              className="px-6 py-2 rounded-lg bg-finance-blue-600 text-white hover:bg-finance-blue-700 transition-colors duration-200 text-lg"
+              className={`px-6 py-2 rounded-lg bg-finance-blue-600 text-white hover:bg-finance-blue-700 transition-colors duration-200 text-lg ${
+                isSubmitting ? "opacity-50 cursor-not-allowed" : ""
+              }`}
+              disabled={isSubmitting} // Disable button while submitting
             >
               {t("modals.addTransaction.save")}
             </button>

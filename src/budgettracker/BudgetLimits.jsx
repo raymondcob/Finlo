@@ -49,9 +49,9 @@ const BudgetLimits = () => {
 
   // Add frequency options
   const frequencies = [
-    { value: "weekly", label: t("budgets.frequency.weekly") },
-    { value: "monthly", label: t("budgets.frequency.monthly") },
-    { value: "yearly", label: t("budgets.frequency.yearly") },
+    { value: "weekly", label: "Weekly" }, // Replace with plain strings
+    { value: "monthly", label: "Monthly" },
+    { value: "yearly", label: "Yearly" },
   ];
 
   // Calculate next reset date based on frequency
@@ -868,7 +868,7 @@ const BudgetLimits = () => {
 
           <Form.Item
             name="frequency"
-            label={t("budgets.frequency")}
+            label={t("budgets.setBudgetFrequency")} // Use translation key for the label
             rules={[
               { required: true, message: t("budgets.frequencyRequired") },
             ]}
@@ -877,7 +877,7 @@ const BudgetLimits = () => {
             <Select>
               {frequencies.map((freq) => (
                 <Option key={freq.value} value={freq.value}>
-                  {freq.label}
+                  {freq.label} {/* Use the label directly */}
                 </Option>
               ))}
             </Select>
@@ -896,7 +896,12 @@ const BudgetLimits = () => {
               },
             ]}
           >
-            <Input type="number" prefix="$" step="0.01" />
+            <Input
+              type="number"
+              prefix="$"
+              step="0.01"
+              className="dark:bg-gray-700 dark:text-white dark:border-gray-600" // Added dark mode styles
+            />
           </Form.Item>
 
           <div className="flex justify-end gap-2">

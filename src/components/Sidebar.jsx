@@ -215,7 +215,10 @@ const Sidebar = ({ isOpen, onMenuClick }) => {
               isCollapsed && !isMobile ? "hidden" : ""
             }`}
           >
-            <div className="bg-gradient-to-r from-finance-blue-50 to-finance-blue-100 dark:from-finance-blue-800 dark:to-finance-blue-900 p-3 rounded-lg shadow-md">
+            <div
+              className="bg-gradient-to-r from-finance-blue-50 to-finance-blue-100 dark:from-finance-blue-800 dark:to-finance-blue-900 p-3 rounded-lg shadow-md cursor-pointer"
+              onClick={() => navigate("/settings#help-support")} // Redirect to Help & Support section
+            >
               <h3 className="text-sm font-medium text-finance-blue-700 dark:text-white mb-1">
                 Need Help?
               </h3>

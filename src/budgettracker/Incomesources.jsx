@@ -115,6 +115,12 @@ const IncomeSources = () => {
   return (
     <motion.div variants={containerVariants} initial="hidden" animate="visible" className="space-y-6 p-4">
       <motion.div variants={itemVariants} className="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-xl shadow-sm mb-6">
+        <p className="text-blue-700 dark:text-blue-300 text-sm mb-4">
+          {t(
+            "incomesources.cardManagementNotice",
+            "Currently, this app supports managing only one card (credit or debit) at a time. If you want to track both, you can manage them as a single card by combining their balances. We are actively working on adding support for multiple cards in future updates."
+          )}
+        </p>
         <h1 className="text-xl sm:text-2xl font-semibold text-gray-800 dark:text-white mb-2">
           {t("incomesources.title")}
         </h1>
