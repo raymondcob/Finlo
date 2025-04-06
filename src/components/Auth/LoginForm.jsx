@@ -4,8 +4,9 @@ import {
   signInWithEmailAndPassword,
   signInWithPopup,
   GoogleAuthProvider,
+  getAuth,
 } from "firebase/auth";
-import { auth } from "../../config/firebase";
+import { auth, app } from "../../config/firebase";
 import { UserContext } from "../../context/UserContext";
 import {
   FaGoogle,
@@ -52,20 +53,16 @@ const LoginForm = () => {
     setIsLoading(true);
     setError("");
 
+    const auth = getAuth(app);
     const provider = new GoogleAuthProvider();
-    // Remove the custom parameters that might be causing the form replication
-    provider.setCustomParameters({
-      prompt: "select_account",
-    });
 
     try {
       const result = await signInWithPopup(auth, provider);
-      const user = result.user;
-      setUser(user);
+      setUser(result.user);
       navigate("/dashboard");
     } catch (error) {
       if (error.code !== "auth/popup-closed-by-user") {
-        setError(error.message);
+        setError("Failed to sign in with Google");
       }
     } finally {
       setIsLoading(false);
