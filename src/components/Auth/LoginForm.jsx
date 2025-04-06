@@ -53,9 +53,9 @@ const LoginForm = () => {
     setError("");
 
     const provider = new GoogleAuthProvider();
+    // Remove the custom parameters that might be causing the form replication
     provider.setCustomParameters({
       prompt: "select_account",
-      auth_domain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
     });
 
     try {
