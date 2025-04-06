@@ -1,63 +1,75 @@
-import { useState, useContext } from "react"
-import { useNavigate, Link } from "react-router-dom"
-import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from "firebase/auth"
-import { auth } from "../../config/firebase"
-import { UserContext } from "../../context/UserContext"
-import { FaGoogle, FaEnvelope, FaLock, FaEye, FaEyeSlash } from "react-icons/fa"
-import { useTranslation } from "react-i18next"
-import { motion } from "framer-motion"
+import { useState, useContext } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import {
+  signInWithEmailAndPassword,
+  signInWithPopup,
+  GoogleAuthProvider,
+} from "firebase/auth";
+import { auth } from "../../config/firebase";
+import { UserContext } from "../../context/UserContext";
+import {
+  FaGoogle,
+  FaEnvelope,
+  FaLock,
+  FaEye,
+  FaEyeSlash,
+} from "react-icons/fa";
+import { useTranslation } from "react-i18next";
+import { motion } from "framer-motion";
 
 const LoginForm = () => {
-  const { t } = useTranslation()
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [error, setError] = useState("")
-  const [showPassword, setShowPassword] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
-  const navigate = useNavigate()
-  const { user, setUser } = useContext(UserContext)
+  const { t } = useTranslation();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
+  const { user, setUser } = useContext(UserContext);
 
   const handleLogin = async (e) => {
-    e.preventDefault()
-    setIsLoading(true)
-    setError("")
+    e.preventDefault();
+    setIsLoading(true);
+    setError("");
 
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password)
-      console.log("User signed in:", userCredential.user)
-      setUser(userCredential.user)
-      navigate("/dashboard")
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      setUser(userCredential.user);
+      navigate("/dashboard");
     } catch (error) {
       // Simplified error message
-      setError("Wrong email or password")
+      setError("Wrong email or password");
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const handleGoogleLogin = async () => {
-    setIsLoading(true)
-    setError("")
+    setIsLoading(true);
+    setError("");
 
-    const provider = new GoogleAuthProvider()
+    const provider = new GoogleAuthProvider();
     provider.setCustomParameters({
       prompt: "select_account", // Force account selection
-    })
+    });
 
     try {
-      const result = await signInWithPopup(auth, provider)
-      const user = result.user
-      console.log("User signed in with Google:", user)
-      setUser(user)
-      navigate("/dashboard")
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+      setUser(user);
+      navigate("/dashboard");
     } catch (error) {
       if (error.code !== "auth/popup-closed-by-user") {
-        setError(error.message)
+        setError(error.message);
       }
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
     // Make the form more responsive for smaller screens
@@ -68,14 +80,21 @@ const LoginForm = () => {
       className="w-full max-w-md px-2 sm:px-0"
     >
       <div className="text-center mb-6 sm:mb-8">
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-white mb-2">{t("auth.login.title")}</h1>
-        <p className="text-gray-600 dark:text-gray-300">{t("auth.login.subtitle")}</p>
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-white mb-2">
+          {t("auth.login.title")}
+        </h1>
+        <p className="text-gray-600 dark:text-gray-300">
+          {t("auth.login.subtitle")}
+        </p>
       </div>
 
       <form onSubmit={handleLogin} className="space-y-5">
         <div className="space-y-4">
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+            >
               {t("auth.login.email")}
             </label>
             <div className="relative">
@@ -94,7 +113,10 @@ const LoginForm = () => {
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+            >
               {t("auth.login.password")}
             </label>
             <div className="relative">
@@ -115,7 +137,11 @@ const LoginForm = () => {
                   onClick={() => setShowPassword(!showPassword)}
                   className="text-gray-400 hover:text-gray-500 focus:outline-none"
                 >
-                  {showPassword ? <FaEyeSlash className="h-5 w-5" /> : <FaEye className="h-5 w-5" />}
+                  {showPassword ? (
+                    <FaEyeSlash className="h-5 w-5" />
+                  ) : (
+                    <FaEye className="h-5 w-5" />
+                  )}
                 </button>
               </div>
             </div>
@@ -151,7 +177,14 @@ const LoginForm = () => {
                 fill="none"
                 viewBox="0 0 24 24"
               >
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                ></circle>
                 <path
                   className="opacity-75"
                   fill="currentColor"
@@ -197,8 +230,7 @@ const LoginForm = () => {
         </p>
       </form>
     </motion.div>
-  )
-}
+  );
+};
 
-export default LoginForm
-
+export default LoginForm;

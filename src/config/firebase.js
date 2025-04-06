@@ -7,12 +7,12 @@ import { getFirestore } from "firebase/firestore";
 const firebaseConfig = {
   
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: "stackup-b75c4.firebaseapp.com",
-  projectId: "stackup-b75c4",
-  storageBucket: "stackup-b75c4.firebasestorage.app",
-  messagingSenderId: "1049336404907",
-  appId: "1:1049336404907:web:f4605a973e1eea352110ee",
-  measurementId: "G-MKKHLC6342"
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 };
 
 

@@ -1,13 +1,22 @@
-import { useState, useContext, useEffect } from "react"
-import { UserContext } from "../context/UserContext"
-import { collection, query, where, getDocs, addDoc, doc, updateDoc, getDoc } from "firebase/firestore"
-import { db } from "../config/firebase"
-import AddTransactionModal from "./modals/AddTransactionModal"
-import { Card, List, Typography, Table, Tag, Button } from "antd"
-import { motion } from "framer-motion"
-import { useTranslation } from "react-i18next"
-import { format } from "date-fns"
-import { enUS, es, fr } from "date-fns/locale"
+import { useState, useContext, useEffect } from "react";
+import { UserContext } from "../context/UserContext";
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+  addDoc,
+  doc,
+  updateDoc,
+  getDoc,
+} from "firebase/firestore";
+import { db } from "../config/firebase";
+import AddTransactionModal from "./modals/AddTransactionModal";
+import { Card, List, Typography, Table, Tag, Button } from "antd";
+import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
+import { format } from "date-fns";
+import { enUS, es, fr } from "date-fns/locale";
 import {
   FaMoneyBill,
   FaHandHoldingMedical,
@@ -34,10 +43,10 @@ import {
   FaPaw,
   FaPlus,
   FaHandHoldingWater,
-} from "react-icons/fa"
-import toast from "react-hot-toast"
+} from "react-icons/fa";
+import toast from "react-hot-toast";
 
-const { Title, Text } = Typography
+const { Title, Text } = Typography;
 
 // Consistent icon mapping for all components
 export const categoryIcons = {
@@ -76,16 +85,16 @@ export const categoryIcons = {
   personalcare: FaHeart,
   petexpenses: FaPaw,
   otherexpenses: FaWallet,
-}
+};
 
 const Transactions = () => {
-  const { t, i18n } = useTranslation()
-  const { user } = useContext(UserContext)
-  const [transactions, setTransactions] = useState([])
-  const [isModalOpen, setIsModalOpen] = useState(false)
-  const [cardDetails, setCardDetails] = useState({ balance: 0 })
-  const [walletDetails, setWalletDetails] = useState({ balance: 0 })
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
+  const { t, i18n } = useTranslation();
+  const { user } = useContext(UserContext);
+  const [transactions, setTransactions] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [cardDetails, setCardDetails] = useState({ balance: 0 });
+  const [walletDetails, setWalletDetails] = useState({ balance: 0 });
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
   // Define category options - matching exactly with translation file
   const incomeCategories = [
@@ -117,7 +126,7 @@ const Transactions = () => {
       label: t("transactions.categories.income.otherincome"),
       value: "otherincome",
     },
-  ]
+  ];
 
   const essentialExpenses = [
     {
@@ -160,7 +169,7 @@ const Transactions = () => {
       label: t("transactions.categories.essential.loanpayments"),
       value: "loanpayments",
     },
-  ]
+  ];
 
   const lifestyleExpenses = [
     {
@@ -200,7 +209,7 @@ const Transactions = () => {
       label: t("transactions.categories.lifestyle.otherexpenses"),
       value: "otherexpenses",
     },
-  ]
+  ];
 
   useEffect(() => {
     if (user) {
@@ -209,90 +218,89 @@ const Transactions = () => {
           const [cardDoc, walletDoc] = await Promise.all([
             getDoc(doc(db, "cardDetails", user.uid)),
             getDoc(doc(db, "walletDetails", user.uid)),
-          ])
+          ]);
 
           if (cardDoc.exists()) {
-            setCardDetails(cardDoc.data())
+            setCardDetails(cardDoc.data());
           }
           if (walletDoc.exists()) {
-            setWalletDetails(walletDoc.data())
+            setWalletDetails(walletDoc.data());
           }
         } catch (error) {
-          console.error("Error fetching details:", error)
-          toast.error("Failed to load account details")
+          toast.error("Failed to load account details");
         }
-      }
-      fetchDetails()
+      };
+      fetchDetails();
     }
-  }, [user])
+  }, [user]);
 
   useEffect(() => {
     if (user) {
       const fetchTransactions = async () => {
         try {
-          const q = query(collection(db, "transactions"), where("userId", "==", user.uid))
-          const querySnapshot = await getDocs(q)
+          const q = query(
+            collection(db, "transactions"),
+            where("userId", "==", user.uid)
+          );
+          const querySnapshot = await getDocs(q);
           const transactionsData = querySnapshot.docs.map((doc) => ({
             id: doc.id,
             ...doc.data(),
-          }))
-          setTransactions(transactionsData)
+          }));
+          setTransactions(transactionsData);
         } catch (error) {
-          console.error("Error fetching transactions:", error)
-          toast.error("Failed to load transactions")
+          toast.error("Failed to load transactions");
         }
-      }
-      fetchTransactions()
+      };
+      fetchTransactions();
     }
-  }, [user])
+  }, [user]);
 
   // Add window resize listener with cleanup
   useEffect(() => {
     const handleResize = () => {
-      setIsMobile(window.innerWidth < 768)
-    }
+      setIsMobile(window.innerWidth < 768);
+    };
 
     // Add event listener
-    window.addEventListener("resize", handleResize)
+    window.addEventListener("resize", handleResize);
 
     // Initial check
-    handleResize()
+    handleResize();
 
     // Cleanup function to remove event listener
     return () => {
-      window.removeEventListener("resize", handleResize)
-    }
-  }, [])
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
 
   // Add this helper function for better date handling
   const parseTransactionDate = (dateValue) => {
     try {
       // Handle Firestore Timestamp
       if (dateValue?.toDate) {
-        return dateValue.toDate()
+        return dateValue.toDate();
       }
       // Handle number (timestamp)
       if (typeof dateValue === "number") {
-        const date = new Date(dateValue)
-        if (!isNaN(date.getTime())) return date
+        const date = new Date(dateValue);
+        if (!isNaN(date.getTime())) return date;
       }
       // Handle string date
       if (typeof dateValue === "string") {
-        const date = new Date(dateValue)
-        if (!isNaN(date.getTime())) return date
+        const date = new Date(dateValue);
+        if (!isNaN(date.getTime())) return date;
       }
       // Handle Date object
       if (dateValue instanceof Date && !isNaN(dateValue.getTime())) {
-        return dateValue
+        return dateValue;
       }
 
-      console.error("Invalid date value:", dateValue)
-      return null
+      return null;
     } catch (error) {
-      console.error("Error parsing date:", error, "Value:", dateValue)
-      return null
+      return null;
     }
-  }
+  };
 
   // Add this helper function for category translation debugging
   const getTranslatedCategory = (category, type) => {
@@ -301,110 +309,112 @@ const Transactions = () => {
       const normalizedCategory = category
         .toLowerCase()
         .replace(/[^a-z0-9]/g, "")
-        .trim()
+        .trim();
 
       // Determine category type
-      let categoryType = "lifestyle"
+      let categoryType = "lifestyle";
       if (type === "Income") {
-        categoryType = "income"
+        categoryType = "income";
       } else if (
-        essentialExpenses.some((c) => c.label.toLowerCase().replace(/[^a-z0-9]/g, "") === normalizedCategory)
+        essentialExpenses.some(
+          (c) =>
+            c.label.toLowerCase().replace(/[^a-z0-9]/g, "") ===
+            normalizedCategory
+        )
       ) {
-        categoryType = "essential"
+        categoryType = "essential";
       }
 
-      const translationKey = `transactions.categories.${categoryType}.${normalizedCategory}`
-      const translated = t(translationKey)
+      const translationKey = `transactions.categories.${categoryType}.${normalizedCategory}`;
+      const translated = t(translationKey);
 
-      // Debug log for translation
-      console.log("Category translation:", {
-        original: category,
-        normalized: normalizedCategory,
-        type: categoryType,
-        translationKey,
-        result: translated,
-      })
-
-      return translated
+      return translated;
     } catch (error) {
-      console.error("Error translating category:", error)
-      return category
+      return category;
     }
-  }
+  };
 
   const handleAddTransaction = async (transaction) => {
     try {
       if (user) {
-        const dateValue = new Date(transaction.date)
+        const dateValue = new Date(transaction.date);
         if (isNaN(dateValue.getTime())) {
-          throw new Error("Invalid transaction date")
+          throw new Error("Invalid transaction date");
         }
-  
+
         const newTransaction = {
           ...transaction,
           userId: user.uid,
           date: dateValue,
           amount: Number.parseFloat(transaction.amount),
           category: transaction.category,
-        }
-  
+        };
+
         if (transaction.type === "Income") {
           if (transaction.paymentMethod === "Card") {
-            const newBalance = (Number.parseFloat(cardDetails.balance) + transaction.amount).toFixed(2)
+            const newBalance = (
+              Number.parseFloat(cardDetails.balance) + transaction.amount
+            ).toFixed(2);
             setCardDetails((prevDetails) => ({
               ...prevDetails,
               balance: newBalance,
-            }))
+            }));
             await updateDoc(doc(db, "cardDetails", user.uid), {
               balance: newBalance,
-            })
+            });
           } else if (transaction.paymentMethod === "Wallet") {
-            const newBalance = (Number.parseFloat(walletDetails.balance) + transaction.amount).toFixed(2)
+            const newBalance = (
+              Number.parseFloat(walletDetails.balance) + transaction.amount
+            ).toFixed(2);
             setWalletDetails((prevDetails) => ({
               ...prevDetails,
               balance: newBalance,
-            }))
+            }));
             await updateDoc(doc(db, "walletDetails", user.uid), {
               balance: newBalance,
-            })
+            });
           }
         } else if (transaction.type === "Expense") {
           if (transaction.paymentMethod === "Card") {
-            const currentBalance = Number.parseFloat(cardDetails.balance)
+            const currentBalance = Number.parseFloat(cardDetails.balance);
             if (newTransaction.amount > currentBalance) {
-              return
+              return;
             }
-            const newBalance = (Number.parseFloat(cardDetails.balance) - transaction.amount).toFixed(2)
+            const newBalance = (
+              Number.parseFloat(cardDetails.balance) - transaction.amount
+            ).toFixed(2);
             setCardDetails((prevDetails) => ({
               ...prevDetails,
               balance: newBalance,
-            }))
+            }));
             await updateDoc(doc(db, "cardDetails", user.uid), {
               balance: newBalance,
-            })
+            });
           } else if (transaction.paymentMethod === "Wallet") {
-            const currentBalance = Number.parseFloat(walletDetails.balance)
+            const currentBalance = Number.parseFloat(walletDetails.balance);
             if (newTransaction.amount > currentBalance) {
-              return
+              return;
             }
-            const newBalance = (Number.parseFloat(walletDetails.balance) - transaction.amount).toFixed(2)
+            const newBalance = (
+              Number.parseFloat(walletDetails.balance) - transaction.amount
+            ).toFixed(2);
             setWalletDetails((prevDetails) => ({
               ...prevDetails,
               balance: newBalance,
-            }))
+            }));
             await updateDoc(doc(db, "walletDetails", user.uid), {
               balance: newBalance,
-            })
+            });
           }
         }
-  
-        await addDoc(collection(db, "transactions"), newTransaction)
-        setTransactions((prev) => [...prev, newTransaction])
+
+        await addDoc(collection(db, "transactions"), newTransaction);
+        setTransactions((prev) => [...prev, newTransaction]);
       }
     } catch (error) {
-      console.error("Error adding transaction:", error)
+      console.error("Error adding transaction:", error);
     }
-  }
+  };
 
   // Helper function to map old category names to new ones
   const mapLegacyCategory = (category) => {
@@ -430,55 +440,49 @@ const Transactions = () => {
       "Personal Care": "personalcare",
       "Pet Expenses": "petexpenses",
       "Other Expenses": "otherexpenses",
-    }
+    };
 
-    return legacyMap[category] || category.toLowerCase().replace(/\s+/g, "")
-  }
+    return legacyMap[category] || category.toLowerCase().replace(/\s+/g, "");
+  };
 
   // Add this function before renderCategoryTag
   const getCategoryColor = (type, categoryType) => {
     if (type === "Income") {
-      return "#20b77c" // green for income
+      return "#20b77c"; // green for income
     }
     if (categoryType === "essential") {
-      return "#f96a16" // orange for essential expenses
+      return "#f96a16"; // orange for essential expenses
     }
-    return "#0c8de0" // blue for lifestyle expenses
-  }
+    return "#0c8de0"; // blue for lifestyle expenses
+  };
 
   // Also add getCategoryIcon function since it's used in renderCategoryTag
   const getCategoryIcon = (category) => {
-    const IconComponent = categoryIcons[category] || FaWallet
-    return <IconComponent />
-  }
+    const IconComponent = categoryIcons[category] || FaWallet;
+    return <IconComponent />;
+  };
 
   const renderCategoryTag = (transaction) => {
     // Ensure we have a valid category
-    if (!transaction?.category) return null
+    if (!transaction?.category) return null;
 
     // Normalize the category by converting to lowercase and removing spaces
     const normalizedCategory = transaction.category
       .toLowerCase()
       .replace(/\s+/g, "")
-      .replace(/[^a-z0-9/]/g, "") // Keep slashes for categories like "gym/fitness"
+      .replace(/[^a-z0-9/]/g, ""); // Keep slashes for categories like "gym/fitness"
 
     // Determine category type
-    let categoryType = "lifestyle" // default
+    let categoryType = "lifestyle"; // default
     if (transaction.type === "Income") {
-      categoryType = "income"
+      categoryType = "income";
     } else {
       // Check if category exists in essentialExpenses array using normalized comparison
-      const isEssential = essentialExpenses.some((cat) => cat.value.toLowerCase() === normalizedCategory)
-      categoryType = isEssential ? "essential" : "lifestyle"
+      const isEssential = essentialExpenses.some(
+        (cat) => cat.value.toLowerCase() === normalizedCategory
+      );
+      categoryType = isEssential ? "essential" : "lifestyle";
     }
-
-    // Debug log to help identify category matching
-    console.log("Category matching:", {
-      originalCategory: transaction.category,
-      normalizedCategory,
-      categoryType,
-      translationKey: `transactions.categories.${categoryType}.${normalizedCategory}`,
-    })
 
     return (
       <Tag
@@ -490,11 +494,13 @@ const Transactions = () => {
         <span className="text-sm font-inter font-normal text-white">
           {transaction.type.toLowerCase() === "income"
             ? t(`transactions.categories.income.${normalizedCategory}`)
-            : t(`transactions.categories.${categoryType}.${normalizedCategory}`)}
+            : t(
+                `transactions.categories.${categoryType}.${normalizedCategory}`
+              )}
         </span>
       </Tag>
-    )
-  }
+    );
+  };
 
   const getLocale = (language) => {
     const locales = {
@@ -502,18 +508,18 @@ const Transactions = () => {
       es: es,
       fr: fr,
       // Add other mappings as needed
-    }
-    return locales[language] || enUS
-  }
+    };
+    return locales[language] || enUS;
+  };
 
   // Format date for mobile view - shorter format
   const formatMobileDate = (date) => {
-    const parsedDate = parseTransactionDate(date)
-    if (!parsedDate) return "Invalid"
+    const parsedDate = parseTransactionDate(date);
+    if (!parsedDate) return "Invalid";
 
     // Use a shorter date format for mobile
-    return format(parsedDate, "MMM d", { locale: getLocale(i18n.language) })
-  }
+    return format(parsedDate, "MMM d", { locale: getLocale(i18n.language) });
+  };
 
   const columns = [
     {
@@ -550,15 +556,21 @@ const Transactions = () => {
         },
       ],
       onFilter: (value, record) => {
-        const normalizedCategory = mapLegacyCategory(record.category)
+        const normalizedCategory = mapLegacyCategory(record.category);
         if (value === "Income") {
-          return incomeCategories.some((cat) => cat.value === normalizedCategory)
+          return incomeCategories.some(
+            (cat) => cat.value === normalizedCategory
+          );
         } else if (value === "Essential Expenses") {
-          return essentialExpenses.some((cat) => cat.value === normalizedCategory)
+          return essentialExpenses.some(
+            (cat) => cat.value === normalizedCategory
+          );
         } else if (value === "Lifestyle Expenses") {
-          return lifestyleExpenses.some((cat) => cat.value === normalizedCategory)
+          return lifestyleExpenses.some(
+            (cat) => cat.value === normalizedCategory
+          );
         }
-        return normalizedCategory === value
+        return normalizedCategory === value;
       },
       render: (category, record) => renderCategoryTag(record),
     },
@@ -572,7 +584,10 @@ const Transactions = () => {
       ],
       onFilter: (value, record) => record.type.includes(value),
       render: (type) => (
-        <Tag color={type === "Income" ? "#20b77c" : "#f96a16"} className="rounded-full px-3 py-1">
+        <Tag
+          color={type === "Income" ? "#20b77c" : "#f96a16"}
+          className="rounded-full px-3 py-1"
+        >
           {t(`transactions.type.${type.toLowerCase()}`)}
         </Tag>
       ),
@@ -582,7 +597,9 @@ const Transactions = () => {
       dataIndex: "provider",
       key: "provider",
       render: (provider) => (
-        <span className="text-gray-800 dark:text-gray-200">{provider || t("transactions.untitled")}</span>
+        <span className="text-gray-800 dark:text-gray-200">
+          {provider || t("transactions.untitled")}
+        </span>
       ),
     },
     {
@@ -595,7 +612,10 @@ const Transactions = () => {
       ],
       onFilter: (value, record) => record.paymentMethod.includes(value),
       render: (method) => (
-        <Tag color={method === "Card" ? "#0c8de0" : "#20b77c"} className="rounded-full px-3 py-1">
+        <Tag
+          color={method === "Card" ? "#0c8de0" : "#20b77c"}
+          className="rounded-full px-3 py-1"
+        >
           {t(`transactions.payment.${method.toLowerCase()}`)}
         </Tag>
       ),
@@ -606,20 +626,19 @@ const Transactions = () => {
       key: "date",
       defaultSortOrder: "descend",
       render: (date) => {
-        const parsedDate = parseTransactionDate(date)
+        const parsedDate = parseTransactionDate(date);
         if (!parsedDate) {
-          console.error("Invalid date in table:", date)
-          return "Invalid Date"
+          return "Invalid Date";
         }
 
-        const locale = getLocale(i18n.language)
-        return format(parsedDate, "PPP", { locale })
+        const locale = getLocale(i18n.language);
+        return format(parsedDate, "PPP", { locale });
       },
       sorter: (a, b) => {
-        const dateA = parseTransactionDate(a.date)
-        const dateB = parseTransactionDate(b.date)
-        if (!dateA || !dateB) return 0
-        return dateB - dateA
+        const dateA = parseTransactionDate(a.date);
+        const dateB = parseTransactionDate(b.date);
+        if (!dateA || !dateB) return 0;
+        return dateB - dateA;
       },
       filters: [
         {
@@ -636,20 +655,20 @@ const Transactions = () => {
         },
       ],
       onFilter: (value, record) => {
-        const transactionDate = parseTransactionDate(record.date)
-        const now = new Date()
-        const diffTime = Math.abs(now - transactionDate)
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+        const transactionDate = parseTransactionDate(record.date);
+        const now = new Date();
+        const diffTime = Math.abs(now - transactionDate);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
         switch (value) {
           case "7days":
-            return diffDays <= 7
+            return diffDays <= 7;
           case "30days":
-            return diffDays <= 30
+            return diffDays <= 30;
           case "90days":
-            return diffDays <= 90
+            return diffDays <= 90;
           default:
-            return true
+            return true;
         }
       },
     },
@@ -658,13 +677,19 @@ const Transactions = () => {
       dataIndex: "amount",
       key: "amount",
       render: (amount, record) => (
-        <span className={record.type === "Income" ? "text-green-600 font-medium" : "text-red-600 font-medium"}>
+        <span
+          className={
+            record.type === "Income"
+              ? "text-green-600 font-medium"
+              : "text-red-600 font-medium"
+          }
+        >
           {record.type === "Income" ? "+" : "-"}${amount.toFixed(2)}
         </span>
       ),
       sorter: (a, b) => a.amount - b.amount,
     },
-  ]
+  ];
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -674,7 +699,7 @@ const Transactions = () => {
         staggerChildren: 0.1,
       },
     },
-  }
+  };
 
   const itemVariants = {
     hidden: { y: 20, opacity: 0 },
@@ -687,23 +712,31 @@ const Transactions = () => {
         damping: 24,
       },
     },
-  }
+  };
 
   const renderMobileList = () => (
     <List
       dataSource={transactions.sort((a, b) => {
-        const dateA = parseTransactionDate(a.date)
-        const dateB = parseTransactionDate(b.date)
-        if (!dateA || !dateB) return 0
-        return dateB - dateA
+        const dateA = parseTransactionDate(a.date);
+        const dateB = parseTransactionDate(b.date);
+        if (!dateA || !dateB) return 0;
+        return dateB - dateA;
       })}
       renderItem={(item) => (
-        <motion.div variants={itemVariants} initial="hidden" animate="visible" className="mb-4">
+        <motion.div
+          variants={itemVariants}
+          initial="hidden"
+          animate="visible"
+          className="mb-4"
+        >
           <Card className="w-full shadow-md dark:bg-gray-800 dark:border-gray-700">
             <div className="flex justify-between items-center mb-2">
               <div className="flex items-center">
                 {renderCategoryTag(item)}
-                <Tag color={item.type === "Income" ? "#20b77c" : "#f96a16"} className="ml-2 rounded-full px-3 py-1">
+                <Tag
+                  color={item.type === "Income" ? "#20b77c" : "#f96a16"}
+                  className="ml-2 rounded-full px-3 py-1"
+                >
                   {t(`transactions.type.${item.type.toLowerCase()}`)}
                 </Tag>
               </div>
@@ -712,15 +745,22 @@ const Transactions = () => {
               </Text>
             </div>
             <div className="flex justify-between items-center mb-2">
-              <Text className="text-gray-600 dark:text-gray-300 truncate max-w-[150px]">{item.provider}</Text>
-              <Tag color={item.paymentMethod === "Card" ? "#0c8de0" : "#20b77c"} className="rounded-full px-3 py-1">
+              <Text className="text-gray-600 dark:text-gray-300 truncate max-w-[150px]">
+                {item.provider}
+              </Text>
+              <Tag
+                color={item.paymentMethod === "Card" ? "#0c8de0" : "#20b77c"}
+                className="rounded-full px-3 py-1"
+              >
                 {t(`transactions.payment.${item.paymentMethod.toLowerCase()}`)}
               </Tag>
             </div>
             <div className="flex justify-end items-center">
               <Text
                 className={`text-lg font-semibold ${
-                  item.type === "Income" ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"
+                  item.type === "Income"
+                    ? "text-green-600 dark:text-green-400"
+                    : "text-red-600 dark:text-red-400"
                 }`}
               >
                 {item.type === "Income" ? "+" : "-"}${item.amount.toFixed(2)}
@@ -730,7 +770,7 @@ const Transactions = () => {
         </motion.div>
       )}
     />
-  )
+  );
 
   return (
     <div className="p-4 sm:p-6 bg-gray-50 dark:bg-gray-900">
@@ -780,8 +820,7 @@ const Transactions = () => {
         walletBalance={walletDetails.balance}
       />
     </div>
-  )
-}
+  );
+};
 
-export default Transactions
-
+export default Transactions;
