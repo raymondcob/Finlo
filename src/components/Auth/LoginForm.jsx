@@ -4,9 +4,8 @@ import {
   signInWithEmailAndPassword,
   signInWithPopup,
   GoogleAuthProvider,
-  getAuth,
 } from "firebase/auth";
-import { auth, app } from "../../config/firebase";
+import { auth } from "../../config/firebase";
 import { UserContext } from "../../context/UserContext";
 import {
   FaGoogle,
@@ -53,7 +52,6 @@ const LoginForm = () => {
     setIsLoading(true);
     setError("");
 
-    const auth = getAuth(app);
     const provider = new GoogleAuthProvider();
 
     try {
