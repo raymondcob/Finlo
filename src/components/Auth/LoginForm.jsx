@@ -1,11 +1,12 @@
 import { useState, useContext } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import {
+  getAuth,
   signInWithEmailAndPassword,
   signInWithPopup,
   GoogleAuthProvider,
 } from "firebase/auth";
-import { auth } from "../../config/firebase";
+import { app } from "../../config/firebase";
 import { UserContext } from "../../context/UserContext";
 import {
   FaGoogle,
@@ -16,6 +17,11 @@ import {
 } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
+
+const auth = getAuth(app);
+auth.settings = {
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+};
 
 const LoginForm = () => {
   const { t } = useTranslation();
@@ -54,7 +60,8 @@ const LoginForm = () => {
 
     const provider = new GoogleAuthProvider();
     provider.setCustomParameters({
-      prompt: "select_account", // Force account selection
+      prompt: "select_account",
+      auth_domain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
     });
 
     try {
