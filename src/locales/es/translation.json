@@ -330,6 +330,7 @@
     "cashbalanceinitial": "Establecer Saldo Inicial",
     "cardbalancealert": "Alerta de saldo bajo en la tarjeta: ${{balance}}",
     "walletbalancealert": "Alerta de saldo bajo en la cartera: ${{balance}}",
+    "cardManagementNotice":"Actualmente, esta aplicación solo permite gestionar una tarjeta (crédito o débito) a la vez. Si desea controlar ambas, puede gestionarlas como una sola combinando sus saldos. Estamos trabajando activamente para añadir compatibilidad con varias tarjetas en futuras actualizaciones.",
     "modals": {
       "addCard": {
         "title": "Agregar Detalles de Tarjeta",
