@@ -226,7 +226,7 @@
     "goalName": "Goal Name",
     "targetAmount": "Target Amount",
     "currentAmount": "Current Amount",
-    "progress": "Progress",
+    "progress": "{{percentage}}% of your goal achieved",
     "allocate": "Allocate",
     "modals": {
       "addGoal": {
@@ -330,6 +330,7 @@
     "cashbalanceinitial": "Set Initial Balance",
     "cardbalancealert": "Low card balance alert: ${{balance}}",
     "walletbalancealert": "Low wallet balance alert: ${{balance}}",
+    "cardManagementNotice": "Currently, this app supports managing only one card (credit or debit) at a time. If you want to track both, you can manage them as a single card by combining their balances. We are actively working on adding support for multiple cards in future updates.",
     "modals": {
       "addCard": {
         "title": "Add Card Details",

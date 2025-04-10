@@ -550,3 +550,69 @@ body {
   border-style: solid;
 }
 
+/* Responsive typography */
+html {
+  font-size: 16px;
+}
+
+@media (max-width: 768px) {
+  html {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  html {
+    font-size: 12px;
+  }
+}
+
+/* Responsive grid utilities */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 0 0.5rem;
+  }
+}
+
+/* Responsive table */
+.table-responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.table-responsive table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+/* Responsive modals */
+.modal {
+  max-width: 90%;
+  margin: 0 auto;
+}
+
+@media (max-width: 480px) {
+  .modal {
+    max-width: 100%;
+  }
+}
+
+/* Responsive buttons */
+.button {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+}
+
+@media (max-width: 768px) {
+  .button {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+  }
+}
+

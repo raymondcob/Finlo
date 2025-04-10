@@ -170,7 +170,6 @@ const SavingsGoals = () => {
     localStorage.setItem("goalStatus", JSON.stringify(updatedStatus))
   }
 
-  // Update the renderGoalCard function to apply glassmorphism
   const renderGoalCard = (goal) => {
     const percentage = goal.goalAmount ? Math.floor((goal.currentAmount / goal.goalAmount) * 100) : 0
     const isCompleted = percentage >= 100
@@ -183,14 +182,16 @@ const SavingsGoals = () => {
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: 50 }}
         transition={{ duration: 0.5 }}
-        className="p-6 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md rounded-2xl shadow-lg border border-gray-100/50 dark:border-gray-700/50"
+        className="p-6 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md rounded-2xl shadow-lg border border-gray-100/50 dark:border-gray-700/50 flex flex-col space-y-4"
         style={{
           backdropFilter: "blur(10px)",
           WebkitBackdropFilter: "blur(10px)",
         }}
       >
-        <div className="flex justify-between items-center mb-4 rounded-xl">
-          <h3 className="text-xl font-semibold text-gray-800 dark:text-white">{goal.goalName}</h3>
+        <div className="flex justify-between items-center">
+          <h3 className="text-lg font-semibold text-gray-800 dark:text-white truncate max-w-[70%]">
+            {goal.goalName}
+          </h3>
           {isCompleted ? (
             <Badge count={<CheckCircleOutlined style={{ color: "#52c41a" }} />} className="pulse-animation" />
           ) : (
@@ -206,11 +207,9 @@ const SavingsGoals = () => {
           }}
           className="dark:text-white"
         />
-        <div className="mt-4 flex justify-between items-center rounded-xl">
-          <span className="text-sm text-gray-600 dark:text-gray-300">
-            ${goal.currentAmount || 0} / ${goal.goalAmount}
-          </span>
-          <span className="text-sm text-gray-600 dark:text-gray-300">
+        <div className="flex justify-between items-center text-sm text-gray-600 dark:text-gray-300">
+          <span>${goal.currentAmount || 0} / ${goal.goalAmount}</span>
+          <span>
             {goal.deadline
               ? t("savingsGoals.deadline") + ": " + new Date(goal.deadline).toLocaleDateString()
               : t("savingsGoals.noDeadline")}
@@ -270,10 +269,9 @@ const SavingsGoals = () => {
         </div>
       )}
 
-      {/* Update the Add Savings Goal button to have dotted borders */}
       <motion.div
         variants={itemVariants}
-        className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 flex justify-between items-center"
+        className="relative bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col space-y-4"
       >
         <div>
           <h2 className="text-2xl font-semibold text-gray-800 dark:text-white">{t("savingsGoals.title")}</h2>
@@ -295,7 +293,7 @@ const SavingsGoals = () => {
           <TabPane tab={t("savingsGoals.activeGoals")} key="active">
             <AnimatePresence>
               {activeGoals.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 rounded-full">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                   {activeGoals.map(renderGoalCard)}
                 </div>
               ) : (
@@ -308,7 +306,7 @@ const SavingsGoals = () => {
           <TabPane tab={t("savingsGoals.completedGoals")} key="completed">
             <AnimatePresence>
               {completedGoals.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 rpunded-full ">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                   {completedGoals.map(renderGoalCard)}
                 </div>
               ) : (
@@ -332,5 +330,5 @@ const SavingsGoals = () => {
   )
 }
 
-export default SavingsGoals;
+export default SavingsGoals
 

@@ -124,7 +124,6 @@ const LoginForm = () => {
                 href="#"
                 className="text-sm text-finance-blue-600 hover:text-finance-blue-500 dark:text-finance-blue-400"
               >
-                {t("auth.login.forgotPassword")}
               </a>
             </div>
           </div>

@@ -480,59 +480,59 @@ function DashBoard() {
           </div>
         </div>
 
-        <div className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-6">
-          <div className="p-6 rounded-xl bg-white dark:bg-gray-700 shadow-md border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:shadow-lg">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-finance-blue-900/50 flex items-center justify-center">
-                <FaWallet className="text-blue-600 dark:text-finance-blue-400" />
+        <div className="mt-12 grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
+          <div className="p-4 sm:p-6 rounded-xl bg-white dark:bg-gray-700 shadow-md border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:shadow-lg">
+            <div className="flex items-center gap-3 mb-2 sm:mb-4">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-blue-100 dark:bg-finance-blue-900/50 flex items-center justify-center">
+                <FaWallet className="text-blue-600 dark:text-finance-blue-400 text-sm sm:text-base" />
               </div>
-              <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
+              <span className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">
                 {t("dashboard.totalbalance")}
               </span>
             </div>
-            <p className="text-2xl font-bold text-gray-800 dark:text-white">
+            <p className="text-lg sm:text-2xl font-bold text-gray-800 dark:text-white">
               ${financialData.totalBalance.toLocaleString()}
             </p>
           </div>
 
-          <div className="p-6 rounded-xl bg-white dark:bg-gray-700 shadow-md border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:shadow-lg">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/50 flex items-center justify-center">
-                <FaArrowUp className="text-green-600 dark:text-green-400" />
+          <div className="p-4 sm:p-6 rounded-xl bg-white dark:bg-gray-700 shadow-md border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:shadow-lg">
+            <div className="flex items-center gap-3 mb-2 sm:mb-4">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-green-100 dark:bg-green-900/50 flex items-center justify-center">
+                <FaArrowUp className="text-green-600 dark:text-green-400 text-sm sm:text-base" />
               </div>
-              <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
+              <span className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">
                 {t("dashboard.totalIncome")}
               </span>
             </div>
-            <p className="text-2xl font-bold text-green-600 dark:text-green-400">
+            <p className="text-lg sm:text-2xl font-bold text-green-600 dark:text-green-400">
               ${financialData.totalIncome.toLocaleString()}
             </p>
           </div>
 
-          <div className="p-6 rounded-xl bg-white dark:bg-gray-700 shadow-md border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:shadow-lg">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-900/50 flex items-center justify-center">
-                <FaArrowDown className="text-red-600 dark:text-red-400" />
+          <div className="p-4 sm:p-6 rounded-xl bg-white dark:bg-gray-700 shadow-md border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:shadow-lg">
+            <div className="flex items-center gap-3 mb-2 sm:mb-4">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-red-100 dark:bg-red-900/50 flex items-center justify-center">
+                <FaArrowDown className="text-red-600 dark:text-red-400 text-sm sm:text-base" />
               </div>
-              <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
+              <span className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">
                 {t("dashboard.totalExpenses")}
               </span>
             </div>
-            <p className="text-2xl font-bold text-red-600 dark:text-red-400">
+            <p className="text-lg sm:text-2xl font-bold text-red-600 dark:text-red-400">
               ${financialData.totalExpenses.toLocaleString()}
             </p>
           </div>
 
-          <div className="p-6 rounded-xl bg-white dark:bg-gray-700 shadow-md border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:shadow-lg">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-full bg-yellow-100 dark:bg-amber-900/50 flex items-center justify-center">
-                <FaPiggyBank className="text-yellow-600 dark:text-amber-400" />
+          <div className="p-4 sm:p-6 rounded-xl bg-white dark:bg-gray-700 shadow-md border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:shadow-lg">
+            <div className="flex items-center gap-3 mb-2 sm:mb-4">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-yellow-100 dark:bg-amber-900/50 flex items-center justify-center">
+                <FaPiggyBank className="text-yellow-600 dark:text-amber-400 text-sm sm:text-base" />
               </div>
-              <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
+              <span className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">
                 {t("dashboard.totalSavings")}
               </span>
             </div>
-            <p className="text-2xl font-bold text-yellow-600 dark:text-amber-400">
+            <p className="text-lg sm:text-2xl font-bold text-yellow-600 dark:text-amber-400">
               ${financialData.totalSavings.toLocaleString()}
             </p>
           </div>
@@ -743,7 +743,9 @@ function DashBoard() {
                   />
                   <div className="flex justify-end">
                     <span className="text-xs text-gray-500 dark:text-gray-400">
-                      {Math.round((goal.currentAmount / goal.goalAmount) * 100)}% of your goal achieved
+                      {t("savingsGoals.progress", {
+                        percentage: Math.round((goal.currentAmount / goal.goalAmount) * 100),
+                      })}
                     </span>
                   </div>
                 </div>

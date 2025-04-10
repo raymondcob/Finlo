@@ -42,8 +42,11 @@
       "setBudgetLimits": "💡 Establece límites de presupuesto para un mejor control de tus gastos"
     },
     "buttons": {
+      "noActiveGoals": "No hay objetivos activos",
+      "setBudgetLimits": "Establecer Límites de Presupuesto",
+      "recentTransactions": "Ver Transacciones Recientes",
       "showAllTransactions": "Mostrar todas las transacciones",
-      "manageSavingsGoals": "Gestionar metas de ahorro"
+      "manageSavingsGoals": "Gestionar objetivos de ahorro"
     }
   },
   "transactions": {
@@ -226,7 +229,7 @@
     "goalName": "Nombre del Objetivo",
     "targetAmount": "Cantidad Objetivo",
     "currentAmount": "Cantidad Actual",
-    "progress": "Progreso",
+    "progress": "{{percentage}}% de tu objetivo alcanzado",
     "allocate": "Asignar",
     "modals": {
       "addGoal": {
@@ -330,6 +333,7 @@
     "cashbalanceinitial": "Establecer Saldo Inicial",
     "cardbalancealert": "Alerta de saldo bajo en la tarjeta: ${{balance}}",
     "walletbalancealert": "Alerta de saldo bajo en la cartera: ${{balance}}",
+    "cardManagementNotice": "Actualmente, esta aplicación solo admite la gestión de una tarjeta (crédito o débito) a la vez. Si deseas realizar un seguimiento de ambas, puedes gestionarlas como una sola tarjeta combinando sus saldos. Estamos trabajando activamente para agregar soporte para múltiples tarjetas en futuras actualizaciones.",
     "modals": {
       "addCard": {
         "title": "Agregar Detalles de Tarjeta",

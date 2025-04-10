@@ -174,11 +174,14 @@ const AddTransactionModal = ({ open, onClose, onAddTransaction, cardBalance, wal
     const IconComponent = categoryIcons[item.value] || FaWallet
 
     return (
-      <div className="flex items-center gap-2">
-        <div className="h-8 w-8 rounded-full flex items-center justify-center" style={{ backgroundColor: "#fdaa60" }}>
-          <IconComponent className="text-white" />
+      <div className="flex items-center gap-3">
+        <div
+          className="h-10 w-10 rounded-full flex items-center justify-center"
+          style={{ backgroundColor: "#0c8de0" }} // Finance-themed blue color
+        >
+          <IconComponent className="text-white text-lg" />
         </div>
-        <span className="text-sm">{item.label}</span>
+        <span className="text-sm font-medium text-gray-800 dark:text-gray-200">{item.label}</span>
       </div>
     )
   }

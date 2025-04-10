@@ -453,48 +453,94 @@ const Transactions = () => {
   }
 
   const renderCategoryTag = (transaction) => {
-    // Ensure we have a valid category
-    if (!transaction?.category) return null
+    if (!transaction?.category) return null;
 
-    // Normalize the category by converting to lowercase and removing spaces
     const normalizedCategory = transaction.category
       .toLowerCase()
       .replace(/\s+/g, "")
-      .replace(/[^a-z0-9/]/g, "") // Keep slashes for categories like "gym/fitness"
+      .replace(/[^a-z0-9/]/g, "");
 
-    // Determine category type
-    let categoryType = "lifestyle" // default
+    let categoryType = "lifestyle";
     if (transaction.type === "Income") {
-      categoryType = "income"
+      categoryType = "income";
     } else {
-      // Check if category exists in essentialExpenses array using normalized comparison
-      const isEssential = essentialExpenses.some((cat) => cat.value.toLowerCase() === normalizedCategory)
-      categoryType = isEssential ? "essential" : "lifestyle"
+      const isEssential = essentialExpenses.some(
+        (cat) => cat.value.toLowerCase() === normalizedCategory
+      );
+      categoryType = isEssential ? "essential" : "lifestyle";
     }
 
-    // Debug log to help identify category matching
-    console.log("Category matching:", {
-      originalCategory: transaction.category,
-      normalizedCategory,
-      categoryType,
-      translationKey: `transactions.categories.${categoryType}.${normalizedCategory}`,
-    })
-
     return (
-      <Tag
+      <div
         key={`${transaction.id}-${normalizedCategory}`}
-        color={getCategoryColor(transaction.type, categoryType)}
-        className="flex items-center gap-2 w-max rounded-full px-2 py-1"
+        className="inline-flex items-center gap-2 px-2 py-0.5 rounded-md text-sm font-medium"
+        style={{
+          backgroundColor:
+            transaction.type === "Income"
+              ? "rgba(32, 183, 124, 0.1)"
+              : categoryType === "essential"
+              ? "rgba(249, 106, 22, 0.1)"
+              : "rgba(12, 141, 224, 0.1)",
+          border: `1px solid ${
+            transaction.type === "Income"
+              ? "rgba(32, 183, 124, 0.3)"
+              : categoryType === "essential"
+              ? "rgba(249, 106, 22, 0.3)"
+              : "rgba(12, 141, 224, 0.3)"
+          }`,
+          backdropFilter: "blur(6px)",
+          borderRadius: "6px", // Less rounded border
+        }}
       >
         {getCategoryIcon(normalizedCategory)}
-        <span className="text-sm font-inter font-normal text-white">
+        <span
+          className={`${
+            transaction.type === "Income"
+              ? "text-green-600"
+              : categoryType === "essential"
+              ? "text-orange-600"
+              : "text-blue-600"
+          }`}
+        >
           {transaction.type.toLowerCase() === "income"
             ? t(`transactions.categories.income.${normalizedCategory}`)
             : t(`transactions.categories.${categoryType}.${normalizedCategory}`)}
         </span>
-      </Tag>
-    )
-  }
+      </div>
+    );
+  };
+
+  const renderTypeTag = (type) => (
+    <div
+      className="inline-flex items-center px-2 py-0.5 rounded-md text-sm font-medium"
+      style={{
+        backgroundColor: type === "Income" ? "rgba(32, 183, 124, 0.1)" : "rgba(249, 106, 22, 0.1)",
+        border: `1px solid ${type === "Income" ? "rgba(32, 183, 124, 0.3)" : "rgba(249, 106, 22, 0.3)"}`,
+        backdropFilter: "blur(6px)",
+        borderRadius: "6px", // Less rounded border
+      }}
+    >
+      <span className={type === "Income" ? "text-green-600" : "text-orange-600"}>
+        {t(`transactions.type.${type.toLowerCase()}`)}
+      </span>
+    </div>
+  );
+
+  const renderPaymentMethodTag = (method) => (
+    <div
+      className="inline-flex items-center px-2 py-0.5 rounded-md text-sm font-medium"
+      style={{
+        backgroundColor: method === "Card" ? "rgba(12, 141, 224, 0.1)" : "rgba(32, 183, 124, 0.1)",
+        border: `1px solid ${method === "Card" ? "rgba(12, 141, 224, 0.3)" : "rgba(32, 183, 124, 0.3)"}`,
+        backdropFilter: "blur(6px)",
+        borderRadius: "6px", // Less rounded border
+      }}
+    >
+      <span className={method === "Card" ? "text-blue-600" : "text-green-600"}>
+        {t(`transactions.payment.${method.toLowerCase()}`)}
+      </span>
+    </div>
+  );
 
   const getLocale = (language) => {
     const locales = {
@@ -571,11 +617,7 @@ const Transactions = () => {
         { text: t("transactions.type.income"), value: "Income" },
       ],
       onFilter: (value, record) => record.type.includes(value),
-      render: (type) => (
-        <Tag color={type === "Income" ? "#20b77c" : "#f96a16"} className="rounded-full px-3 py-1">
-          {t(`transactions.type.${type.toLowerCase()}`)}
-        </Tag>
-      ),
+      render: (type) => renderTypeTag(type),
     },
     {
       title: t("transactions.provider"),
@@ -594,11 +636,7 @@ const Transactions = () => {
         { text: t("transactions.payment.card"), value: "Card" },
       ],
       onFilter: (value, record) => record.paymentMethod.includes(value),
-      render: (method) => (
-        <Tag color={method === "Card" ? "#0c8de0" : "#20b77c"} className="rounded-full px-3 py-1">
-          {t(`transactions.payment.${method.toLowerCase()}`)}
-        </Tag>
-      ),
+      render: (method) => renderPaymentMethodTag(method),
     },
     {
       title: t("transactions.date"),
@@ -698,29 +736,47 @@ const Transactions = () => {
         return dateB - dateA
       })}
       renderItem={(item) => (
-        <motion.div variants={itemVariants} initial="hidden" animate="visible" className="mb-4">
+        <motion.div
+          variants={itemVariants}
+          initial="hidden"
+          animate="visible"
+          className="mb-4"
+        >
           <Card className="w-full shadow-md dark:bg-gray-800 dark:border-gray-700">
-            <div className="flex justify-between items-center mb-2">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-2">
               <div className="flex items-center">
                 {renderCategoryTag(item)}
-                <Tag color={item.type === "Income" ? "#20b77c" : "#f96a16"} className="ml-2 rounded-full px-3 py-1">
+                <Tag
+                  color={item.type === "Income" ? "#20b77c" : "#f96a16"}
+                  className="ml-2 rounded-md px-2 py-0.5 text-xs sm:text-sm"
+                >
                   {t(`transactions.type.${item.type.toLowerCase()}`)}
                 </Tag>
               </div>
-              <Text strong className="dark:text-gray-200 text-xs">
+              <Text
+                strong
+                className="dark:text-gray-200 text-xs sm:text-sm mt-2 sm:mt-0"
+              >
                 {formatMobileDate(item.date)}
               </Text>
             </div>
-            <div className="flex justify-between items-center mb-2">
-              <Text className="text-gray-600 dark:text-gray-300 truncate max-w-[150px]">{item.provider}</Text>
-              <Tag color={item.paymentMethod === "Card" ? "#0c8de0" : "#20b77c"} className="rounded-full px-3 py-1">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-2">
+              <Text className="text-gray-600 dark:text-gray-300 truncate max-w-full sm:max-w-[150px] text-xs sm:text-sm">
+                {item.provider}
+              </Text>
+              <Tag
+                color={item.paymentMethod === "Card" ? "#0c8de0" : "#20b77c"}
+                className="rounded-md px-2 py-0.5 text-xs sm:text-sm mt-2 sm:mt-0"
+              >
                 {t(`transactions.payment.${item.paymentMethod.toLowerCase()}`)}
               </Tag>
             </div>
             <div className="flex justify-end items-center">
               <Text
                 className={`text-lg font-semibold ${
-                  item.type === "Income" ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"
+                  item.type === "Income"
+                    ? "text-green-600 dark:text-green-400"
+                    : "text-red-600 dark:text-red-400"
                 }`}
               >
                 {item.type === "Income" ? "+" : "-"}${item.amount.toFixed(2)}
@@ -740,13 +796,16 @@ const Transactions = () => {
         transition={{ duration: 0.5 }}
         className="flex flex-col md:flex-row justify-between items-center mb-6 bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700"
       >
-        <Title level={2} className="mb-4 md:mb-0 text-gray-800 dark:text-white">
+        <Title
+          level={2}
+          className="mb-4 md:mb-0 text-gray-800 dark:text-white text-lg sm:text-2xl"
+        >
           {t("transactions.title")}
         </Title>
         <Button
           type="default"
           onClick={() => setIsModalOpen(true)}
-          className="bg-transparent hover:bg-finance-blue-50 dark:hover:bg-finance-blue-900/30 text-finance-blue-600 dark:text-finance-blue-400 border-2 border-dashed border-finance-blue-300 dark:border-finance-blue-700 hover:border-finance-blue-500 dark:hover:border-finance-blue-500 flex items-center gap-2"
+          className="bg-transparent hover:bg-finance-blue-50 dark:hover:bg-finance-blue-900/30 text-finance-blue-600 dark:text-finance-blue-400 border-2 border-dashed border-finance-blue-300 dark:border-finance-blue-700 hover:border-finance-blue-500 dark:hover:border-finance-blue-500 flex items-center gap-2 text-sm sm:text-base"
           icon={<FaPlus />}
         >
           {t("transactions.addtransaction")}
@@ -768,6 +827,7 @@ const Transactions = () => {
             rowKey={(record) => record.id}
             pagination={{ pageSize: 6 }}
             scroll={{ x: true }}
+            className="text-xs sm:text-sm"
           />
         )}
       </motion.div>
