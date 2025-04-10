@@ -226,7 +226,7 @@
     "goalName": "Goal Name",
     "targetAmount": "Target Amount",
     "currentAmount": "Current Amount",
-    "progress": "Progress",
+    "progress": "{{percentage}}% of your goal achieved",
     "allocate": "Allocate",
     "modals": {
       "addGoal": {

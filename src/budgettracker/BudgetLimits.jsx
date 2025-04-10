@@ -456,36 +456,36 @@ const BudgetLimits = () => {
       animate={{ opacity: 1 }}
       className="space-y-6 bg-gray-50 dark:bg-gray-900"
     >
-      <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
-        <div className="flex justify-between items-center mb-6">
-          <div>
-            <h1 className="text-2xl font-semibold text-gray-800 dark:text-white">
-              {t("budgets.title")}
-            </h1>
-            <p className="text-gray-600 dark:text-gray-300">
-              {t("budgets.subtitle")}
-            </p>
-          </div>
-          <Button
-            type="default"
-            onClick={() => setIsModalVisible(true)}
-            className="bg-transparent hover:bg-finance-blue-50 dark:hover:bg-finance-blue-900/30 text-finance-blue-600 dark:text-finance-blue-400 border-2 border-dashed border-finance-blue-300 dark:border-finance-blue-700 hover:border-finance-blue-500 dark:hover:border-finance-blue-500"
-          >
-            {t("budgets.setLimit")}
-          </Button>
+      <motion.div
+        className="relative bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col space-y-4"
+      >
+        <div className="flex flex-col space-y-2">
+          <h2 className="text-2xl font-semibold text-gray-800 dark:text-white">
+            {t("budgets.title")}
+          </h2>
+          <p className="text-gray-600 dark:text-gray-300">
+            {t("budgets.subtitle")}
+          </p>
         </div>
+        <Button
+          type="default"
+          onClick={() => setIsModalVisible(true)}
+          className="bg-transparent hover:bg-finance-blue-50 dark:hover:bg-finance-blue-900/30 text-finance-blue-600 dark:text-finance-blue-400 border-2 border-dashed border-finance-blue-300 dark:border-finance-blue-700 hover:border-finance-blue-500 dark:hover:border-finance-blue-500"
+        >
+          {t("budgets.setLimit")}
+        </Button>
+      </motion.div>
 
-        {Object.entries(categories).map(([groupKey, group]) => (
-          <div key={group.title} className="mb-6 mt-6">
-            <h2 className="text-xl font-semibold mb-4 text-gray-700 dark:text-gray-200 ">
-              {group.title}
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {group.items.map((item) => renderCategoryCard(item))}
-            </div>
+      {Object.entries(categories).map(([groupKey, group]) => (
+        <div key={group.title} className="mb-6 mt-6">
+          <h2 className="text-xl font-semibold mb-4 text-gray-700 dark:text-gray-200 ">
+            {group.title}
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {group.items.map((item) => renderCategoryCard(item))}
           </div>
-        ))}
-      </div>
+        </div>
+      ))}
 
       <Modal
         title={t("budgets.setLimitTitle")}

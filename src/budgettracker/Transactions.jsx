@@ -502,6 +502,42 @@ const Transactions = () => {
     );
   };
 
+  const renderTypeTag = (type) => (
+    <div
+      className="inline-flex items-center px-2 py-0.5 rounded-md text-sm font-medium"
+      style={{
+        backgroundColor:
+          type === "Income" ? "rgba(32, 183, 124, 0.1)" : "rgba(249, 106, 22, 0.1)",
+        border: `1px solid ${
+          type === "Income" ? "rgba(32, 183, 124, 0.3)" : "rgba(249, 106, 22, 0.3)"
+        }`,
+        backdropFilter: "blur(6px)",
+      }}
+    >
+      <span className={type === "Income" ? "text-green-600" : "text-orange-600"}>
+        {t(`transactions.type.${type.toLowerCase()}`)}
+      </span>
+    </div>
+  );
+
+  const renderPaymentMethodTag = (method) => (
+    <div
+      className="inline-flex items-center px-2 py-0.5 rounded-md text-sm font-medium"
+      style={{
+        backgroundColor:
+          method === "Card" ? "rgba(12, 141, 224, 0.1)" : "rgba(32, 183, 124, 0.1)",
+        border: `1px solid ${
+          method === "Card" ? "rgba(12, 141, 224, 0.3)" : "rgba(32, 183, 124, 0.3)"
+        }`,
+        backdropFilter: "blur(6px)",
+      }}
+    >
+      <span className={method === "Card" ? "text-blue-600" : "text-green-600"}>
+        {t(`transactions.payment.${method.toLowerCase()}`)}
+      </span>
+    </div>
+  );
+
   const getLocale = (language) => {
     const locales = {
       en: enUS,
@@ -583,14 +619,7 @@ const Transactions = () => {
         { text: t("transactions.type.income"), value: "Income" },
       ],
       onFilter: (value, record) => record.type.includes(value),
-      render: (type) => (
-        <Tag
-          color={type === "Income" ? "#20b77c" : "#f96a16"}
-          className="rounded-full px-3 py-1"
-        >
-          {t(`transactions.type.${type.toLowerCase()}`)}
-        </Tag>
-      ),
+      render: (type) => renderTypeTag(type),
     },
     {
       title: t("transactions.provider"),
@@ -611,14 +640,7 @@ const Transactions = () => {
         { text: t("transactions.payment.card"), value: "Card" },
       ],
       onFilter: (value, record) => record.paymentMethod.includes(value),
-      render: (method) => (
-        <Tag
-          color={method === "Card" ? "#0c8de0" : "#20b77c"}
-          className="rounded-full px-3 py-1"
-        >
-          {t(`transactions.payment.${method.toLowerCase()}`)}
-        </Tag>
-      ),
+      render: (method) => renderPaymentMethodTag(method),
     },
     {
       title: t("transactions.date"),
@@ -733,12 +755,7 @@ const Transactions = () => {
             <div className="flex justify-between items-center mb-2">
               <div className="flex items-center">
                 {renderCategoryTag(item)}
-                <Tag
-                  color={item.type === "Income" ? "#20b77c" : "#f96a16"}
-                  className="ml-2 rounded-full px-3 py-1"
-                >
-                  {t(`transactions.type.${item.type.toLowerCase()}`)}
-                </Tag>
+                {renderTypeTag(item.type)}
               </div>
               <Text strong className="dark:text-gray-200 text-xs">
                 {formatMobileDate(item.date)}
@@ -748,12 +765,7 @@ const Transactions = () => {
               <Text className="text-gray-600 dark:text-gray-300 truncate max-w-[150px]">
                 {item.provider}
               </Text>
-              <Tag
-                color={item.paymentMethod === "Card" ? "#0c8de0" : "#20b77c"}
-                className="rounded-full px-3 py-1"
-              >
-                {t(`transactions.payment.${item.paymentMethod.toLowerCase()}`)}
-              </Tag>
+              {renderPaymentMethodTag(item.paymentMethod)}
             </div>
             <div className="flex justify-end items-center">
               <Text
