@@ -501,7 +501,7 @@ const Transactions = () => {
           backdropFilter: "blur(6px)",
         }}
       >
-        {getCategoryIcon(normalizedCategory)}
+        <div className="mr-2">{getCategoryIcon(normalizedCategory)}</div> {/* Added spacing */}
         <span
           className={`${
             transaction.type === "Income"
