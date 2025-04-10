@@ -5,7 +5,7 @@ import DashBoard from "../budgettracker/dashboard";
 import Transactions from "../budgettracker/Transactions";
 import Reports from "../budgettracker/Reports";
 import Income from "../budgettracker/Incomesources";
-import Settings from "../budgettracker/settings";
+import Settings from "../budgettracker/Settings";
 import SavingsGoals from "../budgettracker/SavingsGoals";
 import BudgetLimits from "../budgettracker/BudgetLimits";
 import PrivateRoute from "./PrivateRoute";
