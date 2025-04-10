@@ -116,9 +116,7 @@ const IncomeSources = () => {
     <motion.div variants={containerVariants} initial="hidden" animate="visible" className="space-y-6 p-4">
       <motion.div variants={itemVariants} className="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-xl shadow-sm mb-6">
         <p className="text-blue-700 dark:text-blue-300 text-sm mb-4">
-          {t(
-            "incomesources.cardManagementNotice"
-          )}
+          {t("incomesources.cardManagementNotice")}
         </p>
         <h1 className="text-xl sm:text-2xl font-semibold text-gray-800 dark:text-white mb-2">
           {t("incomesources.title")}

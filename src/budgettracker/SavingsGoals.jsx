@@ -270,14 +270,13 @@ const SavingsGoals = () => {
         </div>
       )}
 
-      {/* Update the Add Savings Goal button to have dotted borders */}
       <motion.div
         variants={itemVariants}
-        className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 flex justify-between items-center"
+        className="relative bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col space-y-4"
       >
-        <div>
+        <div className="flex flex-col space-y-2">
           <h2 className="text-2xl font-semibold text-gray-800 dark:text-white">{t("savingsGoals.title")}</h2>
-          <p className="text-gray-600 dark:text-gray-300 mt-1">{t("savingsGoals.subtitle")}</p>
+          <p className="text-gray-600 dark:text-gray-300">{t("savingsGoals.subtitle")}</p>
         </div>
         <Button
           type="default"
@@ -332,5 +331,5 @@ const SavingsGoals = () => {
   )
 }
 
-export default SavingsGoals;
+export default SavingsGoals
 
