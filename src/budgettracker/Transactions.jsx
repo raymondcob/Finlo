@@ -463,21 +463,17 @@ const Transactions = () => {
   };
 
   const renderCategoryTag = (transaction) => {
-    // Ensure we have a valid category
     if (!transaction?.category) return null;
 
-    // Normalize the category by converting to lowercase and removing spaces
     const normalizedCategory = transaction.category
       .toLowerCase()
       .replace(/\s+/g, "")
-      .replace(/[^a-z0-9/]/g, ""); // Keep slashes for categories like "gym/fitness"
+      .replace(/[^a-z0-9/]/g, "");
 
-    // Determine category type
-    let categoryType = "lifestyle"; // default
+    let categoryType = "lifestyle";
     if (transaction.type === "Income") {
       categoryType = "income";
     } else {
-      // Check if category exists in essentialExpenses array using normalized comparison
       const isEssential = essentialExpenses.some(
         (cat) => cat.value.toLowerCase() === normalizedCategory
       );
@@ -485,26 +481,47 @@ const Transactions = () => {
     }
 
     return (
-      <Tag
+      <div
         key={`${transaction.id}-${normalizedCategory}`}
-        color={getCategoryColor(transaction.type, categoryType)}
-        className="flex items-center gap-2 w-max rounded-full px-2 py-1"
+        className="inline-flex items-center px-2 py-0.5 rounded-full text-sm font-medium"
+        style={{
+          backgroundColor:
+            transaction.type === "Income"
+              ? "rgba(32, 183, 124, 0.1)"
+              : categoryType === "essential"
+              ? "rgba(249, 106, 22, 0.1)"
+              : "rgba(12, 141, 224, 0.1)",
+          border: `1px solid ${
+            transaction.type === "Income"
+              ? "rgba(32, 183, 124, 0.3)"
+              : categoryType === "essential"
+              ? "rgba(249, 106, 22, 0.3)"
+              : "rgba(12, 141, 224, 0.3)"
+          }`,
+          backdropFilter: "blur(6px)",
+        }}
       >
         {getCategoryIcon(normalizedCategory)}
-        <span className="text-sm font-inter font-normal text-white">
+        <span
+          className={`${
+            transaction.type === "Income"
+              ? "text-green-600"
+              : categoryType === "essential"
+              ? "text-orange-600"
+              : "text-blue-600"
+          }`}
+        >
           {transaction.type.toLowerCase() === "income"
             ? t(`transactions.categories.income.${normalizedCategory}`)
-            : t(
-                `transactions.categories.${categoryType}.${normalizedCategory}`
-              )}
+            : t(`transactions.categories.${categoryType}.${normalizedCategory}`)}
         </span>
-      </Tag>
+      </div>
     );
   };
 
   const renderTypeTag = (type) => (
     <div
-      className="inline-flex items-center px-2 py-0.5 rounded-md text-sm font-medium"
+      className="inline-flex items-center px-2 py-0.5 rounded-full text-sm font-medium"
       style={{
         backgroundColor:
           type === "Income" ? "rgba(32, 183, 124, 0.1)" : "rgba(249, 106, 22, 0.1)",
@@ -522,7 +539,7 @@ const Transactions = () => {
 
   const renderPaymentMethodTag = (method) => (
     <div
-      className="inline-flex items-center px-2 py-0.5 rounded-md text-sm font-medium"
+      className="inline-flex items-center px-2 py-0.5 rounded-full text-sm font-medium"
       style={{
         backgroundColor:
           method === "Card" ? "rgba(12, 141, 224, 0.1)" : "rgba(32, 183, 124, 0.1)",
