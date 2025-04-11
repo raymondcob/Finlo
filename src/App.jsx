@@ -48,7 +48,7 @@ function App() {
       </UserProvider>
     </LoadingProvider>
 
-    <Analytics /> // Add this line to include Vercel Analytics
+    <Analytics mode="production" /> // Add this line to include Vercel Analytics
 
     </>
   );
